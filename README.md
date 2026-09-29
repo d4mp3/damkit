@@ -25,8 +25,9 @@ devkit dostarcza:
 6. [Workflowy](#workflowy)
 7. [Bezpieczeństwo: hook read-only](#bezpieczeństwo-hook-read-only)
 8. [Dokumentacja i decyzje](#dokumentacja-i-decyzje)
-9. [Rozwijanie devkitu](#rozwijanie-devkitu)
-10. [Zawartość repo](#zawartość-repo)
+9. [Codex](#codex)
+10. [Rozwijanie devkitu](#rozwijanie-devkitu)
+11. [Zawartość repo](#zawartość-repo)
 
 ---
 
@@ -34,7 +35,7 @@ devkit dostarcza:
 
 ```bash
 # 1. raz na maszynę: zarejestruj to repo jako marketplace (ścieżka lokalna lub URL gita)
-claude plugin marketplace add ~/dev/claude-config
+claude plugin marketplace add ~/dev/devkit
 
 # 2. w każdym projekcie, w którym chcesz devkit:
 cd ~/dev/moj-projekt
@@ -44,7 +45,7 @@ claude plugin install devkit@dampe --scope project   # zapisuje .claude/settings
 claude plugin marketplace update dampe
 ```
 
-Test bez instalacji: `claude --plugin-dir ~/dev/claude-config`.
+Test bez instalacji: `claude --plugin-dir ~/dev/devkit`.
 
 Nowy projekt: skopiuj [`templates/CLAUDE.project.md`](templates/CLAUDE.project.md) jako `CLAUDE.md`
 i uzupełnij tylko to, czego nie da się odczytać z kodu: komendy, CRS, design, cel deployu.
@@ -305,7 +306,7 @@ Rozmowa: "geometrie trzymamy w 2180 czy 4326?" → decyzja
 
 ```
 1. claude plugin install devkit@dampe --scope project
-2. cp ~/dev/claude-config/templates/CLAUDE.project.md CLAUDE.md → uzupełnij (bez sekcji, które nie dotyczą)
+2. cp ~/dev/devkit/templates/CLAUDE.project.md CLAUDE.md → uzupełnij (bez sekcji, które nie dotyczą)
 3. /devkit:adr dla pierwszych decyzji (stack, CRS, fundament design systemu, deploy)
 4. Frontend? → workflow 5 (design system) przed pierwszymi ekranami
 5. Pierwszy feature → workflow 1
@@ -376,6 +377,24 @@ Decyzje dotyczące samego devkitu:
 | [0008](docs/adr/0008-explicit-effort-per-role.md) | jawny `effort` per rola |
 | [0009](docs/adr/0009-ui-quality-through-design-system.md) | jakość UI przez design system i zrzuty, bez agenta-designera |
 | [0010](docs/adr/0010-typescript-files-only-as-assets.md) | bez agentów od TS; pliki TS/CSS tylko jako assety |
+| [0011](docs/adr/0011-codex-variant-as-independent-copy.md) | wariant dla Codex CLI jako niezależna kopia w `codex/` |
+| [0012](docs/adr/0012-codex-guard-as-plugin-hook.md) | guard read-only w Codeksie jako hook pluginu filtrowany po `agent_type` |
+
+---
+
+## Codex
+
+Katalog [`codex/`](codex/README.md) zawiera **niezależną wersję devkitu dla Codex CLI** i modeli
+OpenAI: plugin ze skillami, 9 ról jako agenci TOML, guard read-only i sandbox. To osobna kopia plików,
+a nie symlinki ([ADR-0011](docs/adr/0011-codex-variant-as-independent-copy.md)). Instalacja i różnice
+względem wersji Claude są w [`codex/README.md`](codex/README.md).
+
+```bash
+codex plugin marketplace add ~/dev/devkit/codex        # raz na maszynę
+codex plugin add devkit@dampe                                 # skille + guard read-only
+python3 ~/dev/devkit/codex/scripts/install_agents.py ~/dev/moj-projekt   # role
+cp ~/dev/devkit/codex/templates/AGENTS.project.md ~/dev/moj-projekt/AGENTS.md
+```
 
 ---
 
@@ -418,7 +437,8 @@ templates/
 docs/
   dokumentacja.md          # jak prowadzimy dokumentację
   design-system.md         # workflow design systemu
-  adr/                     # decyzje (0001–0010)
+  adr/                     # decyzje (0001–0012)
 CLAUDE.md                  # instrukcje dla Claude przy pracy nad tym repo
+codex/                     # niezależna wersja dla Codex CLI (patrz codex/README.md)
 _archive/agents-v1/        # poprzednie wersje agentów (niewczytywane)
 ```

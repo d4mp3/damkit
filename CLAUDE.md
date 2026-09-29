@@ -6,7 +6,7 @@ Human docs are in Polish (README, docs/), model-facing files in English (ADR-000
 ## Commands
 - Validate manifests: `claude plugin validate .`
 - Guard hook tests: `python3 hooks/test_guard_readonly.py`
-- Try the plugin without installing: `claude --plugin-dir .` (from any project dir: `--plugin-dir ~/dev/claude-config`)
+- Try the plugin without installing: `claude --plugin-dir .` (from any project dir: `--plugin-dir ~/dev/devkit`)
 - Refresh an installed copy: `claude plugin marketplace update dampe`
 
 ## Conventions
@@ -28,3 +28,5 @@ Human docs are in Polish (README, docs/), model-facing files in English (ADR-000
 - Documentation follows `skills/documenting-code`. Record decisions as ADRs in `docs/adr/`, and
   when adding one, add a row to the ADR table in README.md.
 - `_archive/` holds the old v1 agents. They are not loaded; don't edit them.
+- `codex/` is an independent Codex variant (ADR-0011). When changing `skills/`, `agents/` or `hooks/`,
+  consider porting the change there and run `python3 codex/scripts/check.py`.

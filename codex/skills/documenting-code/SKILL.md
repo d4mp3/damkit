@@ -1,0 +1,82 @@
+---
+name: documenting-code
+description: Use when writing or updating any documentation - README, docstrings, code comments, AGENTS.md, runbooks, docs/ pages, CLI help, API docs - or when deciding whether something should be documented at all, or when existing docs look stale or contradict the code.
+---
+
+# Documenting code
+
+Documentation exists to carry what the code cannot. Anything a reader (human or LLM) can
+reliably reconstruct from the code is a liability in prose: it goes stale, and stale docs
+are worse than none because readers trust them over the code.
+
+## Decide first: write, generate, or skip
+
+For each piece of information, ask in this order:
+
+1. **Can it be derived from the code?** (what a function does, its parameters, the module
+   structure). If so, **skip it.** Improve names and types instead.
+2. **Can it be generated from the code?** (the API schema, the config schema, CLI help, the list of
+   env vars). If so, **generate it** in CI: FastAPI → OpenAPI, Pydantic → JSON Schema,
+   Typer/argparse → `--help`, docstrings → mkdocstrings.
+3. **Only a human knows it?** (why, constraints, decisions, operations, domain context). If so,
+   **write it**, in the place listed below.
+
+## Where each kind of knowledge goes
+
+| Knowledge | Place | Rule |
+|---|---|---|
+| Why this non-obvious code is like this | a comment at that line | The *why* or the hazard, never the *what*. |
+| The contract of a public function or class | its docstring | Semantics the types don't show: units, CRS, invariants, side effects, raised errors. |
+| A decision with alternatives | `docs/adr/NNNN-*.md` | Use the adr skill. It is never edited after acceptance; supersede it instead. |
+| How to run, test and deploy | `README.md` | A quickstart that CI actually executes, or at least the same commands CI runs. |
+| Facts an AI assistant needs | `AGENTS.md` | Short (aim for under 100 lines), only what isn't inferable, with pointers instead of copies. |
+| How to operate or recover | `docs/runbooks/*.md` | Task-oriented, copy-pasteable commands, with a "last verified" date. |
+| Domain concepts (forestry, GIS rules) | `docs/explanation/*.md` | Kept stable. It links to code, it doesn't restate it. |
+
+This follows the Diátaxis split: tutorials, how-to guides (runbooks), reference (generated),
+and explanation (ADRs, domain). Don't mix the modes in one page.
+
+## Writing rules
+
+- **Concrete over general.** Write "EPSG:2180, metres" and not "a projected CRS". Write `uv run pytest -q` and not "run the tests".
+- **One source of truth.** Link to the canonical place and don't copy. Two copies means one is wrong.
+- **Same change, same PR.** When behavior changes, update the docs that describe it in the same diff.
+  If a doc no longer matches and nobody will maintain it, delete it.
+- **Date what decays.** Runbooks and setup guides carry `Last verified: YYYY-MM-DD (versions)`.
+- **No marketing, no filler.** Every sentence either instructs, constrains or explains a reason.
+
+## Comments: good vs noise
+
+```python
+# noise: restates the code
+# loop over features and check validity
+for f in features:
+    ...
+
+# useful: explains a constraint the code cannot show
+# fid is not stable across GeoPackage re-exports; match on the business key instead.
+key = f["properties"]["nr_wydz"]
+
+# useful: marks a hazard with a reference
+# PgBouncer runs in transaction mode: server-side cursors break (see ADR-0007).
+DISABLE_SERVER_SIDE_CURSORS = True
+```
+
+`TODO` comments need a reason and an issue/ADR reference, or they are just noise.
+
+## AGENTS.md specifically
+
+- Put in it the commands, the architecture in 3–10 bullets, conventions the code doesn't enforce, and the deploy target.
+- Keep out of it the code tours, style rules a linter enforces, and anything duplicated from README.
+- Add a line when you had to correct the assistant twice for the same thing. Remove lines that
+  stop being true.
+
+## Checking for staleness
+
+When a change renames or removes something (a function, command, env var, flag, endpoint, setting, file):
+
+```bash
+git grep -n -i "<old name>" -- '*.md' '*.rst' '*.txt' 'docs/' '*.py'
+```
+
+Every hit in prose is either updated in the same change or reported as documentation drift.

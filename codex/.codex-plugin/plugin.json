@@ -1,0 +1,22 @@
+{
+  "name": "devkit",
+  "version": "0.6.0",
+  "description": "Technology skills and review/learning workflows for Python/Django/FastAPI, React/TypeScript, PostgreSQL/PostGIS, web maps, Kubernetes/k3s/GitOps, container images and CI/CD. Includes a read-only guard hook for devkit's reviewer roles; the roles themselves ship separately (scripts/install_agents.py).",
+  "author": { "name": "Damian Pszczoła" },
+  "license": "UNLICENSED",
+  "keywords": ["django", "react", "typescript", "postgis", "kubernetes", "k3s", "gitops", "platform-engineering", "gis"],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
+  "interface": {
+    "displayName": "devkit",
+    "shortDescription": "Django, React/TS, PostGIS, k8s and platform engineering skills",
+    "longDescription": "On-demand skills for Django/FastAPI, React/TypeScript, UI building with a design system, web maps, PostgreSQL/PostGIS, geodata validation, Kubernetes/k3s/GitOps, container images and CI/CD, plus review routing, ADRs, documentation rules and a mentor mode.",
+    "developerName": "Damian Pszczoła",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "Review my changes before I commit.",
+      "Teach me how to set up ArgoCD app-of-apps on k3s."
+    ]
+  }
+}

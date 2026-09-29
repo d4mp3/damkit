@@ -9,6 +9,7 @@ GUARD = Path(__file__).with_name("guard_readonly.py")
 
 ALLOW = [
     "kubectl get pods -A -o wide",
+    "bash -lc 'kubectl get pods -A'",
     "kubectl -n apps describe pod web-7d9f",
     "kubectl logs deploy/web --tail=200 --previous",
     "kubectl get events -n apps --sort-by=.lastTimestamp | tail -n 40",
@@ -63,6 +64,10 @@ ALLOW = [
 ]
 
 DENY = [
+    "bash -lc 'kubectl delete pod x'",
+    "/bin/zsh -lc 'git push'",
+    "bash -ec 'git push'",
+    "sh -xc 'rm -rf build'",
     "kubectl apply -f deploy.yaml",
     "kubectl -n apps delete pod web-1",
     "kubectl edit deploy web",

@@ -358,10 +358,11 @@ def check_segment(seg: list[str], raw: str, depth: int = 0) -> None:
         return
     head = seg[0].rsplit("/", 1)[-1]
     args = seg[1:]
-    if head in SHELLS and "-c" in args and depth < 3:
-        i = args.index("-c")
-        if i + 1 < len(args):
-            check_command(args[i + 1], depth + 1)
+    # `-c` may sit in a flag cluster: `bash -lc '...'`, `sh -ec '...'`
+    c_flag = next((i for i, a in enumerate(args) if re.fullmatch(r"-[a-zA-Z]*c[a-zA-Z]*", a)), None)
+    if head in SHELLS and c_flag is not None and depth < 3:
+        if c_flag + 1 < len(args):
+            check_command(args[c_flag + 1], depth + 1)
         return
     if head == "eval" and depth < 3:
         check_command(" ".join(args), depth + 1)
