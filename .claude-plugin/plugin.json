@@ -1,0 +1,8 @@
+{
+  "name": "devkit",
+  "displayName": "devkit — Python/Django, React/TypeScript, PostGIS, Kubernetes & platform engineering",
+  "version": "0.5.0",
+  "description": "Role-based subagents (implement, review, test, investigate cluster, research docs) plus on-demand technology skills for Django/FastAPI, React/TypeScript, UI building with a design system, web maps, PostgreSQL/PostGIS, geodata validation, Kubernetes/k3s/GitOps, container images and CI/CD, and a mentor mode for learning.",
+  "author": { "name": "Damian Pszczoła" },
+  "keywords": ["django", "react", "typescript", "postgis", "kubernetes", "k3s", "gitops", "platform-engineering", "gis"]
+}

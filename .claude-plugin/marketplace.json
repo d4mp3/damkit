@@ -1,0 +1,12 @@
+{
+  "name": "dampe",
+  "owner": { "name": "Damian Pszczoła" },
+  "description": "Personal Claude Code plugins.",
+  "plugins": [
+    {
+      "name": "devkit",
+      "source": "./",
+      "description": "Role-based subagents and technology skills for Python/Django, PostGIS, Kubernetes and platform engineering."
+    }
+  ]
+}
