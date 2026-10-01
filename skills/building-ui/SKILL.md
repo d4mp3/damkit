@@ -24,9 +24,13 @@ Look for: a tokens file (`tokens.css`, `@theme` in the Tailwind v4 CSS, `tailwin
   **to the design system** (with a story), not a one-off in the feature.
 - **It doesn't exist:** don't invent styles inline. Propose a minimal foundation based on
   `${CLAUDE_PLUGIN_ROOT}/skills/building-ui/assets/tokens.css` and a component library, and ask before establishing it.
-  That is a decision worth an ADR.
+  That is a decision worth an ADR (via the domain-modeling skill).
 
 ## 2. Decide what the screen is for (before code, for new screens)
+
+If the layout itself is still an open question (several plausible structures, nobody can pick
+on paper), answer it first with `/prototype` (UI variants on a throwaway route). This skill
+builds the chosen structure for real, inside the design system.
 
 Write 3–5 lines: the user's main task, the **one** primary action, the data density
 (a marketing page, a content page or a data-heavy tool), and the regions (e.g. "filters | map | detail panel").

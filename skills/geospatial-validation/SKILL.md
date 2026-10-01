@@ -5,6 +5,11 @@ description: Use when building or changing tools that validate geospatial data -
 
 # Geospatial data validation
 
+The project's ADRs and `CONTEXT.md` win over this file. The contracts below (error record
+shape, exit codes, rule format) are defaults to propose while grilling or writing the spec, not
+facts: once the project records its own decision, follow that and use its terms (e.g. its word
+for a dataset, a rule or a finding) instead of the ones here.
+
 ## Principles
 
 1. **The validator never mutates input.** Open read-only (pyogrio/fiona read mode,
@@ -15,9 +20,9 @@ description: Use when building or changing tools that validate geospatial data -
 3. **Rules are data.** Rules are defined in YAML, validated against a schema, and have stable
    IDs, so reports stay comparable across versions.
 
-## Error record contract
+## Error record contract (default proposal)
 
-Use one shape in the CLI JSON output, the web service API and the map layer:
+Propose one shape for the CLI JSON output, the web service API and the map layer:
 
 ```json
 {
@@ -39,7 +44,8 @@ Use one shape in the CLI JSON output, the web service API and the map layer:
   which can fall outside the polygon).
 - Output a FeatureCollection of errors as well, so the web service can draw them on the map directly
   (rendering patterns: the web-maps skill).
-- CLI exit codes: `0` valid, `1` validation errors found, `2` usage/config/IO error. CI depends on this.
+- CLI exit codes, proposed baseline: `0` valid, `1` validation errors found, `2` usage/config/IO error.
+  CI depends on them, so whichever codes the project picks deserve an ADR.
 
 ## Rule categories (check in this order and short-circuit)
 

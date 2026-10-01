@@ -24,11 +24,14 @@ To, co da się z kodu wygenerować, generuj. Resztę pomiń.
 |---|---|---|---|
 | Co to jest, jak zainstalować i używać | `README.md` | ludzie | [README](../README.md) |
 | Fakty dla asystenta AI | `CLAUDE.md` | model | [CLAUDE.md](../CLAUDE.md) |
+| Słownik domeny: pojęcia i synonimy, których unikamy | `CONTEXT.md` (skill `domain-modeling`) | obaj | (w projektach) |
 | Decyzje i ich powody | `docs/adr/NNNN-*.md` | obaj | [docs/adr/](adr/) |
+| Co budujemy i dlaczego: spec, tickety | tracker zadań (`/to-spec`, `/to-tickets`) | obaj | (w projektach) |
+| Konfiguracja skilli Matta: tracker, etykiety, układ dokumentów | `docs/agents/*.md` | model | (w projektach) |
 | Jak coś zrobić lub naprawić | `docs/runbooks/*.md` | ludzie w stresie | (w projektach homelab) |
 | Jak pracować w danym obszarze (workflow) | `docs/*.md` (przewodniki how-to) | ludzie | [design-system.md](design-system.md), ten plik |
 | Wizualny kontrakt UI | tokeny + Storybook (generowane z kodu) | obaj | [tokens.css](../skills/building-ui/assets/tokens.css) (startowy) |
-| Pojęcia domenowe | `docs/explanation/*.md` | obaj | (w platformie leśnej) |
+| Dłuższe wyjaśnienia domenowe, których nie zmieści słownik | `docs/explanation/*.md`, linkowane z `CONTEXT.md` | obaj | (w platformie leśnej) |
 | Kontrakt funkcji lub klasy | docstring | obaj | — |
 | Nieoczywiste „dlaczego” w kodzie | komentarz przy linii | obaj | `hooks/guard_readonly.py` |
 
@@ -36,8 +39,9 @@ To, co da się z kodu wygenerować, generuj. Resztę pomiń.
 
 | Zdarzenie | Co robisz | Pomoc devkitu |
 |---|---|---|
-| Podjęta decyzja trudna do odwrócenia | nowy ADR | `/devkit:adr "tytuł"`, model sam to zaproponuje |
-| Zmiana decyzji | nowy ADR z `Supersedes:`, w starym zmieniasz tylko status | skill `adr` |
+| Podjęta decyzja trudna do odwrócenia | nowy ADR | `/grill-with-docs` zapisuje go w trakcie; poza nim skill `domain-modeling` |
+| Zmiana decyzji | nowy ADR, który zastępuje stary; w starym zmieniasz tylko status | skill `domain-modeling` |
+| Nowe pojęcie albo pojęcie zmienia znaczenie | wpis w `CONTEXT.md` | `/grill-with-docs`, `domain-modeling`; `code-reviewer` zgłasza rozjazd |
 | Zmiana zachowania, nazwy, komendy, zmiennej env | aktualizacja dokumentacji **w tym samym diffie** | `code-reviewer` zgłasza nieaktualną dokumentację |
 | Model drugi raz popełnia ten sam błąd | jedna linijka w `CLAUDE.md` | — |
 | Dokument przestał być prawdą i nikt go nie utrzyma | usuwasz go | — |
@@ -51,7 +55,7 @@ To, co da się z kodu wygenerować, generuj. Resztę pomiń.
 - [ ] Czy nowe komentarze mówią „dlaczego”, a nie „co”?
 - [ ] Czy nie dopisałem opisu kodu, który zestarzeje się przy następnej zmianie?
 
-`/devkit:review-changes` sprawdza pierwsze dwa punkty automatycznie.
+`/devkit:review-changes` (`code-reviewer`) sprawdza pierwsze dwa punkty automatycznie.
 
 ## Antywzorce
 

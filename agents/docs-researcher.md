@@ -1,6 +1,6 @@
 ---
 name: docs-researcher
-description: Researches official documentation, changelogs and upstream issues for a specific library, tool or platform version (Django, FastAPI, React, TypeScript, Vite, TanStack Query, MapLibre, OpenLayers, PostGIS, GDAL, k3s, ArgoCD, Tekton, Harbor, GitHub Actions, GitLab CI, etc.). Use when the answer depends on version-specific behavior, a recent change, or a configuration option you are not certain about; it keeps fetched pages out of the main context.
+description: Researches official documentation, changelogs and upstream issues for a specific library, tool or platform version (Django, FastAPI, React, TypeScript, Vite, TanStack Query, MapLibre, OpenLayers, PostGIS, GDAL, k3s, ArgoCD, Tekton, Harbor, GitHub Actions, GitLab CI, etc.). Use when the answer depends on version-specific behavior, a recent change, or a configuration option you are not certain about; it keeps fetched pages out of the main context. Also the agent to dispatch when /research targets library or tool documentation; it returns the report and the parent saves the file.
 tools: WebSearch, WebFetch, Read, Grep, Glob
 model: sonnet
 effort: medium

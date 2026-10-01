@@ -1,10 +1,23 @@
 # <Project name>
 
-<!-- Copy to the project root as CLAUDE.md. Keep it short: only what the model
-     can't infer from the code. Delete the sections that don't apply. -->
+<!-- Copy to the project root as CLAUDE.md, then run /setup-matt-pocock-skills: it appends
+     its own `## Agent skills` block here. Keep it short: only what the model can't infer
+     from the code. Delete the sections that don't apply, but keep `## Workflow`. -->
 
 ## What this is
 <1–3 sentences: purpose, users, where it runs.>
+
+## Workflow
+Process follows Matt Pocock's skills (/grill-with-docs → /to-spec → /to-tickets → /implement).
+devkit adds stack knowledge and specialist agents; it never replaces a step.
+- Project ADRs and `CONTEXT.md` override devkit skills; the contracts those skills describe are
+  proposals until an ADR settles them.
+- After /code-review: if the diff touches auth/permissions/input parsing, models/migrations/SQL,
+  Docker/k8s/CI or frontend, run /devkit:review-changes on the same fixed point and report it
+  as a separate `## Risk` section. Don't merge or rerank it with Standards and Spec.
+- Final test/lint/type run: delegate to devkit:test-runner.
+- Tickets whose blockers are all done may run in parallel, one devkit:implementation-worker
+  per ticket; review once after merging the worktrees.
 
 ## Commands
 - Setup: `uv sync`
@@ -34,7 +47,7 @@
 - Rules: tokens only, no arbitrary Tailwind values; a missing component goes into the design system first
 
 ## Data & GIS
-- Storage CRS: EPSG:2180. API/interchange CRS: EPSG:4326.
+- Storage CRS: EPSG:2180. API/interchange CRS: EPSG:4326. <pointer to the ADR>
 - Large tables: <name ≈ rows>. Migrations on them follow expand/contract.
 
 ## Deployment
@@ -43,7 +56,7 @@
 
 ## Conventions & decisions
 - <non-obvious rules, e.g. "never call external APIs inside a transaction">
-- <ADRs: docs/adr/>
+- <one-line pointers to ADRs that constrain everyday coding, e.g. "Geometries stored in EPSG:2180, see docs/adr/0003-storage-crs.md">
 
 ## Learning goals (optional, used by /devkit:mentor)
 - <e.g. "I want to write the NetworkPolicies and ArgoCD ApplicationSets myself">

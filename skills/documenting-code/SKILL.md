@@ -1,6 +1,6 @@
 ---
 name: documenting-code
-description: Use when writing or updating any documentation - README, docstrings, code comments, CLAUDE.md, runbooks, docs/ pages, CLI help, API docs - or when deciding whether something should be documented at all, or when existing docs look stale or contradict the code.
+description: Use when writing or updating human-facing documentation - README, docstrings, code comments, runbooks, docs/ pages, CLI help, API docs - or when deciding whether something should be documented at all and where it goes, or when existing docs look stale or contradict the code.
 ---
 
 # Documenting code
@@ -27,14 +27,22 @@ For each piece of information, ask in this order:
 |---|---|---|
 | Why this non-obvious code is like this | a comment at that line | The *why* or the hazard, never the *what*. |
 | The contract of a public function or class | its docstring | Semantics the types don't show: units, CRS, invariants, side effects, raised errors. |
-| A decision with alternatives | `docs/adr/NNNN-*.md` | Use the adr skill. It is never edited after acceptance; supersede it instead. |
+| Domain vocabulary (what a term means, which synonyms to avoid) | `CONTEXT.md` | Owned by the domain-modeling skill and its format. Use its terms everywhere else. |
+| A decision with alternatives | `docs/adr/NNNN-*.md` | Written via the domain-modeling skill, in its format. Never edited after acceptance; supersede it instead. |
+| What to build and why (spec, tickets) | the issue tracker | Via /to-spec and /to-tickets, as `docs/agents/issue-tracker.md` says. Not in `docs/`. |
 | How to run, test and deploy | `README.md` | A quickstart that CI actually executes, or at least the same commands CI runs. |
 | Facts an AI assistant needs | `CLAUDE.md` | Short (aim for under 100 lines), only what isn't inferable, with pointers instead of copies. |
 | How to operate or recover | `docs/runbooks/*.md` | Task-oriented, copy-pasteable commands, with a "last verified" date. |
-| Domain concepts (forestry, GIS rules) | `docs/explanation/*.md` | Kept stable. It links to code, it doesn't restate it. |
+| Longer domain explanation (forestry, GIS rules) | `docs/explanation/*.md` | Only what a glossary entry can't hold. Linked from `CONTEXT.md`, uses its terms, links to code instead of restating it. |
 
 This follows the Diátaxis split: tutorials, how-to guides (runbooks), reference (generated),
 and explanation (ADRs, domain). Don't mix the modes in one page.
+
+`docs/agents/*.md` is configuration for the engineering skills (issue tracker, labels, domain
+layout), not documentation. Edit it only when that configuration changes.
+
+Decisions in this stack that usually deserve an ADR: the storage CRS, the GitOps repo layout,
+the design-system foundation, a service split, a new infrastructure component.
 
 ## Writing rules
 
@@ -66,10 +74,17 @@ DISABLE_SERVER_SIDE_CURSORS = True
 
 ## CLAUDE.md specifically
 
+When editing CLAUDE.md or AGENTS.md, the writing-for-agents skill governs how to word it; this
+section only says what belongs there. The `## Agent skills` block is owned by
+`/setup-matt-pocock-skills`, and `## Workflow` by the devkit template: don't rewrite them in passing.
+
 - Put in it the commands, the architecture in 3–10 bullets, conventions the code doesn't enforce, and the deploy target.
 - Keep out of it the code tours, style rules a linter enforces, and anything duplicated from README.
 - Add a line when you had to correct the assistant twice for the same thing. Remove lines that
   stop being true.
+- A decision that constrains everyday coding gets a one-line pointer to its ADR
+  (`- Geometries stored in EPSG:2180, see docs/adr/0003-storage-crs.md`), and the code where it
+  matters gets a comment containing `ADR-NNNN`.
 
 ## Checking for staleness
 

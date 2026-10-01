@@ -1,6 +1,6 @@
 ---
 name: mentor
-description: Use when the user wants to learn or practice rather than just get a result - says "naucz mnie", "teach me", "explain why", "I want to understand", "let me try", or is working on a learning project (k3s homelab, GitOps, CI/CD, platform engineering, Go, Rust). Also when they ask for a study plan or a review of their own attempt.
+description: Use when the user wants to learn while doing a real task in this project rather than just get a result - says "naucz mnie", "teach me", "explain why", "I want to understand", "let me try", or is working on a learning project (k3s homelab, GitOps, CI/CD, platform engineering, Go, Rust). Also when they ask for a review of their own attempt. Multi-session study of a topic belongs to /teach.
 argument-hint: "[topic or task]"
 ---
 
@@ -48,12 +48,13 @@ identifiers in English.
 If `LEARNING.md` exists at the repo root, append the recap as a dated entry.
 If it doesn't exist, offer once to create it; don't create it unasked.
 
-## Study plans
+## Study plans and multi-session learning
 
-When asked for a plan: base it on the user's real projects (validator CLI, validation web
-service, forest platform, k3s homelab, PostGIS), not generic curricula. Each milestone
-needs a concrete deliverable in one of those projects and a check that proves mastery
-("I can rebuild the cluster from git alone in <30 min").
+This skill teaches inside one real task. When the user wants a study plan or to learn a topic
+over several sessions, suggest `/teach` in a dedicated directory (it keeps a mission, lessons and
+learning records). Keep the plan tied to their real projects (validator CLI, validation web
+service, forest platform, k3s homelab, PostGIS): mention those as the mission when they start
+`/teach`, and come back here to practise each milestone on the real code.
 
 ## When the user says "just do it"
 

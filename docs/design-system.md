@@ -26,6 +26,8 @@ Design system zamienia gust w **ograniczenia w kodzie**. Model, który ma do dys
 
 ## Faza 0: decyzje (jedna sesja z Claude, wynik: ADR)
 
+Najlepiej w `/grill-with-docs`: wywiad dopisuje pojęcia do `CONTEXT.md` i od razu zapisuje ADR.
+
 1. Opowiedz Claude o produkcie: kto używa (leśnicy, pasjonaci, uczniowie), na czym (telefon
    w terenie, desktop w biurze), jaki charakter (spokojny, treściowy, bez marketingu), jaka gęstość
    (blog i edu wygodne, mapy, statystyki i walidator kompaktowe).
@@ -35,7 +37,9 @@ Design system zamienia gust w **ograniczenia w kodzie**. Model, który ma do dys
    - **Mantine**: gotowa, bogata biblioteka (tabele, daty, formularze), mniej kodu do utrzymania,
      mniejsza swoboda wyglądu.
    - **Radix Primitives + własne style**: maksimum kontroli, najwięcej pracy.
-3. `/devkit:adr "Fundament design systemu"`: zapisuje wybór i odrzucone opcje.
+3. ADR „Fundament design systemu” z wyborem i odrzuconymi opcjami. `/grill-with-docs` zapisze go
+   sam; poza grillowaniem poproś o niego wprost (skill `domain-modeling`).
+4. Niepewny wygląd ekranów kluczowych? `/prototype` (warianty UI) przed Fazą 1.
 
 ## Faza 1: tokeny
 

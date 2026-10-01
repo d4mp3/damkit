@@ -1,6 +1,6 @@
 # ADR-0006: Dokumentujemy „dlaczego”, generujemy „co”, pilnujemy aktualności w review
 
-- Status: Accepted
+- Status: Accepted; część o skillu `adr` zastąpiona przez [ADR-0013](0013-process-belongs-to-matt-pocock-skills.md)
 - Date: 2026-09-29
 
 ## Context

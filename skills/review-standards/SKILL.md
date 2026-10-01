@@ -42,7 +42,10 @@ Label every finding:
 | medium | Edge-case bug, missing test for risky logic, operability gap that will hurt during an incident. |
 | low | Maintainability issue with concrete future cost. Report at most 3. |
 
-Style, naming and formatting are not findings unless they hide a bug.
+Style, naming, formatting, documented conventions and code smells (duplication, speculative
+generality, feature envy…) belong to the Standards axis of `/code-review`, and spec
+compliance to its Spec axis. Report them only when they hide a bug. Name domain concepts with
+the terms from `CONTEXT.md` when it exists.
 
 ## Finding format
 
