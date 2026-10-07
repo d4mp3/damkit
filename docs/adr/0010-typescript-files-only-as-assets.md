@@ -1,6 +1,6 @@
 # ADR-0010: Bez agentów od TypeScriptu. Pliki TS/CSS w repo tylko jako assety skilli.
 
-- Status: Accepted
+- Status: Accepted; zdanie o flagach w `typescript-conventions` zastąpione przez [ADR-0014](0014-knowledge-skills-hold-only-what-the-model-lacks.md)
 - Date: 2026-09-29
 
 ## Context

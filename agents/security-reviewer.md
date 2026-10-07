@@ -33,8 +33,6 @@ add an **Attack scenario** line (who the attacker is, what they send, what they 
 
 - Django/DRF: `${CLAUDE_PLUGIN_ROOT}/skills/django-conventions/references/security.md`
 - CI/CD: the "Security" section of `${CLAUDE_PLUGIN_ROOT}/skills/ci-pipelines/SKILL.md`
-- React/TypeScript frontend: the "Security" section of `${CLAUDE_PLUGIN_ROOT}/skills/react-conventions/SKILL.md`
-  (XSS through `dangerouslySetInnerHTML`/URLs, tokens in `localStorage`, public `VITE_*` variables)
 
 Run scanners if they are installed, and treat their output as leads to verify, not as findings:
 `bandit -r <changed dirs>`, `pip-audit`, `semgrep --config auto <files>`, `trivy fs .`,

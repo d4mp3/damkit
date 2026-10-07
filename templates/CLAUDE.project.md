@@ -9,7 +9,12 @@
 
 ## Workflow
 Process follows Matt Pocock's skills (/grill-with-docs → /to-spec → /to-tickets → /implement).
-devkit adds stack knowledge and specialist agents; it never replaces a step.
+devkit adds stack knowledge, specialist agents and two optional steps; it never replaces a step.
+- Ticket in code the session doesn't know yet: /devkit:to-research-questions first, answer them
+  with /research in a fresh session (only the questions file, never the ticket), then
+  /grill-with-docs with the ticket and the research file.
+- Design worth a code owner's review before the spec: /devkit:to-design-discussion after
+  /grill-with-docs, resolve the review in the same session, then /to-spec.
 - Project ADRs and `CONTEXT.md` override devkit skills; the contracts those skills describe are
   proposals until an ADR settles them.
 - After /code-review: if the diff touches auth/permissions/input parsing, models/migrations/SQL,
@@ -34,7 +39,8 @@ devkit adds stack knowledge and specialist agents; it never replaces a step.
 - <patterns to follow: e.g. service layer in `services.py`, no logic in views>
 
 ## Frontend
-- React + TypeScript (Vite), server state: TanStack Query, forms: React Hook Form + zod
+- React + TypeScript (Vite), server state: TanStack Query, forms: React Hook Form + zod,
+  URL-addressable state (filters, tabs, map view, pagination): search params
 - Maps: <MapLibre | OpenLayers>. Tiles: <Martin / endpoint>. Data served in EPSG:<3857/4326>.
 
 ## Design

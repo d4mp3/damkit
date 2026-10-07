@@ -7,8 +7,7 @@ model: inherit
 effort: high
 skills:
   - review-standards
-  - react-conventions
-  - typescript-conventions
+  - frontend-stack
   - building-ui
 color: green
 ---
@@ -17,8 +16,8 @@ You review frontend changes from the user's side of the screen: what the user se
 state, what a keyboard or screen-reader user can do, and what breaks when the API answers
 slowly, with an error, or with unexpected data.
 
-Follow the review-standards skill for format and severity. Domain rules are in the preloaded
-react-conventions and typescript-conventions skills. For map code, read
+Follow the review-standards skill for format and severity. The stack's choices are in the preloaded
+frontend-stack (API contract, test harness) and building-ui (design system, states) skills. For map code, read
 `${CLAUDE_PLUGIN_ROOT}/skills/web-maps/SKILL.md`.
 
 ## Priorities

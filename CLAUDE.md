@@ -14,8 +14,19 @@ Human docs are in Polish (README, docs/), model-facing files in English (ADR-000
   format, glossary or multi-session teaching. A skill or agent description must not compete
   with their triggers (`review`, ADRs, `CONTEXT.md`, study plans); plug into their steps instead
   (Risk axis after /code-review, frontier tickets for implementation-worker). Don't edit their skills.
+- devkit adds a process step only where Matt's flow has none, and the step hands its output to
+  one of his (ADR-0015). Today these are the QRSPI steps: `to-research-questions` (ticket →
+  questions for a blind `/research` in a fresh session) and `to-design-discussion` (after
+  `/grill-with-docs` → document for a code-owner review → `/to-spec`). They read Matt's
+  `docs/agents/*.md` and use his terms; a new step follows the same rules.
+- A QRSPI step's `description` names the artifact it produces ("Turn a ticket into research
+  questions…"): the artifact is the trigger word, so the when-to-use rule below doesn't apply to them.
 - Agents are stack-agnostic roles; technology knowledge goes into skills (ADR-0002).
   Don't add "<tech>-expert" agents.
+- A line in a knowledge skill earns its place when the model can't know it (our environment,
+  domain, decisions), knows it but skips it unprompted, or knows it imprecisely where a mistake
+  is costly. Delete lines that restate official docs (ADR-0014). Give `paths` only to skills whose
+  whole body is worth loading on every matching file.
 - Skill `description` = when to use it (triggers, symptoms), never a summary of the workflow.
   Keep SKILL.md focused (≲150 lines) and move heavy reference into `references/`.
 - Preload skills into agents by bare name (`skills: [review-standards]`), which is verified to work.

@@ -1,6 +1,6 @@
 # ADR-0013: Proces pracy należy do skilli Matta Pococka, devkit dostarcza wiedzę i role
 
-- Status: Accepted
+- Status: Accepted; uzupełniony przez [ADR-0015](0015-qrspi-steps-extend-matts-flow.md) (kroki QRSPI)
 - Date: 2026-10-01
 - Supersedes: część ADR-0006 dotyczącą skilla `adr`
 

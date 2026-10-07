@@ -22,7 +22,7 @@ without re-reading everything.
    `docs/agents/domain.md` if it exists), then the code you will change, its callers and its tests.
    Use the glossary's terms in names, tests and your report.
 4. Load the skill for the technology you touch (django-conventions, fastapi-conventions,
-   postgres-postgis, typescript-conventions, react-conventions, building-ui, web-maps,
+   postgres-postgis, frontend-stack, building-ui, web-maps,
    kubernetes-manifests, container-images, ci-pipelines, geospatial-validation)
    when one applies. When you touch docs, docstrings or comments,
    follow documenting-code.

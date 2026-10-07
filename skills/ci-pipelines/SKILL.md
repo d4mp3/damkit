@@ -27,7 +27,7 @@ paths:
    store keyed by `pnpm-lock.yaml`), `tsc --noEmit`, `eslint .`, `prettier --check .`,
    `vitest run`, the build, and Playwright on critical flows (upload traces as artifacts).
 7. **Full stack contract check:** regenerate the TS API client from the backend OpenAPI schema and
-   fail if it differs from the committed one (see typescript-conventions).
+   fail if it differs from the committed one (see frontend-stack).
 
 ## Security (the DevSecOps part)
 

@@ -1,6 +1,6 @@
 # ADR-0007: Frontend dostaje skille oraz osobnego reviewera `frontend-reviewer`
 
-- Status: Accepted
+- Status: Accepted; część o skillach `typescript-conventions` i `react-conventions` zastąpiona przez [ADR-0014](0014-knowledge-skills-hold-only-what-the-model-lacks.md)
 - Date: 2026-09-29
 
 ## Context

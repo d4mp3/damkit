@@ -1,7 +1,7 @@
 {
   "name": "devkit",
   "displayName": "devkit — Python/Django, React/TypeScript, PostGIS, Kubernetes & platform engineering",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Companion to Matt Pocock's engineering skills: role-based subagents (parallel ticket worker, Risk-axis reviewers, test runner, cluster investigator, docs researcher) plus on-demand technology skills for Django/FastAPI, React/TypeScript, UI building with a design system, web maps, PostgreSQL/PostGIS, geodata validation, Kubernetes/k3s/GitOps, container images and CI/CD, and a mentor mode for learning on real tasks.",
   "author": { "name": "Damian Pszczoła" },
   "keywords": ["django", "react", "typescript", "postgis", "kubernetes", "k3s", "gitops", "platform-engineering", "gis"]

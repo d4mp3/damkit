@@ -104,7 +104,7 @@ na dwa sposoby:
 
 | Obszar | Matt | devkit |
 |---|---|---|
-| Od pomysłu do commita | `/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` (z `/tdd`) | brak własnego procesu |
+| Od pomysłu do commita | `/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` (z `/tdd`) | dwa opcjonalne kroki QRSPI w lukach flow: `/devkit:to-research-questions` przed grillem, `/devkit:to-design-discussion` przed specem ([ADR-0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md)) |
 | Słownik domeny | `CONTEXT.md` (`domain-modeling`) | skille używają jego terminów |
 | Decyzje | ADR-y w formacie `domain-modeling`, zapisywane przez `/grill-with-docs` | `code-reviewer` zgłasza brakujący ADR; skille wiedzy podsuwają decyzje typowe dla stacku |
 | Tracker, etykiety | `docs/agents/*.md` (`/setup-matt-pocock-skills`), `/triage` | worker i `review-changes` czytają tickety według `docs/agents/issue-tracker.md` |
@@ -148,12 +148,19 @@ Po instalacji:
 ### 2. Główny flow z punktami wpięcia devkitu
 
 ```
-/grill-with-docs                      wywiad → CONTEXT.md + ADR-y
+[opcjonalnie, ticket w kodzie, którego sesja nie zna]
+/devkit:to-research-questions <ticket>  pytania o obecny kod, bez intencji
+  → /research w świeżej sesji (tylko plik z pytaniami) → <obszar>-research.md
+  ▼
+/grill-with-docs                      wywiad → CONTEXT.md + ADR-y (z ticketem i plikiem research)
   │  devkit: skille wiedzy podsuwają pytania i sensowne domyślne (CRS, kody wyjścia walidatora,
   │          fundament design systemu, układ GitOps); docs-researcher, gdy odpowiedź zależy od wersji
   │
   ├─ pytanie wymaga działającego kodu? → /handoff → /prototype → /handoff z wnioskami
   │     devkit: web-maps i building-ui przy prototypie mapy lub ekranu
+  ├─ projekt warto pokazać właścicielowi kodu? → /devkit:to-design-discussion
+  │     ~200 linii: stan obecny i docelowy, wzorce Follow/Avoid, decyzje D1…, otwarte pytania;
+  │     uwagi z review rozwiązujesz w tej samej sesji
   ▼
 /to-spec → /to-tickets                spec i tickety z blokerami w trackerze
   │  sekcja "Testing Decisions" = seamy; implementation-worker pracuje tylko na nich
@@ -267,6 +274,8 @@ Do eksploracji kodu służy wbudowany agent **`Explore`** ([ADR-0004](docs/adr/0
 |---|---|---|
 | `review-changes` | `/devkit:review-changes [fixed-point]`, po `/code-review` | oś **Risk**: kieruje diff do właściwych reviewerów **równolegle**, łączy ich wyniki, sam sprawdza każde znalezisko critical/high i raportuje osobno od Standards i Spec |
 | `mentor` | `/devkit:mentor [temat]` albo „naucz mnie…” | nauka przy realnym zadaniu: model mentalny, zadania `TODO(human)`, podpowiedzi stopniowane, podsumowanie, `LEARNING.md`. Plan nauki na wiele sesji: `/teach` |
+| `to-research-questions` | `/devkit:to-research-questions <ticket>` przed `/grill-with-docs` | krok QRSPI: zamienia ticket na pytania o obecny kod bez śladu intencji, dla ślepego `/research` w świeżej sesji |
+| `to-design-discussion` | `/devkit:to-design-discussion` po `/grill-with-docs` | krok QRSPI: dokument około 200 linii do review przez właściciela kodu przed `/to-spec`; każdy wskaźnik do kodu sprawdzony |
 | `building-ui` | przy tworzeniu widoków, komponentów, stylów | design system projektu → cel ekranu → budowa z tokenów i komponentów → wszystkie stany → **zrzuty ekranu przed „gotowe”** |
 
 ### Wiedza (ładuje się sama, gdy pracujesz na pasujących plikach lub tematach)
@@ -275,8 +284,7 @@ Do eksploracji kodu służy wbudowany agent **`Explore`** ([ADR-0004](docs/adr/0
 |---|---|
 | `django-conventions` | `models.py`, `views.py`, `serializers.py`, `migrations/`, `settings*` |
 | `fastapi-conventions` | pracy z FastAPI (po opisie) |
-| `typescript-conventions` | `*.ts`, `*.tsx`, `tsconfig*.json`, `package.json`, `vite.config.*`: strict, zod na granicach, typy z OpenAPI |
-| `react-conventions` | `*.tsx`, `*.jsx`: stan, efekty, TanStack Query, dostępność, testy (Vitest, Testing Library, MSW, Playwright) |
+| `frontend-stack` | łączeniu frontendu z API (po opisie): klient i typy z OpenAPI, kontrola dryfu w CI, zod dla danych spoza API; testy frontu (MSW, `QueryClient` per test, mapy poza jsdom, Playwright) |
 | `web-maps` | mapach w React (po opisie): MapLibre vs OpenLayers, EPSG:2180 na mapie, MVT z PostGIS, błędy walidacji na mapie |
 | `postgres-postgis` | `*.sql`, `migrations/`, `alembic/versions/`, zapytaniach przestrzennych |
 | `geospatial-validation` | pracy nad walidatorem danych geo i webserwisem (po opisie) |
@@ -368,9 +376,9 @@ Tickety, które się zazębiają, rób po kolei, nawet jeśli formalnie nie blok
 
 ```
 1. Backend: endpoint + serializer/schema + testy (django/fastapi-conventions, /tdd na seamie API)
-2. pnpm gen:api → typy i klient TS z OpenAPI (typescript-conventions)
+2. pnpm gen:api → typy i klient TS z OpenAPI (frontend-stack)
      → zmiana w API, która psuje frontend, wychodzi przy tsc, a nie na produkcji
-3. Frontend: widok według workflow 4 (building-ui + react-conventions)
+3. Frontend: widok według workflow 4 (building-ui + frontend-stack)
 4. /code-review → /devkit:review-changes → security + postgres (backend), frontend-reviewer (UI)
 5. test-runner: pytest + vitest; Playwright dla krytycznego flow
 ```
@@ -567,6 +575,8 @@ Decyzje dotyczące samego devkitu:
 | [0011](docs/adr/0011-codex-variant-as-independent-copy.md) | wariant dla Codex CLI jako niezależna kopia w `codex/` |
 | [0012](docs/adr/0012-codex-guard-as-plugin-hook.md) | guard read-only w Codeksie jako hook pluginu filtrowany po `agent_type` |
 | [0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md) | proces należy do skilli Matta Pococka; devkit to wiedza i role, bez skilla `adr` |
+| [0014](docs/adr/0014-knowledge-skills-hold-only-what-the-model-lacks.md) | skille wiedzy tylko z tym, czego model nie ma; React i TS zastępuje `frontend-stack` |
+| [0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md) | kroki QRSPI (`to-research-questions`, `to-design-discussion`) wypełniają luki we flow Matta |
 
 ---
 
@@ -599,6 +609,7 @@ claude --plugin-dir .                    # test na żywo
 - Nowa technologia to nowy **skill**, a nie nowy agent.
 - Nie dubluj skilli procesowych Matta (grill, spec, tickety, tdd, review Standards/Spec, ADR-y,
   `/teach`). Opis nowego skilla nie może konkurować z ich triggerami; wpinaj się w ich kroki ([ADR-0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md)).
+- Nowy krok procesu tylko tam, gdzie flow Matta ma lukę, i zawsze z wynikiem oddawanym jednemu z jego kroków, jak QRSPI ([ADR-0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md)).
 - Nowy agent read-only wymaga `disallowedTools`, wpisu w `READONLY_AGENTS` i testu.
 - Nowy asset wymaga uzasadnienia: jaką decyzję niesie i dlaczego nie da się go wygenerować.
 - Istotna zmiana podejścia to nowy ADR w `docs/adr/`.
@@ -613,7 +624,7 @@ claude --plugin-dir .                    # test na żywo
   plugin.json              # manifest pluginu "devkit"
   marketplace.json         # marketplace "dampe" (source: ./)
 agents/                    # 9 agentów (role)
-skills/                    # 15 skilli (wiedza i procesy)
+skills/                    # 16 skilli (wiedza i procesy)
   <name>/SKILL.md          #   instrukcja
   <name>/references/       #   cięższe materiały, czytane na żądanie
   building-ui/assets/      #   tokens.css: startowe tokeny design systemu
@@ -626,7 +637,7 @@ templates/
 docs/
   dokumentacja.md          # jak prowadzimy dokumentację
   design-system.md         # workflow design systemu
-  adr/                     # decyzje (0001–0013)
+  adr/                     # decyzje (0001–0015)
 CLAUDE.md                  # instrukcje dla Claude przy pracy nad tym repo
 codex/                     # niezależna wersja dla Codex CLI (patrz codex/README.md)
 _archive/agents-v1/        # poprzednie wersje agentów (niewczytywane)

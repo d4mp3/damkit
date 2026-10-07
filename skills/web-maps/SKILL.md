@@ -25,6 +25,10 @@ proj4.defs("EPSG:2180",
 register(proj4);
 ```
 
+Coordinates in 2180, 4326 and 3857 share one TypeScript type (`[number, number]`). Where more
+than one CRS lives in the client, brand them so a missing transform fails at compile time:
+`type Xy2180 = [number, number] & { readonly __crs: "EPSG:2180" }`.
+
 ## Data volume decides the transport
 
 | Features in view | Transport |
