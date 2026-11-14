@@ -10,6 +10,7 @@ devkit dostarcza:
 - **skille**, czyli wiedzę o technologiach i kilka procesów (review ryzyka, nauka przy zadaniu,
   budowanie UI), ładowane dopiero wtedy, gdy są potrzebne;
 - **hook read-only**, który technicznie blokuje reviewerom zmiany w klastrze, repo, bazie i plikach;
+- **serwery LSP** dla TypeScriptu i Pythona: diagnostyka po każdej edycji i nawigacja po symbolach;
 - **wzorce pracy**: dokumentacja (ADR-y, `CLAUDE.md`), design system, szablon `CLAUDE.md` dla
   projektów. To repo stosuje je samo na sobie.
 
@@ -31,10 +32,11 @@ o stacku i wyspecjalizowanych agentów, którzy wpinają się w kroki tego proce
 6. [Jak korzystać: wywoływanie](#jak-korzystać-wywoływanie)
 7. [Workflowy](#workflowy)
 8. [Bezpieczeństwo: hook read-only](#bezpieczeństwo-hook-read-only)
-9. [Dokumentacja i decyzje](#dokumentacja-i-decyzje)
-10. [Codex](#codex)
-11. [Rozwijanie devkitu](#rozwijanie-devkitu)
-12. [Zawartość repo](#zawartość-repo)
+9. [Serwery LSP](#serwery-lsp)
+10. [Dokumentacja i decyzje](#dokumentacja-i-decyzje)
+11. [Codex](#codex)
+12. [Rozwijanie devkitu](#rozwijanie-devkitu)
+13. [Zawartość repo](#zawartość-repo)
 
 ---
 
@@ -58,7 +60,7 @@ Nowy projekt razem ze skillami Matta: [setup krok po kroku](#1-setup-nowego-proj
 W skrócie: plugin → `npx skills@latest add mattpocock/skills` → szablon
 [`templates/CLAUDE.project.md`](templates/CLAUDE.project.md) jako `CLAUDE.md` → `/setup-matt-pocock-skills`.
 
-**Wymagania:** `python3` (hook), opcjonalnie narzędzia wykorzystywane przez skille i agentów:
+**Wymagania:** `python3` (hook), serwery LSP na `PATH` (raz na maszynę, [szczegóły](#serwery-lsp)), opcjonalnie narzędzia wykorzystywane przez skille i agentów:
 `kubeconform`, `kube-linter`, `hadolint`, `actionlint`, `trivy`, Playwright (zrzuty ekranu UI).
 Agenci sprawdzają, co jest zainstalowane, i nie zakładają reszty.
 
@@ -544,6 +546,28 @@ kubectl create clusterrolebinding claude-readonly --clusterrole=view \
 
 ---
 
+## Serwery LSP
+
+devkit rejestruje w [`.lsp.json`](.lsp.json) dwa serwery języka
+([ADR-0016](docs/adr/0016-lsp-servers-in-plugin.md)). Po każdej edycji pliku Claude dostaje błędy
+typów i brakujące importy (`Found N new diagnostic issues`, rozwinięcie: `Ctrl+O`), a narzędzie
+`LSP` szuka definicji i referencji po symbolach.
+
+| Serwer | Pliki | Instalacja binarki (raz na maszynę) |
+|---|---|---|
+| `typescript-language-server` | `.ts` `.tsx` `.mts` `.cts` `.js` `.jsx` `.mjs` `.cjs` | `npm install -g typescript-language-server typescript` |
+| `pyright-langserver` | `.py` `.pyi` | `uv tool install pyright` (albo `pipx install pyright`, `npm install -g pyright`) |
+
+- Binarka musi być na `PATH` powłoki, z której startuje `claude`. Brak widać w `/plugin` → **Errors**
+  (`Executable not found in $PATH`). Po instalacji wystarczy kolejna edycja pliku.
+- TypeScript bierze `tsserver` z `node_modules` projektu, więc typy zgadzają się z wersją projektu.
+  Pyright czyta `pyrightconfig.json` albo `[tool.pyright]` w `pyproject.toml` i potrzebuje aktywnego
+  venv (`.venv` w katalogu projektu), żeby rozwiązać importy. W projekcie Django dołóż `django-stubs`.
+- Wyłącz oficjalne `typescript-lsp` i `pyright-lsp`, jeśli je masz: dwa serwery dla tych samych
+  plików dublują diagnostykę.
+
+---
+
 ## Dokumentacja i decyzje
 
 Podejście: **dokumentuj „dlaczego”, generuj „co”, pilnuj aktualności w review**
@@ -577,6 +601,7 @@ Decyzje dotyczące samego devkitu:
 | [0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md) | proces należy do skilli Matta Pococka; devkit to wiedza i role, bez skilla `adr` |
 | [0014](docs/adr/0014-knowledge-skills-hold-only-what-the-model-lacks.md) | skille wiedzy tylko z tym, czego model nie ma; React i TS zastępuje `frontend-stack` |
 | [0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md) | kroki QRSPI (`to-research-questions`, `to-design-discussion`) wypełniają luki we flow Matta |
+| [0016](docs/adr/0016-lsp-servers-in-plugin.md) | serwery LSP (TypeScript, Pyright) w `.lsp.json` pluginu |
 
 ---
 
@@ -623,6 +648,7 @@ claude --plugin-dir .                    # test na żywo
 .claude-plugin/
   plugin.json              # manifest pluginu "devkit"
   marketplace.json         # marketplace "dampe" (source: ./)
+.lsp.json                  # serwery LSP: TypeScript, Pyright
 agents/                    # 9 agentów (role)
 skills/                    # 16 skilli (wiedza i procesy)
   <name>/SKILL.md          #   instrukcja
@@ -637,7 +663,7 @@ templates/
 docs/
   dokumentacja.md          # jak prowadzimy dokumentację
   design-system.md         # workflow design systemu
-  adr/                     # decyzje (0001–0015)
+  adr/                     # decyzje (0001–0016)
 CLAUDE.md                  # instrukcje dla Claude przy pracy nad tym repo
 codex/                     # niezależna wersja dla Codex CLI (patrz codex/README.md)
 _archive/agents-v1/        # poprzednie wersje agentów (niewczytywane)
