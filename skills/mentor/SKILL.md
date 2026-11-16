@@ -52,9 +52,9 @@ If it doesn't exist, offer once to create it; don't create it unasked.
 
 This skill teaches inside one real task. When the user wants a study plan or to learn a topic
 over several sessions, suggest `/teach` in a dedicated directory (it keeps a mission, lessons and
-learning records). Keep the plan tied to their real projects (validator CLI, validation web
-service, forest platform, k3s homelab, PostGIS): mention those as the mission when they start
-`/teach`, and come back here to practise each milestone on the real code.
+learning records). Keep the plan tied to their real projects (`## What this is` and
+`## Learning goals` in the project's `CLAUDE.md`, or ask): mention those as the mission when they
+start `/teach`, and come back here to practise each milestone on the real code.
 
 ## When the user says "just do it"
 
