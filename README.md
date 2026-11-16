@@ -36,6 +36,7 @@ knowledge and specialized agents that plug into the steps of that process
 10. [Documentation and decisions](#documentation-and-decisions)
 11. [Developing geostack](#developing-geostack)
 12. [Repository contents](#repository-contents)
+13. [License](#license)
 
 ---
 
@@ -661,4 +662,9 @@ docs/
   design-system.md         # design system workflow
   adr/                     # decisions (0001–0021)
 CLAUDE.md                  # instructions for Claude when working on this repo
+LICENSE                    # MIT
 ```
+
+## License
+
+[MIT](LICENSE)
