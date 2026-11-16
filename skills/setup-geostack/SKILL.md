@@ -89,12 +89,20 @@ on conflicts. Never touch `.claude/settings.local.json`.
   If the repo commits a `.env.example`, replace `Read(./.env.*)` with the ignored env files by name, so
   Claude can still read the example.
 - **Ask** before what leaves the machine: `git push`, opening and merging PRs.
-- **Hooks**, built from the commands found in step 2, with `"$CLAUDE_PROJECT_DIR"` paths:
-  - `PostToolUse` on `Edit|Write`: the formatter for the edited file only (`ruff format <file>`,
-    `prettier --write <file>`), exiting 0 for other file types. Only if the project has a formatter.
-  - `Stop`: the fastest check that matters (lint or typecheck, not the full suite: it runs at the end
-    of every turn), output to stderr, `exit 2` on failure. Run it once first: if it fails today, don't
-    add the hook (it would send every turn back to pre-existing failures) and list it for the user instead.
+- **Hooks**: copy `${CLAUDE_PLUGIN_ROOT}/skills/setup-geostack/assets/hooks/` (`lib.sh`, `format.sh`,
+  `check.sh`) to `.claude/hooks/` and make the two scripts executable. A script that already exists there
+  is the project's own copy: leave it, and ask before replacing it. The template registers them:
+  - `format.sh` on `PostToolUse` (`Edit|Write`) formats the edited file with the formatter the project
+    already uses: ruff format or black for Python, prettier or biome for JS/TS/CSS/JSON.
+  - `check.sh` on `Stop` lints and type-checks the files changed since the last commit (ruff, mypy,
+    eslint or biome, tsc) and exits 2 on errors in those files, so Claude fixes them before ending
+    the turn. Tests don't run there.
+
+  The scripts run only the tools the project depends on or configures, so they need no editing per
+  stack. Tell the user which tools they will use here. If a tool is too slow or too noisy for every turn
+  (mypy on a large untyped codebase), list the wanted tools as arguments instead
+  (`check.sh ruff eslint tsc`) and say why. How the hooks work, for the user:
+  `${CLAUDE_PLUGIN_ROOT}/docs/project-settings.md`.
 - **Plugins**: keep `geostack@dampe` and its marketplace, so teammates and cloud sessions get geostack.
 - Leave out what a project file can't or shouldn't set: `defaultMode: "auto"` and `autoMode` are ignored
   there, and personal choices (`statusLine`, `model`, sandbox paths for one machine) belong in user

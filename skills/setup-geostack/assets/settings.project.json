@@ -15,9 +15,35 @@
       "Bash(gh pr merge *)"
     ]
   },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check.sh"
+          }
+        ]
+      }
+    ]
+  },
   "extraKnownMarketplaces": {
     "dampe": {
-      "source": { "source": "github", "repo": "d4mp3/geostack" }
+      "source": {
+        "source": "github",
+        "repo": "d4mp3/geostack"
+      }
     }
   },
   "enabledPlugins": {
