@@ -41,8 +41,10 @@ Collect only what the model could not cheaply infer later:
   Storybook script and URL. Product character, density and layout patterns are decisions: take them
   from an ADR or existing docs, otherwise write `<decide in /grill-with-docs>`.
 - **Deployment**: read what the repo shows: the registry and image names from CI push steps, the build
-  system, ArgoCD Applications (app name, GitOps repo URL), Helm/Kustomize directories, and node
-  architecture from `nodeSelector`/`kubernetes.io/arch` or multi-arch builds. Don't ask about the rest:
+  system, ArgoCD Applications (app name, GitOps repo URL), Helm/Kustomize directories, node
+  architecture from `nodeSelector`/`kubernetes.io/arch` or multi-arch builds, and the cluster's
+  distribution, `ingressClassName`/`gatewayClassName` and `storageClassName` from manifests or
+  infrastructure code (Terraform for EKS/GKE/AKS, k3s config, OpenShift `Route`s). Don't ask about the rest:
   the deployment layout is a decision, so leave the placeholder.
 - **Language hints** for step 3: UI strings in components or i18n files, the language of README and
   docs, and the language of recent commit messages (`git log -20 --format=%s`).
