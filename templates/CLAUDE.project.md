@@ -24,6 +24,12 @@ devkit adds stack knowledge, specialist agents and two optional steps; it never 
 - Tickets whose blockers are all done may run in parallel, one devkit:implementation-worker
   per ticket; review once after merging the worktrees.
 
+## Language
+- Conversation: <e.g. Polish>. Code, identifiers and comments: English.
+- UI copy: <language>, sentence case, <tone: e.g. informal vs formal address>
+- Locale for numbers, dates and units: <e.g. pl-PL>, formatted through `Intl`
+- Human-facing docs (README, docs/, ADRs): <language>. Commit messages: <language>
+
 ## Commands
 - Setup: `uv sync`
 - Tests: `uv run pytest -q` (single file: `uv run pytest path/to/test_x.py -x`)
@@ -49,7 +55,6 @@ devkit adds stack knowledge, specialist agents and two optional steps; it never 
 - Product character: <e.g. calm, content-first, data-dense tool for foresters; not marketing-like>
 - Density: <comfortable for blog/edu, compact for maps/statistics/validator>
 - Layout patterns: <e.g. map full-screen + side panel; content pages max-width 72ch>
-- UI copy: Polish, sentence case, <tone: e.g. "ty" vs "Państwo">
 - Rules: tokens only, no arbitrary Tailwind values; a missing component goes into the design system first
 
 ## Data & GIS
