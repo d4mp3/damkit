@@ -42,8 +42,9 @@ knowledge and specialized agents that plug into the steps of that process
 ## Installation
 
 ```bash
-# 1. once per machine: register this repo as a marketplace (local path or git URL)
-claude plugin marketplace add ~/dev/devkit
+# 1. once per machine: register this repo as a marketplace
+claude plugin marketplace add d4mp3/devkit     # from GitHub
+claude plugin marketplace add ~/dev/devkit     # or from a local clone, if you develop devkit
 
 # 2. in every project where you want devkit:
 cd ~/dev/my-project
