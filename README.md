@@ -1,7 +1,7 @@
 # geostack
 
 A Claude Code plugin for everyday work and growth in the
-**Python/Django/FastAPI · React/TypeScript · PostgreSQL/PostGIS · GIS data and web maps · Docker · Kubernetes (k3s) · GitOps · CI/CD** stack.
+**Python/Django/FastAPI · React/TypeScript · PostgreSQL/PostGIS · GIS data, web maps and QGIS plugins · Docker · Kubernetes (k3s) · GitOps · CI/CD** stack.
 
 geostack provides:
 - **agents (subagents)** for tasks worth isolating: implementation in a separate worktree,
@@ -301,6 +301,7 @@ Code exploration uses the built-in **`Explore`** agent ([ADR-0004](docs/adr/0004
 | `web-maps` | maps in React (by description): MapLibre vs OpenLayers, a national CRS (e.g. EPSG:2180) on a map, MVT from PostGIS, validation errors on a map |
 | `postgres-postgis` | `*.sql`, `migrations/`, `alembic/versions/`, spatial queries |
 | `geospatial-validation` | work on the geodata validator and web service (by description) |
+| `qgis-plugins` | QGIS plugins and PyQGIS (by description): threads and `QgsTask`, Processing-first structure, `unload()`, headless tests, publishing, QGIS 4 (Qt6) migration |
 | `kubernetes-manifests` | `kustomization.yaml`, `Chart.yaml`, `values*.yaml`, `k8s/`, `manifests/`, `argocd/`… |
 | `container-images` | `Dockerfile*`, `.dockerignore`, `compose*.yml` (Python/uv, GDAL, frontend images, multi-arch) |
 | `ci-pipelines` | `.github/workflows/`, `.gitlab-ci.yml`, `tekton/` |
@@ -616,6 +617,7 @@ Decisions about geostack itself:
 | [0019](docs/adr/0019-setup-devkit-writes-project-claude-md.md) | `setup-geostack` writes the project `CLAUDE.md` and its languages; skills stop assuming Polish |
 | [0020](docs/adr/0020-domain-and-region-come-from-the-project.md) | geostack serves any GIS project; domain, region and CRS come from the project |
 | [0021](docs/adr/0021-rename-to-geostack.md) | the plugin is renamed from devkit to geostack |
+| [0022](docs/adr/0022-qgis-plugins-skill.md) | QGIS plugins are in scope, as one `qgis-plugins` knowledge skill |
 
 ---
 
@@ -648,11 +650,11 @@ claude --plugin-dir .                    # live test
   marketplace.json         # "dampe" marketplace (source: ./)
 .lsp.json                  # LSP servers: TypeScript, Pyright
 agents/                    # 9 agents (roles)
-skills/                    # 17 skills (knowledge and processes)
+skills/                    # 18 skills (knowledge and processes)
   <name>/SKILL.md          #   instructions
   <name>/references/       #   heavier material, read on demand
   building-ui/assets/      #   tokens.css: starter design system tokens
-  setup-geostack/assets/     #   CLAUDE.project.md: template for projects' CLAUDE.md
+  setup-geostack/assets/   #   CLAUDE.project.md: template for projects' CLAUDE.md
 hooks/
   hooks.json               # PreToolUse → guard registration
   guard_readonly.py        # read-only hook
@@ -660,7 +662,7 @@ hooks/
 docs/
   documentation.md         # how we keep documentation
   design-system.md         # design system workflow
-  adr/                     # decisions (0001–0021)
+  adr/                     # decisions (0001–0022)
 CLAUDE.md                  # instructions for Claude when working on this repo
 LICENSE                    # MIT
 ```
