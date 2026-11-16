@@ -43,4 +43,3 @@ Human docs are in Polish (README, docs/), model-facing files in English (ADR-000
 - Documentation follows `skills/documenting-code`. Record this repo's decisions as ADRs in `docs/adr/`
   in the existing format (Polish, Context/Decision/Alternatives/Consequences), and when adding one,
   add a row to the ADR table in README.md.
-- `_archive/` holds the old v1 agents. They are not loaded; don't edit them.

@@ -649,5 +649,4 @@ docs/
   design-system.md         # workflow design systemu
   adr/                     # decyzje (0001–0017)
 CLAUDE.md                  # instrukcje dla Claude przy pracy nad tym repo
-_archive/agents-v1/        # poprzednie wersje agentów (niewczytywane)
 ```
