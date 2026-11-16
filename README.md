@@ -602,6 +602,7 @@ Decisions about devkit itself:
 | [0016](docs/adr/0016-lsp-servers-in-plugin.md) | LSP servers (TypeScript, Pyright) in the plugin's `.lsp.json` |
 | [0017](docs/adr/0017-drop-codex-variant.md) | dropping the Codex CLI variant; supersedes 0011 and 0012 |
 | [0018](docs/adr/0018-english-only.md) | the whole repo in English; supersedes 0005 |
+| [0019](docs/adr/0019-setup-devkit-writes-project-claude-md.md) | `setup-devkit` writes the project `CLAUDE.md` and its languages; skills stop assuming Polish |
 
 ---
 
@@ -647,6 +648,6 @@ templates/
 docs/
   documentation.md         # how we keep documentation
   design-system.md         # design system workflow
-  adr/                     # decisions (0001–0018)
+  adr/                     # decisions (0001–0019)
 CLAUDE.md                  # instructions for Claude when working on this repo
 ```
