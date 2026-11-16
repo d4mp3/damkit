@@ -44,5 +44,3 @@ Human docs are in Polish (README, docs/), model-facing files in English (ADR-000
   in the existing format (Polish, Context/Decision/Alternatives/Consequences), and when adding one,
   add a row to the ADR table in README.md.
 - `_archive/` holds the old v1 agents. They are not loaded; don't edit them.
-- `codex/` is an independent Codex variant (ADR-0011). When changing `skills/`, `agents/` or `hooks/`,
-  consider porting the change there and run `python3 codex/scripts/check.py`.

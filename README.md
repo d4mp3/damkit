@@ -34,9 +34,8 @@ o stacku i wyspecjalizowanych agentów, którzy wpinają się w kroki tego proce
 8. [Bezpieczeństwo: hook read-only](#bezpieczeństwo-hook-read-only)
 9. [Serwery LSP](#serwery-lsp)
 10. [Dokumentacja i decyzje](#dokumentacja-i-decyzje)
-11. [Codex](#codex)
-12. [Rozwijanie devkitu](#rozwijanie-devkitu)
-13. [Zawartość repo](#zawartość-repo)
+11. [Rozwijanie devkitu](#rozwijanie-devkitu)
+12. [Zawartość repo](#zawartość-repo)
 
 ---
 
@@ -605,22 +604,6 @@ Decyzje dotyczące samego devkitu:
 
 ---
 
-## Codex
-
-Katalog [`codex/`](codex/README.md) zawiera **niezależną wersję devkitu dla Codex CLI** i modeli
-OpenAI: plugin ze skillami, 9 ról jako agenci TOML, guard read-only i sandbox. To osobna kopia plików,
-a nie symlinki ([ADR-0011](docs/adr/0011-codex-variant-as-independent-copy.md)). Instalacja i różnice
-względem wersji Claude są w [`codex/README.md`](codex/README.md).
-
-```bash
-codex plugin marketplace add ~/dev/devkit/codex        # raz na maszynę
-codex plugin add devkit@dampe                                 # skille + guard read-only
-python3 ~/dev/devkit/codex/scripts/install_agents.py ~/dev/moj-projekt   # role
-cp ~/dev/devkit/codex/templates/AGENTS.project.md ~/dev/moj-projekt/AGENTS.md
-```
-
----
-
 ## Rozwijanie devkitu
 
 Konwencje dla pracy nad tym repo są w [`CLAUDE.md`](CLAUDE.md). W skrócie:
@@ -665,6 +648,5 @@ docs/
   design-system.md         # workflow design systemu
   adr/                     # decyzje (0001–0016)
 CLAUDE.md                  # instrukcje dla Claude przy pracy nad tym repo
-codex/                     # niezależna wersja dla Codex CLI (patrz codex/README.md)
 _archive/agents-v1/        # poprzednie wersje agentów (niewczytywane)
 ```
