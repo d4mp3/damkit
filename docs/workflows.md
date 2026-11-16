@@ -104,6 +104,8 @@ axes are reported separately and never merged or ranked together.
 2. **You** add Matt's skills: `npx skills@latest add mattpocock/skills`.
 3. **You** run `/geostack:setup-geostack` in a session. Claude reads the commands and the stack
    from the repo and asks only what it can't read:
+   - the stack, when the repo is fresh or doesn't show it: backend, database, spatial data, frontend,
+     images, Kubernetes. A layer you rule out gets no section in `CLAUDE.md`;
    - the languages of the conversation, UI copy, docs and commit messages;
    - optional learning goals for `/geostack:mentor`;
    - the cluster, when the repo doesn't show it ("run by the ops team, details unknown" is a valid answer).

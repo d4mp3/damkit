@@ -1,6 +1,6 @@
 ---
 name: setup-geostack
-description: "Write or complete the project's CLAUDE.md (geostack's workflow, the project's commands, its language settings) and its shared .claude/settings.json (deny rules, check hooks, the geostack plugin). Run once per project, before /setup-matt-pocock-skills."
+description: "Write or complete the project's CLAUDE.md (geostack's workflow, the project's commands, its language settings, sections only for the stack it uses) and its shared .claude/settings.json (deny rules, check hooks, the geostack plugin). Run once per project, before /setup-matt-pocock-skills."
 disable-model-invocation: true
 ---
 
@@ -15,6 +15,8 @@ Running in this order keeps geostack's `## Workflow` rules and Matt's pointers i
 This skill records **facts**, not decisions. Storage CRS, map library, design system foundation and
 deployment layout are decisions: they belong to `/grill-with-docs` and end in ADRs. Where the repo has
 not settled one yet, leave the template's placeholder and mark it `<decide in /grill-with-docs>`.
+Which layers the project has, and the technology already chosen for each, is a fact: the repo shows it
+or the user knows it. The `CLAUDE.md` gets only the sections and lines that this stack needs.
 
 ## Process
 
@@ -33,8 +35,11 @@ Collect only what the model could not cheaply infer later:
   generation. The commands CI runs (`.github/workflows/`, `.gitlab-ci.yml`, `tekton/`) are the truth;
   then `Makefile`/`justfile`, `pyproject.toml`, `package.json` scripts. Never invent a command:
   if you can't find one, leave the placeholder.
-- **Stack**: which template sections apply. No frontend → drop `## Frontend` and `## Design`.
-  No spatial data → drop `## Data & GIS`. No Kubernetes or GitOps → drop `## Deployment`.
+- **Stack**: for each layer, whether the repo shows it, rules it out or leaves it unclear: backend
+  (language, framework), database, spatial data (geometry columns, PostGIS, GDAL, geodata files),
+  web frontend and whether it shows a map, design system, QGIS plugin (`metadata.txt`), container
+  images, Kubernetes or GitOps, CI. The evidence is code, manifests and dependencies, not plans in a
+  README. A repo with no manifests and almost no code is fresh: every layer is unclear.
 - **Settled decisions**: existing ADRs (`docs/adr/`) that constrain everyday coding become one-line pointers.
   So does what the code has already settled: the SRID of geometry columns in models and migrations is
   the storage CRS. Only with no ADR and no geometry columns is the CRS left for `/grill-with-docs`.
@@ -52,7 +57,15 @@ Collect only what the model could not cheaply infer later:
 
 ### 3. Ask what the repo can't tell
 
-Ask in one round, with the hints from step 2 as proposed answers:
+If any layer is unclear, ask about the stack first, on its own: the other questions depend on it.
+In a fresh repo ask about every layer, otherwise only about the unclear ones, with what step 2 found
+as the proposed answer. Each layer ends up as one of:
+
+- in the project, with its technology → its sections and lines get written;
+- planned, technology not chosen yet → its section gets written with `<decide in /grill-with-docs>`;
+- not in the project → its sections and lines are left out, and its questions below aren't asked.
+
+Then ask the rest in one round, with the hints from step 2 as proposed answers:
 
 - the conversation language;
 - the UI copy language and tone (e.g. informal vs formal address), only if there is a UI;
@@ -71,9 +84,12 @@ don't skip it, even when every answer is English.
 
 ### 4. Write `CLAUDE.md`
 
-- New file: fill the template, drop the sections that don't apply and the template comment.
-  Keep `## Workflow` verbatim: it is how Matt's `/implement` learns when to call geostack's agents.
-- Existing file: add only the missing sections and missing command lines. When the file and the repo
+- New file: fill the template for the stack from steps 2–3. Its sections and some lines carry a
+  `when:` comment: keep them only where it holds for this project, then drop every comment. Keep
+  `## Workflow` as written, except that its review-changes line names only the risk areas the project
+  has: the section is how Matt's `/implement` learns when to call geostack's agents.
+- Existing file: add only the sections and command lines the stack needs and the file lacks, e.g. a
+  frontend that appeared since the last run. When the file and the repo
   disagree (e.g. a test command CI no longer runs), ask instead of choosing.
 - Keep it short: every line is loaded on every turn. Drop example values the project doesn't use.
 
@@ -113,7 +129,8 @@ Add `CLAUDE.local.md` and `.claude/settings.local.json` to `.gitignore` if they 
 
 Show the user the resulting files, or the added parts for existing ones, followed by a list of the
 placeholders left in `CLAUDE.md`: `<decide in /grill-with-docs>` ones for the first grill, and facts you
-couldn't find for the user to fill in. Don't commit.
+couldn't find for the user to fill in. Name the layers you left out, so the user can rerun this
+skill when one of them arrives. Don't commit.
 
 ### 6. Hand off
 
