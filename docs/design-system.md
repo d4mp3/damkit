@@ -1,126 +1,126 @@
-# Design system: jak go zbudować i jak z nim pracować z Claude
+# Design system: how to build one and work with it in Claude
 
-Przewodnik how-to dla frontendów w React/TypeScript.
-Reguły, których model używa przy każdym widoku, są w skillu
-[`building-ui`](../skills/building-ui/SKILL.md). Uzasadnienie podejścia:
+A how-to guide for React/TypeScript frontends.
+The rules the model uses on every view are in the skill
+[`building-ui`](../skills/building-ui/SKILL.md). Rationale for the approach:
 [ADR-0009](adr/0009-ui-quality-through-design-system.md).
 
 > Last verified: 2026-09-29
 
-## Po co
+## Why
 
-Model zna zasady projektowania, ale każda sesja projektuje od zera. Bez design systemu dostajesz
-na każdym ekranie inne odstępy, odcienie i przyciski, a wszystko wygląda „jak z AI”.
-Design system zamienia gust w **ograniczenia w kodzie**. Model, który ma do dyspozycji
-`<Button variant="secondary">` i `--space-4`, nie wymyśli 14. odcienia szarego.
+The model knows design principles, but every session designs from scratch. Without a design system you get
+different spacing, shades and buttons on every screen, and everything looks "AI-made".
+A design system turns taste into **constraints in code**. A model that has
+`<Button variant="secondary">` and `--space-4` at hand won't invent a 14th shade of gray.
 
-## Z czego się składa
+## What it consists of
 
-| Warstwa | Co to jest | Gdzie w repo projektu |
+| Layer | What it is | Where in the project repo |
 |---|---|---|
-| **Tokeny** | kolory, odstępy, typografia, promienie, cienie, ruch, gęstość, w 3 warstwach: prymitywy → semantyczne → motywy | `src/styles/tokens.css` (lub `@theme` w Tailwind v4) |
-| **Komponenty bazowe** | Button, Input, Select, Dialog, Table, Tabs, Toast… | `src/components/ui/` (lub `packages/ui/` w monorepo) |
-| **Wzorce** | złożone układy: „mapa + panel”, „tabela z filtrami”, „strona treści”, „dashboard” | `src/components/patterns/` |
-| **Żywa dokumentacja** | Storybook: każdy komponent i stan jako story, generowane z kodu, więc się nie starzeje | `*.stories.tsx` |
-| **Egzekwowanie** | lint zakazujący surowych wartości, testy wizualne stories | konfiguracja ESLint/stylelint, Playwright |
+| **Tokens** | colors, spacing, typography, radii, shadows, motion, density, in 3 layers: primitives → semantic → themes | `src/styles/tokens.css` (or `@theme` in Tailwind v4) |
+| **Base components** | Button, Input, Select, Dialog, Table, Tabs, Toast… | `src/components/ui/` (or `packages/ui/` in a monorepo) |
+| **Patterns** | composite layouts: "map + panel", "table with filters", "content page", "dashboard" | `src/components/patterns/` |
+| **Living documentation** | Storybook: every component and state as a story, generated from code, so it doesn't go stale | `*.stories.tsx` |
+| **Enforcement** | lint that forbids raw values, visual tests of stories | ESLint/stylelint config, Playwright |
 
-## Faza 0: decyzje (jedna sesja z Claude, wynik: ADR)
+## Phase 0: decisions (one session with Claude, output: ADR)
 
-Najlepiej w `/grill-with-docs`: wywiad dopisuje pojęcia do `CONTEXT.md` i od razu zapisuje ADR.
+Best done in `/grill-with-docs`: the interview adds terms to `CONTEXT.md` and writes the ADR right away.
 
-1. Opowiedz Claude o produkcie: kto używa (leśnicy, pasjonaci, uczniowie), na czym (telefon
-   w terenie, desktop w biurze), jaki charakter (spokojny, treściowy, bez marketingu), jaka gęstość
-   (blog i edu wygodne, mapy, statystyki i walidator kompaktowe).
-2. Wybierz fundament. Typowe opcje:
-   - **shadcn/ui + Tailwind v4**: komponenty kopiowane do repo (pełna kontrola), Radix pod spodem
-     (dostępność), tokeny jako zmienne CSS. Dobry domyślny wybór.
-   - **Mantine**: gotowa, bogata biblioteka (tabele, daty, formularze), mniej kodu do utrzymania,
-     mniejsza swoboda wyglądu.
-   - **Radix Primitives + własne style**: maksimum kontroli, najwięcej pracy.
-3. ADR „Fundament design systemu” z wyborem i odrzuconymi opcjami. `/grill-with-docs` zapisze go
-   sam; poza grillowaniem poproś o niego wprost (skill `domain-modeling`).
-4. Niepewny wygląd ekranów kluczowych? `/prototype` (warianty UI) przed Fazą 1.
+1. Tell Claude about the product: who uses it (foresters, enthusiasts, students), on what (a phone
+   in the field, a desktop in the office), what character (calm, content-focused, no marketing), what density
+   (blog and edu comfortable; maps, statistics and the validator compact).
+2. Pick a foundation. Typical options:
+   - **shadcn/ui + Tailwind v4**: components copied into the repo (full control), Radix underneath
+     (accessibility), tokens as CSS variables. A good default choice.
+   - **Mantine**: a ready, rich library (tables, dates, forms), less code to maintain,
+     less freedom over the look.
+   - **Radix Primitives + your own styles**: maximum control, most work.
+3. An ADR "Design system foundation" with the choice and the rejected options. `/grill-with-docs` writes it
+   itself; outside grilling, ask for it directly (skill `domain-modeling`).
+4. Unsure how the key screens should look? `/prototype` (UI variants) before Phase 1.
 
-## Faza 1: tokeny
-
-```
-Ty: "Zaproponuj tokeny dla platformy leśnej na bazie assets/tokens.css z building-ui"
-Claude: kopiuje startowy plik, dopasowuje paletę (akcent, neutralne), skalę typografii i gęstość,
-        sprawdza kontrast w obu motywach
-Ty: oglądasz stronę "Tokens" w Storybooku (paleta, skala, typografia) i poprawiasz
-```
-
-Zasady:
-- Komponenty używają **tylko tokenów semantycznych** (`--color-text-muted`), nigdy prymitywów
-  (`--neutral-600`). Zmiana motywu to wtedy edycja jednej warstwy.
-- Jeden akcent (tu leśna zieleń). Kolory `danger`/`warning`/`info`/`success` tylko z funkcją znaczeniową.
-- Kontrast według WCAG 2.2: tekst ≥ 4.5:1, obrys kontrolek ≥ 3:1. Startowy plik jest już sprawdzony,
-  ale każdą zmianę koloru sprawdzasz ponownie.
-- Palety do map i wykresów (sekwencyjne, dywergencyjne, kategoryczne, bezpieczne dla daltonistów)
-  też są tokenami. Zobacz `references/data-dense-and-maps.md` w `building-ui`.
-
-## Faza 2: komponenty bazowe
-
-1. Spisz ekrany platformy (blog, post, profil, czat, edu, mapa, statystyki, walidator) i poproś
-   Claude o **inwentarz komponentów**: czego potrzebują wszystkie ekrany.
-2. Budujesz od prymitywów do złożonych: Button, Input, Label → FormField → Dialog → Table → wzorce.
-3. Każdy komponent dostaje story ze **wszystkimi stanami**: default, hover/focus, disabled, loading,
-   error, długi tekst, oba motywy, obie gęstości.
-4. Po każdym komponencie: `/devkit:review-changes`. `frontend-reviewer` sprawdza dostępność
-   i spójność, a jeśli Storybook działa, robi zrzuty ekranu.
-
-Ten etap to dobry kandydat na `/devkit:mentor`. Tokeny i dostępne komponenty (focus trap w Dialogu,
-role ARIA w Tabs) warto napisać samodzielnie przynajmniej raz.
-
-## Faza 3: egzekwowanie
-
-To, co da się sprawdzić automatycznie, nie idzie do prompta:
-- ESLint: zakaz dowolnych wartości w klasach Tailwinda (reguła z pluginu Tailwinda do ESLint,
-  np. `no-arbitrary-value`, zależnie od wersji pluginu). stylelint: `declaration-strict-value`
-  dla kolorów w CSS.
-- Testy wizualne: Playwright `toHaveScreenshot()` na stories. Są stabilne, w przeciwieństwie
-  do kafelków map.
-- CI: lint + testy wizualne komponentów przy zmianach w `components/ui/`.
-- `CLAUDE.md` projektu: sekcja **Design** z szablonu (`templates/CLAUDE.project.md`), czyli
-  gdzie są tokeny i komponenty, charakter produktu, gęstość, zasady tekstów w UI.
-
-## Codzienna praca z Claude
-
-### Nowy ekran
+## Phase 1: tokens
 
 ```
-1. "Zrób widok listy obserwacji z filtrem po gatunku i mapą"
-2. Claude (skill building-ui): najpierw 3–5 linii o celu ekranu, akcji głównej i regionach
-     → akceptujesz lub poprawiasz strukturę, zanim powstanie kod
-3. Implementacja wyłącznie z komponentów i tokenów DS, ze wszystkimi stanami
-4. Pętla wizualna: zrzuty 375 px i 1280 px (+ dark), Claude ogląda i poprawia
-5. /devkit:review-changes → frontend-reviewer (kod + zrzuty) → poprawki
+You: "Propose tokens for the forest platform based on assets/tokens.css from building-ui"
+Claude: copies the starter file, adjusts the palette (accent, neutrals), the type scale and density,
+        checks contrast in both themes
+You: look at the "Tokens" page in Storybook (palette, scale, typography) and make corrections
 ```
 
-### Brakuje komponentu
+Rules:
+- Components use **only semantic tokens** (`--color-text-muted`), never primitives
+  (`--neutral-600`). Changing a theme is then an edit to one layer.
+- One accent (here forest green). `danger`/`warning`/`info`/`success` colors only when they carry meaning.
+- Contrast per WCAG 2.2: text ≥ 4.5:1, control outlines ≥ 3:1. The starter file is already checked,
+  but you recheck every color change.
+- Palettes for maps and charts (sequential, diverging, categorical, colorblind-safe)
+  are tokens too. See `references/data-dense-and-maps.md` in `building-ui`.
 
-Nie robisz jednorazowego komponentu w feature. Kolejność: komponent w `components/ui/`
-+ story + review, a dopiero potem użycie w feature. Claude powinien to zaproponować sam.
-Jeśli tego nie zrobi, `frontend-reviewer` zgłosi duplikat.
+## Phase 2: base components
 
-### Zmiana tokenu
+1. List the platform's screens (blog, post, profile, chat, edu, map, statistics, validator) and ask
+   Claude for a **component inventory**: what all the screens need.
+2. You build from primitives to composites: Button, Input, Label → FormField → Dialog → Table → patterns.
+3. Every component gets a story with **all states**: default, hover/focus, disabled, loading,
+   error, long text, both themes, both densities.
+4. After each component: `/devkit:review-changes`. `frontend-reviewer` checks accessibility
+   and consistency, and if Storybook is running, takes screenshots.
 
-1. Zmiana w warstwie semantycznej (np. `--color-accent`).
-2. Zrzuty kluczowych stories i ekranów przed i po. Przy testach wizualnych Playwright pokaże różnice.
-3. Sprawdzenie kontrastu.
-4. Zmiana znacząca (nowy akcent, nowa skala)? Nowy ADR, który zastępuje poprzedni.
+This stage is a good candidate for `/devkit:mentor`. Tokens and accessible components (focus trap in Dialog,
+ARIA roles in Tabs) are worth writing yourself at least once.
 
-### Masz makiety w Figmie
+## Phase 3: enforcement
 
-Jeśli projektujesz w Figmie, połącz connector Figma. Claude odczyta makietę, ale implementuje
-**z komponentów i tokenów DS**, a nie z wartości wpisanych na sztywno z makiety. Rozbieżność
-między makietą a tokenami to pytanie do Ciebie, a nie powód do dodania nowego koloru.
+What can be checked automatically doesn't go into the prompt:
+- ESLint: ban arbitrary values in Tailwind classes (a rule from the Tailwind ESLint plugin,
+  e.g. `no-arbitrary-value`, depending on the plugin version). stylelint: `declaration-strict-value`
+  for colors in CSS.
+- Visual tests: Playwright `toHaveScreenshot()` on stories. They are stable, unlike
+  map tiles.
+- CI: lint + visual component tests on changes in `components/ui/`.
+- The project's `CLAUDE.md`: the **Design** section from the template (`templates/CLAUDE.project.md`), that is
+  where the tokens and components are, the product's character, density, rules for UI copy.
 
-## Antywzorce
+## Daily work with Claude
 
-- Styl wpisany wprost w feature „bo tylko tutaj”: po miesiącu masz 5 wersji tego samego przycisku.
-- Ślepe kopiowanie szablonu dashboardu z internetu: to marketingowa estetyka w narzędziu roboczym.
-- Tokeny jako jedyna dokumentacja („jest w CSS”): bez Storybooka nikt, łącznie z modelem,
-  nie widzi, co już istnieje.
-- „Wygląda OK” bez zrzutu ekranu: model nie widzi UI, dopóki go nie wyrenderuje i nie obejrzy.
-- Kolor jako jedyny nośnik informacji (statusy, legenda mapy).
+### New screen
+
+```
+1. "Build an observations list view with a species filter and a map"
+2. Claude (skill building-ui): first 3–5 lines on the screen's goal, primary action and regions
+     → you accept or correct the structure before any code is written
+3. Implementation only from DS components and tokens, with all states
+4. Visual loop: screenshots at 375 px and 1280 px (+ dark), Claude looks and fixes
+5. /devkit:review-changes → frontend-reviewer (code + screenshots) → fixes
+```
+
+### A component is missing
+
+You don't make a one-off component inside a feature. Order: component in `components/ui/`
++ story + review, and only then use it in the feature. Claude should propose this on its own.
+If it doesn't, `frontend-reviewer` will flag the duplicate.
+
+### Changing a token
+
+1. Change in the semantic layer (e.g. `--color-accent`).
+2. Screenshots of key stories and screens before and after. With visual tests, Playwright shows the differences.
+3. Contrast check.
+4. A significant change (new accent, new scale)? A new ADR that supersedes the previous one.
+
+### You have mockups in Figma
+
+If you design in Figma, connect the Figma connector. Claude will read the mockup, but implements
+**from DS components and tokens**, not from values hardcoded from the mockup. A mismatch
+between the mockup and the tokens is a question for you, not a reason to add a new color.
+
+## Anti-patterns
+
+- A style written directly in a feature "because it's only here": after a month you have 5 versions of the same button.
+- Blindly copying a dashboard template from the internet: that is marketing aesthetics in a work tool.
+- Tokens as the only documentation ("it's in the CSS"): without Storybook nobody, including the model,
+  can see what already exists.
+- "Looks OK" without a screenshot: the model doesn't see the UI until it renders it and looks at it.
+- Color as the only carrier of information (statuses, map legend).
