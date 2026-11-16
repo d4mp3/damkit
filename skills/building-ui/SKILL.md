@@ -42,8 +42,9 @@ Data-heavy and map screens have their own patterns: `references/data-dense-and-m
   (`p-[13px]`, `text-[#333]`). A value the scale lacks is a design-system question.
 - **Hierarchy through size, weight and space first, and color last.** Use one accent color. Semantic colors
   (danger, warning, success) only carry meaning.
-- **Real content.** Use Polish copy with realistic lengths ("Nadleśnictwo Krościenko", long
-  species names), numbers and dates through `Intl` with `pl-PL`, and units. No lorem ipsum.
+- **Real content.** Write copy in the project's UI language (`## Language` in `CLAUDE.md`; ask once
+  if it's missing) with realistic lengths (long proper names such as "Nadleśnictwo Krościenko", long
+  species names), numbers and dates through `Intl` with the project's locale, and units. No lorem ipsum.
 - **One primary button per view.** Destructive actions are visually distinct and confirmed.
 - **Accessibility is visual too.** Contrast ≥ 4.5:1 for text and ≥ 3:1 for UI parts. Focus stays visible.
   Never rely on color alone (legends, statuses). Targets ≥ 24×24 px, and 44 px on touch. Respect
@@ -54,7 +55,7 @@ Data-heavy and map screens have their own patterns: `references/data-dense-and-m
 | State | What it shows |
 |---|---|
 | loading | a skeleton in the final layout's shape (no layout jump), not a lone spinner for a whole page |
-| empty | why it's empty, plus the next action ("Dodaj pierwszą obserwację") |
+| empty | why it's empty, plus the next action ("Add your first observation", in the UI language) |
 | error | what failed in human terms, plus retry. Keep the rest of the page usable. |
 | overflow | long text (truncate with a tooltip or wrap), and 0 / 1 / 1000 items (pagination or virtualization) |
 | permission | hidden vs disabled-with-explanation, chosen consistently |

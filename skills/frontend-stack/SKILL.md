@@ -31,6 +31,7 @@ existing code win.
 - MapLibre and OpenLayers do not render in jsdom. Unit-test what surrounds the map (layer and
   style builders, feature → popup mapping, URL ↔ view state) and cover the map itself in
   Playwright. Keep `toHaveScreenshot` to stable UI chrome; tiles make map screenshots flaky.
-- Role and label queries match the Polish UI copy: `getByRole("button", { name: /zapisz/i })`.
+- Role and label queries match the UI copy in the project's language (`## Language` in `CLAUDE.md`),
+  not English: `getByRole("button", { name: /zapisz/i })` in a Polish UI.
 - Playwright covers the critical flows against the real backend (docker compose or a preview
   environment), seeded through the API.
