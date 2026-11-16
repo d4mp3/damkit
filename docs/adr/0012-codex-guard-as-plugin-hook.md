@@ -1,44 +1,44 @@
-# ADR-0012: Guard read-only w Codeksie jako hook pluginu filtrowany po `agent_type`
+# ADR-0012: Read-only guard in Codex as a plugin hook filtered by `agent_type`
 
-- Status: Superseded by [ADR-0017](0017-drop-codex-variant.md); wcześniej zastępował część ADR-0011 dotyczącą guarda
+- Status: Superseded by [ADR-0017](0017-drop-codex-variant.md); earlier, it superseded the part of ADR-0011 about the guard
 - Date: 2026-09-29
 
 ## Context
 
-ADR-0011 wpiął guard read-only w plik TOML każdej roli (`[[hooks.PreToolUse]]`), bo dokumentacja
-Codeksa nie opisywała w wejściu hooka typu agenta. Test na Codex 0.156.1 (`codex exec` z rolą-sondą
-w tymczasowym projekcie) pokazał, że:
-- hook `PreToolUse` na poziomie projektu dostaje dla spawnowanego agenta `"agent_type":"probe"`
-  i `"agent_id"`;
-- hook zadeklarowany w TOML tej samej roli **nie** odpalił przed tą samą komendą;
-- tabela `hooks` w TOML nie psuje wczytywania roli, ale jest martwa.
+ADR-0011 wired the read-only guard into each role's TOML file (`[[hooks.PreToolUse]]`), because the Codex
+documentation did not describe the agent type in the hook input. A test on Codex 0.156.1 (`codex exec` with a probe role
+in a temporary project) showed that:
+- a project-level `PreToolUse` hook receives `"agent_type":"probe"`
+  and `"agent_id"` for a spawned agent;
+- a hook declared in the same role's TOML did **not** fire before the same command;
+- a `hooks` table in TOML does not break loading the role, but it is dead.
 
-Guard z ADR-0011 w praktyce nie działał. Chronił tylko sandbox.
+The guard from ADR-0011 did not work in practice. Only the sandbox protected.
 
 ## Decision
 
-- Guard jest **hookiem pluginu** (`codex/hooks/hooks.json`, `${PLUGIN_ROOT}`), tak jak w wersji Claude
-  (ADR-0003). Ogranicza tylko role z `READONLY_AGENTS` (po `agent_type`). Główna sesja
-  i `implementation_worker` nie dostają decyzji.
-- Komenda hooka kończy się `|| true`. Hook odpala się w każdej sesji, a brak pliku guarda dałby
-  exit 2, który Codex traktuje jako blokadę każdej komendy.
-- Bloki `[[hooks…]]` znikają z TOML ról. `install_agents.py` kopiuje tylko role i nie wymaga
-  korzenia repo gita.
-- `verify_guard.sh` sprawdza cały łańcuch na zainstalowanym pluginie: `code_reviewer` próbuje
-  `git commit`, guard ma to zablokować. Zastępuje `probe_agent_hooks.sh`.
+- The guard is a **plugin hook** (`codex/hooks/hooks.json`, `${PLUGIN_ROOT}`), as in the Claude version
+  (ADR-0003). It restricts only the roles in `READONLY_AGENTS` (by `agent_type`). The main session
+  and `implementation_worker` get no decision.
+- The hook command ends with `|| true`. The hook fires in every session, and a missing guard file would give
+  exit 2, which Codex treats as blocking every command.
+- The `[[hooks…]]` blocks are removed from the role TOMLs. `install_agents.py` copies only the roles and does not require
+  a git repo root.
+- `verify_guard.sh` checks the whole chain on the installed plugin: `code_reviewer` tries
+  `git commit`, and the guard must block it. It replaces `probe_agent_hooks.sh`.
 
 ## Alternatives considered
 
-- **Hook w `.codex/hooks.json` projektu (kopiowany instalatorem)**: to jedyny wariant potwierdzony
-  wprost, ale wymaga scalania z istniejącymi hookami użytkownika i kopii guarda w każdym projekcie.
-  Hook pluginu ma według dokumentacji ten sam schemat wejścia. `verify_guard.sh` to potwierdza,
-  a jeśli wykaże inaczej, wracamy do tej opcji.
-- **Zostawienie hooków w TOML ról**: test pokazał, że Codex ich nie uruchamia.
+- **A hook in the project's `.codex/hooks.json` (copied by the installer)**: the only option confirmed
+  directly, but it requires merging with the user's existing hooks and a copy of the guard in every project.
+  According to the documentation, a plugin hook has the same input schema. `verify_guard.sh` confirms this,
+  and if it shows otherwise, we return to this option.
+- **Keeping the hooks in the role TOMLs**: the test showed that Codex does not run them.
 
 ## Consequences
 
-- Plugin wymaga jednorazowego zaufania do hooka. Bez tego guard jest nieaktywny, a README o tym mówi.
-- Lista ról read-only jest w dwóch miejscach (`guard_readonly.py` i `check.py`); `check.py`
-  pilnuje, żeby się zgadzały.
-- Guard zależy od tego, że Codex dalej przekazuje `agent_type`. `verify_guard.sh` warto uruchamiać
-  po aktualizacjach Codeksa.
+- The plugin requires trusting the hook once. Without that the guard is inactive, and the README says so.
+- The list of read-only roles is in two places (`guard_readonly.py` and `check.py`); `check.py`
+  makes sure they match.
+- The guard depends on Codex continuing to pass `agent_type`. It is worth running `verify_guard.sh`
+  after Codex updates.

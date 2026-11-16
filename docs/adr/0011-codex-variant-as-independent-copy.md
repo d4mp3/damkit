@@ -1,49 +1,49 @@
-# ADR-0011: Wariant dla Codex CLI jako niezależna kopia w `codex/`
+# ADR-0011: Codex CLI variant as an independent copy in `codex/`
 
-- Status: Superseded by [ADR-0017](0017-drop-codex-variant.md); wcześniej część o guardzie read-only zastąpiona przez [ADR-0012](0012-codex-guard-as-plugin-hook.md)
+- Status: Superseded by [ADR-0017](0017-drop-codex-variant.md); earlier, the part about the read-only guard was superseded by [ADR-0012](0012-codex-guard-as-plugin-hook.md)
 - Date: 2026-09-29
 
 ## Context
 
-Chcę mieć devkit również w Codex CLI (0.156) z modelami OpenAI. Codex ma pluginy
-(`.codex-plugin/plugin.json`) ze skillami i hookami oraz marketplace (`.agents/plugins/marketplace.json`),
-ale różni się od Claude Code w miejscach, na których opiera się devkit:
-- plugin **nie może zawierać agentów**. Agenci to pliki TOML w `<projekt>/.codex/agents/`
+I want devkit in Codex CLI (0.156) with OpenAI models as well. Codex has plugins
+(`.codex-plugin/plugin.json`) with skills and hooks, and a marketplace (`.agents/plugins/marketplace.json`),
+but it differs from Claude Code in places devkit relies on:
+- a plugin **cannot contain agents**. Agents are TOML files in `<project>/.codex/agents/`
   (`developer_instructions`, `model`, `model_reasoning_effort`, `sandbox_mode`);
-- dokumentacja nie opisuje w wejściu hooka `PreToolUse` **typu agenta**, więc nie da się polegać na tym,
-  że hook pluginu odróżni reviewera od głównej sesji, tak jak robi to `hooks/guard_readonly.py` (ADR-0003).
-  Binarka 0.156 ma w schemacie opcjonalne `agent_type`, ale nie wiadomo, czy jest wypełniane;
-- Codex ma za to natywny sandbox per agent (`sandbox_mode = "read-only"`: brak zapisu i sieci na poziomie OS);
-- nie ma `paths:` w skillach, izolacji w worktree per agent ani wklejania skilli agentowi.
+- the documentation does not describe the **agent type** in the `PreToolUse` hook input, so we can't rely on
+  a plugin hook telling a reviewer apart from the main session, as `hooks/guard_readonly.py` does (ADR-0003).
+  The 0.156 binary has an optional `agent_type` in its schema, but it is unknown whether it gets filled in;
+- Codex does have a native per-agent sandbox (`sandbox_mode = "read-only"`: no writes and no network at the OS level);
+- there is no `paths:` in skills, no per-agent worktree isolation, and no preloading skills into an agent.
 
 ## Decision
 
-- **`codex/` to niezależna, ręcznie dostosowana kopia**: plugin i marketplace `dampe` w jednym
-  katalogu, 16 skilli, 9 ról. Same prawdziwe pliki, bez symlinków i bez odwołań poza `codex/`.
-- **Role jako TOML instalowane skryptem** (`codex/scripts/install_agents.py`) do `.codex/agents/`
-  projektu, razem z guardem w `.codex/devkit/`. Nazwy w snake_case (`code_reviewer`).
-- **Read-only = sandbox + guard w TOML roli.** `sandbox_mode = "read-only"` jest główną granicą.
-  Port guarda (bez filtra po agencie) jest wpięty jako `[[hooks.PreToolUse]]` w plik każdej z 7 ról
-  z `READONLY_AGENTS`. Czy Codex honoruje hooki z warstwy agenta, sprawdza `probe_agent_hooks.sh`.
-- **Modele:** role, które w wersji Claude mają `sonnet`, dostają `model = "gpt-6-sol"`; role
-  `inherit` nie mają pola `model`. `model_reasoning_effort` jest jawny jak w ADR-0008.
+- **`codex/` is an independent, manually adapted copy**: the `dampe` plugin and marketplace in one
+  directory, 16 skills, 9 roles. Only real files, no symlinks and no references outside `codex/`.
+- **Roles as TOML installed by a script** (`codex/scripts/install_agents.py`) into the project's
+  `.codex/agents/`, together with the guard in `.codex/devkit/`. Names in snake_case (`code_reviewer`).
+- **Read-only = sandbox + guard in the role's TOML.** `sandbox_mode = "read-only"` is the main boundary.
+  A port of the guard (without the agent filter) is wired as `[[hooks.PreToolUse]]` into the file of each of the 7 roles
+  from `READONLY_AGENTS`. `probe_agent_hooks.sh` checks whether Codex honors hooks from the agent layer.
+- **Models:** roles that have `sonnet` in the Claude version get `model = "gpt-6-sol"`; `inherit`
+  roles have no `model` field. `model_reasoning_effort` is explicit, as in ADR-0008.
 
 ## Alternatives considered
 
-- **`codex/skills/` generowane z `skills/` + test wykrywający rozjazd**: jedno źródło prawdy, ale
-  dodatkowe narzędzie i transformacje dla dwóch odbiorców. Odrzucone: wolę niezależną kopię, którą
-  można zmieniać pod Codeksa bez oglądania się na generator.
-- **Symlinki do `../skills`**: treść zostałaby specyficzna dla Claude (`/devkit:…`, nazwy subagentów,
-  `${CLAUDE_PLUGIN_ROOT}`), a Codex kopiuje plugin do cache, więc symlinki mogą nie przetrwać instalacji.
-- **Globalny guard w hooku pluginu lub projektu**: bez pewnego typu agenta blokowałby też główną
-  sesję (`git commit`, `rm`, `npm install`). Jeśli probe pokaże, że `agent_type` jest wypełniane,
-  wracamy do tej opcji nowym ADR-em.
+- **`codex/skills/` generated from `skills/` + a test detecting drift**: one source of truth, but
+  an extra tool and transformations for two audiences. Rejected: I prefer an independent copy that
+  can be changed for Codex without worrying about a generator.
+- **Symlinks to `../skills`**: the content would stay Claude-specific (`/devkit:…`, subagent names,
+  `${CLAUDE_PLUGIN_ROOT}`), and Codex copies the plugin into a cache, so symlinks may not survive installation.
+- **A global guard in a plugin or project hook**: without a reliable agent type, it would also block the main
+  session (`git commit`, `rm`, `npm install`). If the probe shows that `agent_type` is filled in,
+  we return to this option with a new ADR.
 
 ## Consequences
 
-- Zmiany w `skills/`, `agents/` i `hooks/` trzeba przenosić do `codex/` ręcznie. Przypomina o tym
-  linia w `CLAUDE.md`, a `codex/scripts/check.py` wyłapuje pozostałości po Claude.
-- Nazwy modeli OpenAI trzeba aktualizować, gdy zmieni się ich lista.
-- Jeśli `probe_agent_hooks.sh` pokaże, że hooki w TOML agenta nie działają, chroni tylko sandbox: komendy do klastra
-  wymagają zgody człowieka, a po zgodzie nic mechanicznie nie blokuje np. `kubectl apply`.
-- `implementation_worker` nie ma izolacji w worktree. Praca równoległa tylko na rozłącznych plikach.
+- Changes in `skills/`, `agents/` and `hooks/` have to be ported to `codex/` by hand. A line in
+  `CLAUDE.md` is a reminder, and `codex/scripts/check.py` catches Claude leftovers.
+- OpenAI model names have to be updated when their list changes.
+- If `probe_agent_hooks.sh` shows that hooks in the agent's TOML don't work, only the sandbox protects: commands against the cluster
+  require human approval, and after approval nothing mechanically blocks e.g. `kubectl apply`.
+- `implementation_worker` has no worktree isolation. Parallel work only on disjoint files.

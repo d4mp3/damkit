@@ -1,40 +1,40 @@
-# ADR-0009: Jakość UI przez design system i pętlę wizualną, bez agenta „UI/UX designer”
+# ADR-0009: UI quality through a design system and a visual loop, without a "UI/UX designer" agent
 
 - Status: Accepted
 - Date: 2026-09-29
 
 ## Context
 
-Modele znają zasady projektowania UI. W praktyce mają jednak powtarzalne słabości: generyczną
-estetykę („wygląd AI”), niespójność między ekranami (każda sesja zaczyna od zera), brak
-podglądu wyniku i pomijanie stanów (brak danych, błąd, przepełnienie). Samo iterowanie daje
-akceptowalny pojedynczy ekran, ale nie spójną platformę, i kosztuje mój czas przy każdym ekranie.
+Models know the principles of UI design. In practice, though, they have recurring weaknesses: generic
+aesthetics (the "AI look"), inconsistency between screens (every session starts from scratch), no
+preview of the result, and skipped states (no data, error, overflow). Iterating alone produces an
+acceptable single screen, but not a consistent platform, and it costs my time on every screen.
 
 ## Decision
 
-- Skill `building-ui` zawiera proces (najpierw design system projektu, cel ekranu, reguły
-  budowy, tabela stanów, antywzorce), **obowiązkową weryfikację zrzutami ekranu**
-  (`npx playwright screenshot`) przed zgłoszeniem, że gotowe, oraz wzorce dla ekranów z dużą
-  ilością danych i map.
-- Asset `assets/tokens.css`: startowe tokeny w 3 warstwach, ze sprawdzonym kontrastem WCAG.
-- `frontend-reviewer` dostaje wklejony `building-ui`, sprawdza spójność z design systemem i, gdy
-  UI da się wyrenderować, robi zrzuty ekranu.
-- Szablon `CLAUDE.project.md` ma sekcję **Design** na decyzje konkretnego produktu.
-- Przewodnik [`docs/design-system.md`](../design-system.md) opisuje, jak zbudować design system
-  i jak z nim pracować.
+- The `building-ui` skill contains the process (the project's design system first, the screen's goal, build
+  rules, a states table, anti-patterns), **mandatory verification with screenshots**
+  (`npx playwright screenshot`) before reporting that it is done, and patterns for data-heavy screens
+  and maps.
+- Asset `assets/tokens.css`: starter tokens in 3 layers, with checked WCAG contrast.
+- `frontend-reviewer` gets `building-ui` preloaded, checks consistency with the design system and, when
+  the UI can be rendered, takes screenshots.
+- The `CLAUDE.project.md` template has a **Design** section for the decisions of a specific product.
+- The guide [`docs/design-system.md`](../design-system.md) describes how to build a design system
+  and how to work with it.
 
 ## Alternatives considered
 
-- **Agent lub persona „UI/UX designer”**: persona nie dodaje wiedzy, a projektowanie UI wymaga
-  ciągłej wymiany ze mną, której subagent nie ma (ADR-0002).
-- **Tylko iterowanie z modelem**: prowadzi do dryfu między ekranami i przeciętnej estetyki.
-- **Wyłącznie oficjalny skill `frontend-design`**: skupia się na kierunku estetycznym,
-  nie na design systemie, stanach, weryfikacji i narzędziach do pracy z danymi. Można go używać równolegle.
+- **A "UI/UX designer" agent or persona**: a persona adds no knowledge, and UI design requires
+  continuous exchange with me, which a subagent doesn't have (ADR-0002).
+- **Only iterating with the model**: leads to drift between screens and mediocre aesthetics.
+- **Only the official `frontend-design` skill**: it focuses on aesthetic direction,
+  not on the design system, states, verification and tools for working with data. It can be used alongside.
 
 ## Consequences
 
-- Charakter, marka i wzorce konkretnego produktu żyją w repo produktu (`CLAUDE.md`, tokeny,
-  Storybook), a nie w devkicie.
-- Pętla wizualna wymaga działającego dev serwera lub Storybooka oraz przeglądarek Playwrighta.
-  Bez nich agent musi jawnie napisać, że weryfikacji wizualnej nie było.
-- Badań UX z użytkownikami (wywiady, testy) żaden skill nie zastępuje.
+- The character, brand and patterns of a specific product live in the product's repo (`CLAUDE.md`, tokens,
+  Storybook), not in devkit.
+- The visual loop requires a running dev server or Storybook, and Playwright browsers.
+  Without them, the agent must state explicitly that there was no visual verification.
+- No skill replaces UX research with users (interviews, tests).
