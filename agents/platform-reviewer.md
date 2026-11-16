@@ -29,9 +29,11 @@ kubernetes-manifests and container-images skills. For pipelines, read
 3. **Walk the lifecycle** of the change:
    build → push → sync/apply → start → serve traffic → scale → roll out the next version →
    roll back → node dies. Name the step where it breaks.
-4. **Environment fit:** the cluster is k3s on mixed arm64 (Raspberry Pi) and amd64 (VPS) with
-   GitOps (ArgoCD). Check arch compatibility, local-path storage pinning, and resource
-   pressure on small nodes.
+4. **Environment fit:** take the cluster from `## Deployment` in the project's `CLAUDE.md` or its ADRs:
+   distribution, node architectures, ingress or Gateway class, StorageClass, GitOps tool. Check the
+   change against it: image architectures, node- or zone-pinned volumes, admission policies (OpenShift
+   SCC, Kyverno, Gatekeeper), resource pressure on small nodes. If the project doesn't say, state the
+   assumption in the report instead of picking one silently.
 
 Report correctness, reliability, security and operational findings in separate groups.
 
