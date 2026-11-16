@@ -3,7 +3,7 @@
 ## geometry vs geography
 
 - `geometry` in a projected CRS: fast, precise for a regional extent, and the full function set.
-  The default choice for data inside Poland (EPSG:2180).
+  The default choice for data within one country or region (the project's storage CRS, e.g. EPSG:2180).
 - `geography`: correct distances on the sphere for global data, but slower and fewer functions.
   Good for "points within X meters" over worldwide data.
 - Casting on the fly (`geom::geography`) in WHERE kills the index unless there is an expression index.
@@ -14,13 +14,13 @@
 SELECT a.id, b.id
 FROM parcels a
 JOIN forest_units b ON ST_Intersects(a.geom, b.geom)   -- uses GiST on both sides
-WHERE a.geom && ST_MakeEnvelope(:xmin, :ymin, :xmax, :ymax, 2180);
+WHERE a.geom && ST_MakeEnvelope(:xmin, :ymin, :xmax, :ymax, 2180);  -- the column's SRID
 ```
 
 - `ST_Intersects` / `ST_Contains` / `ST_Within` / `ST_DWithin` use the index automatically.
   `ST_Relate` with a custom pattern does not do a bbox pre-filter in every version, so add `&&`.
 - `ST_Intersection` (computes geometry) is expensive. Filter with `ST_Intersects` first.
-- Area/length in a metric CRS: `ST_Area(geom)` on 2180 gives m². On 4326 it gives meaningless "square degrees".
+- Area/length in a metric CRS: `ST_Area(geom)` on a metric CRS such as 2180 gives m². On 4326 it gives meaningless "square degrees".
 
 ## Indexes
 
@@ -49,7 +49,7 @@ a thin endpoint or pg_tileserv/Martin. Simplify per zoom level and cache aggress
 
 ## GeoDjango mapping
 
-- `PolygonField(srid=2180)` keeps the column SRID explicit.
+- `PolygonField(srid=2180)` (the project's storage SRID) keeps the column SRID explicit.
 - `filter(geom__intersects=g)`, `filter(geom__dwithin=(pt, D(m=100)))` (metric SRID or geography only).
 - `Transform` in annotations runs in the DB. Prefer it to transforming in Python.
 - `GEOSGeometry` operations run in Python. Don't loop over 100k rows doing them. Push them to SQL.

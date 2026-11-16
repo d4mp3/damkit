@@ -46,9 +46,12 @@ Safe patterns per DDL: `references/migrations-locking.md`.
 ## PostGIS essentials
 
 - **SRID discipline.** Store in a projected metric CRS when you compute distances or areas
-  over a regional extent. For Poland that is EPSG:2180 (PUWG 1992). Use EPSG:4326 for
-  interchange and web APIs, and EPSG:3857 only for tile rendering. Mixed SRIDs in one column
-  are a bug: enforce with `geometry(MultiPolygon, 2180)`.
+  over a regional extent: usually the national grid (e.g. EPSG:2180 in Poland, 27700 in Great
+  Britain, 25832/25833 in Germany) or a UTM zone. Take the project's storage CRS from
+  `## Data & GIS` in its `CLAUDE.md` or its ADR; with neither, it is a question for
+  `/grill-with-docs`, not a default to pick. Use EPSG:4326 for interchange and web APIs, and
+  EPSG:3857 only for tile rendering. Mixed SRIDs in one column are a bug: enforce with
+  `geometry(MultiPolygon, <srid>)`.
 - `ST_DWithin(geom, :pt, 100)` on 4326 **geometry** means 100 *degrees*. Use metric geometry
   or `geography`.
 - Index-killers: `ST_Distance(...) < x` (use `ST_DWithin`), `ST_Transform(column, ...)` in
