@@ -1,6 +1,6 @@
 ---
 name: mentor
-description: Use when the user wants to learn while doing a real task in this project rather than just get a result - says "naucz mnie", "teach me", "explain why", "I want to understand", "let me try", or is working on a learning project (k3s homelab, GitOps, CI/CD, platform engineering, Go, Rust). Also when they ask for a review of their own attempt. Multi-session study of a topic belongs to /teach.
+description: Use when the user wants to learn while doing a real task in this project rather than just get a result - says "naucz mnie", "teach me", "explain why", "I want to understand", "let me try", or is working on a learning project (a Kubernetes homelab, GitOps, CI/CD, platform engineering, Go, Rust). Also when they ask for a review of their own attempt. Multi-session study of a topic belongs to /teach.
 argument-hint: "[topic or task]"
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: container-images
-description: Use when writing, reviewing or debugging Dockerfiles, Containerfiles, .dockerignore or docker compose files - Python/uv images, React/Vite static frontend images, GDAL/GeoDjango system dependencies, multi-arch (arm64 + amd64) builds, image size, non-root users, signal handling, image scanning and signing, pushing to Harbor.
+description: Use when writing, reviewing or debugging Dockerfiles, Containerfiles, .dockerignore or docker compose files - Python/uv images, React/Vite static frontend images, GDAL/GeoDjango system dependencies, multi-arch (arm64 + amd64) builds, image size, non-root users, signal handling, image scanning and signing, pushing to a registry.
 paths:
   - "**/Dockerfile"
   - "**/Dockerfile.*"
@@ -63,14 +63,18 @@ Adapt versions to the project, and pin the base images by digest in production (
   final stage. Or start from `ghcr.io/osgeo/gdal:ubuntu-small-<ver>`.
 - Don't mix: the `GDAL` Python bindings must match the system libgdal version exactly.
 
-## Multi-arch (Raspberry Pi arm64 + amd64 VPS)
+## Multi-arch (arm64 + amd64)
 
-- `docker buildx build --platform linux/amd64,linux/arm64 -t harbor.example/proj/app:<sha> --push .`
+Needed whenever builders and nodes differ: arm64 cloud nodes (Graviton, Ampere), Raspberry Pi nodes, or
+an Apple Silicon laptop building for amd64 servers (a plain `docker build` there produces arm64 only).
+
+
+- `docker buildx build --platform linux/amd64,linux/arm64 -t registry.example/proj/app:<sha> --push .`
 - QEMU emulation is 5–20× slower for compiling. Prefer native arm64 runners, or make sure every
   dependency has an aarch64 wheel (check before adding a dependency).
 - Verify: `docker buildx imagetools inspect <ref>`.
 - Some popular images are amd64-only or lag behind on arm64 (historically `postgis/postgis`).
-  Check before relying on them on the Pi.
+  Check before relying on them on arm64 nodes.
 
 ## Checks
 
