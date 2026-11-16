@@ -1,653 +1,651 @@
 # devkit
 
-Plugin do Claude Code wspierający codzienną pracę i rozwój w stacku
-**Python/Django/FastAPI · React/TypeScript · PostgreSQL/PostGIS · dane GIS i mapy webowe · Docker · Kubernetes (k3s) · GitOps · CI/CD**.
+A Claude Code plugin for everyday work and growth in the
+**Python/Django/FastAPI · React/TypeScript · PostgreSQL/PostGIS · GIS data and web maps · Docker · Kubernetes (k3s) · GitOps · CI/CD** stack.
 
-devkit dostarcza:
-- **agentów (subagentów)** do zadań, które warto odizolować: implementacja w osobnym worktree,
-  niezależne review (kod, bezpieczeństwo, baza, infrastruktura, frontend), testy, diagnoza klastra,
-  research dokumentacji;
-- **skille**, czyli wiedzę o technologiach i kilka procesów (review ryzyka, nauka przy zadaniu,
-  budowanie UI), ładowane dopiero wtedy, gdy są potrzebne;
-- **hook read-only**, który technicznie blokuje reviewerom zmiany w klastrze, repo, bazie i plikach;
-- **serwery LSP** dla TypeScriptu i Pythona: diagnostyka po każdej edycji i nawigacja po symbolach;
-- **wzorce pracy**: dokumentacja (ADR-y, `CLAUDE.md`), design system, szablon `CLAUDE.md` dla
-  projektów. To repo stosuje je samo na sobie.
+devkit provides:
+- **agents (subagents)** for tasks worth isolating: implementation in a separate worktree,
+  independent review (code, security, database, infrastructure, frontend), tests, cluster diagnosis,
+  documentation research;
+- **skills**: technology knowledge and a few processes (risk review, learning on a task,
+  building UI), loaded only when needed;
+- **a read-only hook** that technically blocks reviewers from changing the cluster, repo, database and files;
+- **LSP servers** for TypeScript and Python: diagnostics after every edit and symbol navigation;
+- **working patterns**: documentation (ADRs, `CLAUDE.md`), design system, a `CLAUDE.md` template for
+  projects. This repo applies them to itself.
 
-devkit jest zaprojektowany do pracy **obok skilli Matta Pococka** ([`mattpocock/skills`](https://github.com/mattpocock/skills)):
-Matt prowadzi proces (od pomysłu przez spec i tickety do commita), a devkit dostarcza wiedzę
-o stacku i wyspecjalizowanych agentów, którzy wpinają się w kroki tego procesu
-([ADR-0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md)). Jak to połączyć:
-[Praca obok skilli Matta Pococka](#praca-obok-skilli-matta-pococka).
-
----
-
-## Spis treści
-
-1. [Instalacja](#instalacja)
-2. [Jak to jest zbudowane](#jak-to-jest-zbudowane)
-3. [Praca obok skilli Matta Pococka](#praca-obok-skilli-matta-pococka)
-4. [Agenci](#agenci)
-5. [Skille](#skille)
-6. [Jak korzystać: wywoływanie](#jak-korzystać-wywoływanie)
-7. [Workflowy](#workflowy)
-8. [Bezpieczeństwo: hook read-only](#bezpieczeństwo-hook-read-only)
-9. [Serwery LSP](#serwery-lsp)
-10. [Dokumentacja i decyzje](#dokumentacja-i-decyzje)
-11. [Rozwijanie devkitu](#rozwijanie-devkitu)
-12. [Zawartość repo](#zawartość-repo)
+devkit is designed to work **alongside Matt Pocock's skills** ([`mattpocock/skills`](https://github.com/mattpocock/skills)):
+Matt runs the process (from idea through spec and tickets to commit), and devkit provides stack
+knowledge and specialized agents that plug into the steps of that process
+([ADR-0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md)). How to combine them:
+[Working alongside Matt Pocock's skills](#working-alongside-matt-pococks-skills).
 
 ---
 
-## Instalacja
+## Table of contents
+
+1. [Installation](#installation)
+2. [How it is built](#how-it-is-built)
+3. [Working alongside Matt Pocock's skills](#working-alongside-matt-pococks-skills)
+4. [Agents](#agents)
+5. [Skills](#skills)
+6. [How to use: invocation](#how-to-use-invocation)
+7. [Workflows](#workflows)
+8. [Safety: the read-only hook](#safety-the-read-only-hook)
+9. [LSP servers](#lsp-servers)
+10. [Documentation and decisions](#documentation-and-decisions)
+11. [Developing devkit](#developing-devkit)
+12. [Repository contents](#repository-contents)
+
+---
+
+## Installation
 
 ```bash
-# 1. raz na maszynę: zarejestruj to repo jako marketplace (ścieżka lokalna lub URL gita)
+# 1. once per machine: register this repo as a marketplace (local path or git URL)
 claude plugin marketplace add ~/dev/devkit
 
-# 2. w każdym projekcie, w którym chcesz devkit:
-cd ~/dev/moj-projekt
-claude plugin install devkit@dampe --scope project   # zapisuje .claude/settings.json: commituj go
+# 2. in every project where you want devkit:
+cd ~/dev/my-project
+claude plugin install devkit@dampe --scope project   # writes .claude/settings.json: commit it
 
-# 3. po zmianach w tym repo:
+# 3. after changes in this repo:
 claude plugin marketplace update dampe
 ```
 
-Test bez instalacji: `claude --plugin-dir ~/dev/devkit`.
+Test without installing: `claude --plugin-dir ~/dev/devkit`.
 
-Nowy projekt razem ze skillami Matta: [setup krok po kroku](#1-setup-nowego-projektu-raz).
-W skrócie: plugin → `npx skills@latest add mattpocock/skills` → szablon
-[`templates/CLAUDE.project.md`](templates/CLAUDE.project.md) jako `CLAUDE.md` → `/setup-matt-pocock-skills`.
+A new project together with Matt's skills: [step-by-step setup](#1-new-project-setup-once).
+In short: plugin → `npx skills@latest add mattpocock/skills` → the
+[`templates/CLAUDE.project.md`](templates/CLAUDE.project.md) template as `CLAUDE.md` → `/setup-matt-pocock-skills`.
 
-**Wymagania:** `python3` (hook), serwery LSP na `PATH` (raz na maszynę, [szczegóły](#serwery-lsp)), opcjonalnie narzędzia wykorzystywane przez skille i agentów:
-`kubeconform`, `kube-linter`, `hadolint`, `actionlint`, `trivy`, Playwright (zrzuty ekranu UI).
-Agenci sprawdzają, co jest zainstalowane, i nie zakładają reszty.
+**Requirements:** `python3` (hook), LSP servers on `PATH` (once per machine, [details](#lsp-servers)), and optionally the tools used by skills and agents:
+`kubeconform`, `kube-linter`, `hadolint`, `actionlint`, `trivy`, Playwright (UI screenshots).
+Agents check what is installed and don't assume the rest.
 
 ---
 
-## Jak to jest zbudowane
+## How it is built
 
-Trzy warstwy, każda z inną odpowiedzialnością ([ADR-0002](docs/adr/0002-agents-are-roles-skills-are-knowledge.md)):
+Three layers, each with a different responsibility ([ADR-0002](docs/adr/0002-agents-are-roles-skills-are-knowledge.md)):
 
-| Warstwa | Gdzie | Co zawiera | Kiedy się ładuje |
+| Layer | Where | What it holds | When it loads |
 |---|---|---|---|
-| **Agent** | `agents/` (plugin) | **rolę**: metodę pracy, narzędzia, format wyniku. Bez wiedzy o stacku. | gdy główna sesja deleguje zadanie |
-| **Skill** | `skills/` (plugin) | **wiedzę o technologii** lub **proces**, opcjonalnie `references/` (cięższe materiały) i `assets/` (pliki do skopiowania) | na żądanie: po opisie, po ścieżce pliku (`paths`), przez `/devkit:…`, albo wklejony agentowi (`skills:`) |
-| **CLAUDE.md** | w projekcie | **fakty o projekcie**: komendy, architektura, CRS, design, deploy | zawsze, w danym projekcie |
+| **Agent** | `agents/` (plugin) | **a role**: working method, tools, output format. No stack knowledge. | when the main session delegates a task |
+| **Skill** | `skills/` (plugin) | **technology knowledge** or **a process**, optionally `references/` (heavier material) and `assets/` (files to copy) | on demand: by description, by file path (`paths`), via `/devkit:…`, or preloaded into an agent (`skills:`) |
+| **CLAUDE.md** | in the project | **project facts**: commands, architecture, CRS, design, deploy | always, in that project |
 
-Co gdzie trafia:
-- **Agent** tylko wtedy, gdy potrzebujesz izolacji kontekstu (dużo logów, plików, stron WWW),
-  innych uprawnień (read-only), równoległości albo niezależnego spojrzenia (review).
-  Nie tworzymy agentów w stylu `django-expert`, `typescript-expert` ani „UI/UX designer”: tracą
-  kontekst rozmowy, a model i tak zna te technologie ([ADR-0010](docs/adr/0010-typescript-files-only-as-assets.md),
+What goes where:
+- **Agent** only when you need context isolation (lots of logs, files, web pages),
+  different permissions (read-only), parallelism or an independent view (review).
+  We don't create agents like `django-expert`, `typescript-expert` or "UI/UX designer": they lose
+  the conversation context, and the model knows these technologies anyway ([ADR-0010](docs/adr/0010-typescript-files-only-as-assets.md),
   [ADR-0009](docs/adr/0009-ui-quality-through-design-system.md)).
-- **Skill** dla wiedzy i procesów. Wartość jest w tym, czego model nie wie: Twoich konwencjach,
-  pułapkach i sposobie weryfikacji.
-- **Asset** (plik w `skills/<name>/assets/`) tylko wtedy, gdy konkretny plik niesie decyzje lepiej
-  niż proza i nie da się go wygenerować narzędziem. Obecnie jest jeden: `building-ui/assets/tokens.css`.
-- **Hook** dla każdej reguły, którą da się wymusić mechanicznie.
+- **Skill** for knowledge and processes. The value is in what the model doesn't know: your conventions,
+  pitfalls and ways of verifying.
+- **Asset** (a file in `skills/<name>/assets/`) only when a concrete file carries decisions better
+  than prose and cannot be generated by a tool. Currently there is one: `building-ui/assets/tokens.css`.
+- **Hook** for every rule that can be enforced mechanically.
 
 ---
 
-## Praca obok skilli Matta Pococka
+## Working alongside Matt Pocock's skills
 
-**Matt prowadzi proces, devkit dostarcza wiedzę i specjalistów**
-([ADR-0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md)). Skilli Matta się nie
-edytuje, bo aktualizują się z upstreamu (`skills-lock.json`). Dlatego to devkit się dopasowuje
-na dwa sposoby:
+**Matt runs the process, devkit provides knowledge and specialists**
+([ADR-0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md)). Matt's skills are not
+edited, because they update from upstream (`skills-lock.json`). So devkit adapts instead,
+in two ways:
 
-- **opisy skilli devkitu nie konkurują o te same słowa**: „review” należy do `/code-review`,
-  ADR-y do `domain-modeling`, nauka wielosesyjna do `/teach`;
-- **połączenie jest zapisane w projekcie**: sekcja `## Workflow` w szablonie `CLAUDE.md` ładuje
-  się zawsze, więc `/implement` Matta wie, kiedy sięgnąć po reviewerów i agentów devkitu.
+- **devkit's skill descriptions don't compete for the same words**: "review" belongs to `/code-review`,
+  ADRs to `domain-modeling`, multi-session learning to `/teach`;
+- **the connection is written into the project**: the `## Workflow` section in the `CLAUDE.md` template
+  always loads, so Matt's `/implement` knows when to reach for devkit's reviewers and agents.
 
-### Kto za co odpowiada
+### Who is responsible for what
 
-| Obszar | Matt | devkit |
+| Area | Matt | devkit |
 |---|---|---|
-| Od pomysłu do commita | `/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` (z `/tdd`) | dwa opcjonalne kroki QRSPI w lukach flow: `/devkit:to-research-questions` przed grillem, `/devkit:to-design-discussion` przed specem ([ADR-0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md)) |
-| Słownik domeny | `CONTEXT.md` (`domain-modeling`) | skille używają jego terminów |
-| Decyzje | ADR-y w formacie `domain-modeling`, zapisywane przez `/grill-with-docs` | `code-reviewer` zgłasza brakujący ADR; skille wiedzy podsuwają decyzje typowe dla stacku |
-| Tracker, etykiety | `docs/agents/*.md` (`/setup-matt-pocock-skills`), `/triage` | worker i `review-changes` czytają tickety według `docs/agents/issue-tracker.md` |
-| Review | osie **Standards** i **Spec** (`/code-review`) | oś **Risk** (`/devkit:review-changes` + 5 reviewerów) |
-| Wiedza o technologiach | brak | Django, FastAPI, TS, React, UI, mapy, PostGIS, walidacja geo, k8s, obrazy, CI |
-| Izolacja i równoległość | `/implement` per ticket z `/clear` | `implementation-worker` (frontier ticketów w worktree), `test-runner`, `cluster-investigator`, `docs-researcher` |
-| Trudne błędy | `/diagnosing-bugs` | `test-runner` (pętla odtwarzająca błąd), `cluster-investigator`, `postgres-reviewer` (EXPLAIN) |
-| Research | `/research` (plik z cytatami w repo) | `docs-researcher` jako agent dla pytań o wersje bibliotek |
-| Nauka | `/teach`: wielosesyjnie, w osobnym katalogu | `/devkit:mentor`: przy realnym zadaniu, `TODO(human)` |
-| Dokumentacja | `writing-for-agents` (`CLAUDE.md`, `AGENTS.md`, skille) | `documenting-code` (README, docstringi, komentarze, runbooki; co gdzie trafia) |
-| Prototyp | `/prototype` (logika albo warianty UI) | `building-ui` buduje wybraną strukturę docelowo, w design systemie |
-| Bezpieczeństwo agentów | `git-guardrails-claude-code` (opcjonalnie) | hook read-only dla reviewerów; oba hooki działają obok siebie |
+| From idea to commit | `/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` (with `/tdd`) | two optional QRSPI steps in the gaps of the flow: `/devkit:to-research-questions` before the grill, `/devkit:to-design-discussion` before the spec ([ADR-0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md)) |
+| Domain glossary | `CONTEXT.md` (`domain-modeling`) | skills use its terms |
+| Decisions | ADRs in the `domain-modeling` format, written by `/grill-with-docs` | `code-reviewer` flags a missing ADR; knowledge skills suggest decisions typical for the stack |
+| Tracker, labels | `docs/agents/*.md` (`/setup-matt-pocock-skills`), `/triage` | the worker and `review-changes` read tickets according to `docs/agents/issue-tracker.md` |
+| Review | **Standards** and **Spec** axes (`/code-review`) | **Risk** axis (`/devkit:review-changes` + 5 reviewers) |
+| Technology knowledge | none | Django, FastAPI, TS, React, UI, maps, PostGIS, geo validation, k8s, images, CI |
+| Isolation and parallelism | `/implement` per ticket with `/clear` | `implementation-worker` (ticket frontier in a worktree), `test-runner`, `cluster-investigator`, `docs-researcher` |
+| Hard bugs | `/diagnosing-bugs` | `test-runner` (a loop that reproduces the bug), `cluster-investigator`, `postgres-reviewer` (EXPLAIN) |
+| Research | `/research` (a file with citations in the repo) | `docs-researcher` as the agent for questions about library versions |
+| Learning | `/teach`: multi-session, in a separate directory | `/devkit:mentor`: on a real task, `TODO(human)` |
+| Documentation | `writing-for-agents` (`CLAUDE.md`, `AGENTS.md`, skills) | `documenting-code` (README, docstrings, comments, runbooks; what goes where) |
+| Prototype | `/prototype` (logic or UI variants) | `building-ui` builds the chosen structure for real, in the design system |
+| Agent safety | `git-guardrails-claude-code` (optional) | read-only hook for reviewers; both hooks work side by side |
 
-### 1. Setup nowego projektu (raz)
+### 1. New project setup (once)
 
 ```bash
-cd ~/dev/moj-projekt
-claude plugin install devkit@dampe --scope project          # 1. devkit (zapisuje .claude/settings.json)
-npx skills@latest add mattpocock/skills                     # 2. skille Matta (.claude/skills + skills-lock.json)
-cp ~/dev/devkit/templates/CLAUDE.project.md CLAUDE.md       # 3. szablon: uzupełnij, zostaw sekcję ## Workflow
-claude                                                      # 4. w sesji:
-  /setup-matt-pocock-skills                                 #    tracker, etykiety triage, układ CONTEXT.md/ADR
+cd ~/dev/my-project
+claude plugin install devkit@dampe --scope project          # 1. devkit (writes .claude/settings.json)
+npx skills@latest add mattpocock/skills                     # 2. Matt's skills (.claude/skills + skills-lock.json)
+cp ~/dev/devkit/templates/CLAUDE.project.md CLAUDE.md       # 3. template: fill it in, keep the ## Workflow section
+claude                                                      # 4. in the session:
+  /setup-matt-pocock-skills                                 #    tracker, triage labels, CONTEXT.md/ADR layout
 ```
 
-Kolejność ma znaczenie. `/setup-matt-pocock-skills` edytuje istniejący `CLAUDE.md` (dopisuje blok
-`## Agent skills` i pliki `docs/agents/*.md`), a nie tworzy osobnego `AGENTS.md`. Jeśli uruchomisz
-go przed skopiowaniem szablonu, zapyta, który plik utworzyć, i reguły z `## Workflow` trafią
-w inne miejsce niż wskaźniki Matta.
+The order matters. `/setup-matt-pocock-skills` edits the existing `CLAUDE.md` (it appends the
+`## Agent skills` block and the `docs/agents/*.md` files) rather than creating a separate `AGENTS.md`. If you run
+it before copying the template, it asks which file to create, and the `## Workflow` rules end up
+in a different place than Matt's pointers.
 
-Po instalacji:
-- `CONTEXT.md` i `docs/adr/` **nie** zakładaj z góry. Powstaną same przy pierwszym `/grill-with-docs`.
-- Usuń skille Matta, których projekt nie potrzebuje, np. `migrate-to-shoehorn` i
-  `scaffold-exercises` w projekcie bez kursów TS, albo `setup-pre-commit` (Husky), gdy używasz
-  `pre-commit`. Każdy zbędny opis skilla to kontekst zużyty w każdej turze i szansa, że odpali się
-  nie ten skill.
-- **Nie włączaj obok drugiego frameworka procesowego** (np. superpowers). Dubluje grillowanie,
-  planowanie, TDD, review i debugowanie, więc skille trzech źródeł konkurują o te same triggery.
-  Wyłączenie w projekcie: `"enabledPlugins": {"superpowers@claude-plugins-official": false}`
-  w `.claude/settings.json`.
+After installation:
+- **Don't** create `CONTEXT.md` and `docs/adr/` up front. They appear on the first `/grill-with-docs`.
+- Remove Matt's skills the project doesn't need, e.g. `migrate-to-shoehorn` and
+  `scaffold-exercises` in a project without TS courses, or `setup-pre-commit` (Husky) when you use
+  `pre-commit`. Every unneeded skill description is context spent on every turn and a chance that
+  the wrong skill fires.
+- **Don't enable a second process framework alongside** (e.g. superpowers). It duplicates grilling,
+  planning, TDD, review and debugging, so skills from three sources compete for the same triggers.
+  To disable it in a project: `"enabledPlugins": {"superpowers@claude-plugins-official": false}`
+  in `.claude/settings.json`.
 
-### 2. Główny flow z punktami wpięcia devkitu
+### 2. Main flow with devkit's hook-in points
 
 ```
-[opcjonalnie, ticket w kodzie, którego sesja nie zna]
-/devkit:to-research-questions <ticket>  pytania o obecny kod, bez intencji
-  → /research w świeżej sesji (tylko plik z pytaniami) → <obszar>-research.md
+[optional, a ticket in code the session doesn't know]
+/devkit:to-research-questions <ticket>  questions about the current code, without the intent
+  → /research in a fresh session (only the questions file) → <area>-research.md
   ▼
-/grill-with-docs                      wywiad → CONTEXT.md + ADR-y (z ticketem i plikiem research)
-  │  devkit: skille wiedzy podsuwają pytania i sensowne domyślne (CRS, kody wyjścia walidatora,
-  │          fundament design systemu, układ GitOps); docs-researcher, gdy odpowiedź zależy od wersji
+/grill-with-docs                      interview → CONTEXT.md + ADRs (with the ticket and the research file)
+  │  devkit: knowledge skills suggest questions and sensible defaults (CRS, validator exit codes,
+  │          design system foundation, GitOps layout); docs-researcher when the answer depends on a version
   │
-  ├─ pytanie wymaga działającego kodu? → /handoff → /prototype → /handoff z wnioskami
-  │     devkit: web-maps i building-ui przy prototypie mapy lub ekranu
-  ├─ projekt warto pokazać właścicielowi kodu? → /devkit:to-design-discussion
-  │     ~200 linii: stan obecny i docelowy, wzorce Follow/Avoid, decyzje D1…, otwarte pytania;
-  │     uwagi z review rozwiązujesz w tej samej sesji
+  ├─ the question needs working code? → /handoff → /prototype → /handoff with conclusions
+  │     devkit: web-maps and building-ui for a map or screen prototype
+  ├─ worth showing the design to the code owner? → /devkit:to-design-discussion
+  │     ~200 lines: current and target state, Follow/Avoid patterns, decisions D1…, open questions;
+  │     you resolve review comments in the same session
   ▼
-/to-spec → /to-tickets                spec i tickety z blokerami w trackerze
-  │  sekcja "Testing Decisions" = seamy; implementation-worker pracuje tylko na nich
+/to-spec → /to-tickets                spec and tickets with blockers in the tracker
+  │  the "Testing Decisions" section = seams; implementation-worker works only on them
   ▼
-/implement  (jeden ticket, /clear przed następnym)
-  │  /tdd czerwone → zielone; skille wiedzy włączają się same po ścieżkach plików
-  │  końcowy przebieg testów, lintów i typów → devkit:test-runner (logi poza kontekstem)
+/implement  (one ticket, /clear before the next)
+  │  /tdd red → green; knowledge skills switch on by themselves based on file paths
+  │  final run of tests, linters and types → devkit:test-runner (logs outside the context)
   │  /code-review <fixed-point>       ## Standards + ## Spec
-  │  /devkit:review-changes <ten sam fixed-point>   ## Risk   (gdy diff dotyka auth, bazy,
-  │                                                            infrastruktury albo frontendu)
+  │  /devkit:review-changes <same fixed-point>   ## Risk   (when the diff touches auth, the database,
+  │                                                          infrastructure or the frontend)
   ▼
-poprawki → commit (hook pre-commit, jeśli jest)
+fixes → commit (pre-commit hook, if there is one)
 ```
 
-Kroki 1–3 (grill, spec, tickety) rób w jednym oknie kontekstu, bez `/clear`. Każdy `/implement`
-zaczyna od świeżego kontekstu, więc reviewerzy devkitu biorą intencję z ticketu, a nie z rozmowy.
+Do steps 1–3 (grill, spec, tickets) in one context window, without `/clear`. Every `/implement`
+starts with a fresh context, so devkit's reviewers take the intent from the ticket, not from the conversation.
 
-Mała zmiana bez specu: opis → `/tdd` (albo `/implement` w tej samej sesji) → `/code-review` →
-`/devkit:review-changes` → commit. Oś Spec zgłosi wtedy „no spec available” i to jest w porządku.
+A small change without a spec: description → `/tdd` (or `/implement` in the same session) → `/code-review` →
+`/devkit:review-changes` → commit. The Spec axis then reports "no spec available", and that's fine.
 
-### 3. Tickety równolegle: frontier i `implementation-worker`
+### 3. Parallel tickets: frontier and `implementation-worker`
 
-Matt robi tickety po kolei. Gdy kilka ticketów ma zamknięte wszystkie blokery (tzw. **frontier**),
-można je zrobić równolegle, każdy w osobnym worktree:
+Matt does tickets one by one. When several tickets have all their blockers closed (the **frontier**),
+they can be done in parallel, each in its own worktree:
 
 ```
-"Tickety #12, #13 i #15 mają zamknięte blokery. Każdy daj osobnemu implementation-worker,
- równolegle; commit w worktree"
-  → worker: ticket + spec-rodzic → CONTEXT.md, ADR-y → /tdd na seamach ze specu → raport
-       (Status, Ticket, kryteria akceptacji met/not met, weryfikacja)
-  → worker bez uzgodnionych seamów albo z otwartym blokerem kończy jako "blocked" i niczego nie zgaduje
-Scalasz worktree → devkit:test-runner → /code-review → /devkit:review-changes → zamykasz tickety
-  → nowy frontier
+"Tickets #12, #13 and #15 have their blockers closed. Give each to a separate implementation-worker,
+ in parallel; commit in the worktree"
+  → worker: ticket + parent spec → CONTEXT.md, ADRs → /tdd on the seams from the spec → report
+       (Status, Ticket, acceptance criteria met/not met, verification)
+  → a worker without agreed seams or with an open blocker ends as "blocked" and guesses nothing
+You merge the worktrees → devkit:test-runner → /code-review → /devkit:review-changes → close the tickets
+  → new frontier
 ```
 
-- „commit w worktree” w poleceniu jest potrzebny, bo worker domyślnie nie commituje, a bez
-  commitów nie ma czego scalić.
-- Workerzy nie uruchamiają review. Review robisz raz, na scalonym diffie.
-- Tickety, które się zazębiają (wspólne pliki, kolejne kroki expand–contract), rób po kolei.
+- "commit in the worktree" is needed in the prompt, because the worker doesn't commit by default, and without
+  commits there is nothing to merge.
+- Workers don't run review. You review once, on the merged diff.
+- Do tickets that overlap (shared files, consecutive expand–contract steps) one by one.
 
-### 4. Review: trzy osie, raportowane osobno
+### 4. Review: three axes, reported separately
 
-| Oś | Skąd | Pyta o | Kto |
+| Axis | From | Asks about | Who |
 |---|---|---|---|
-| **Standards** | `/code-review` (Matt) | czy kod trzyma się udokumentowanych standardów repo; code smelle (Fowler) | sub-agent Matta |
-| **Spec** | `/code-review` (Matt) | czy diff robi to, o co prosił ticket lub spec; brakujące wymagania, nadmiarowy zakres | sub-agent Matta |
-| **Risk** | `/devkit:review-changes` | co się zepsuje: poprawność, regresje, luki w testach, bezpieczeństwo, blokady migracji, deploy, stany UI, nieaktualne docs i `CONTEXT.md` | `code-reviewer` + specjaliści według plików |
+| **Standards** | `/code-review` (Matt) | does the code follow the repo's documented standards; code smells (Fowler) | Matt's sub-agent |
+| **Spec** | `/code-review` (Matt) | does the diff do what the ticket or spec asked for; missing requirements, excess scope | Matt's sub-agent |
+| **Risk** | `/devkit:review-changes` | what will break: correctness, regressions, test gaps, security, migration locks, deploy, UI states, stale docs and `CONTEXT.md` | `code-reviewer` + specialists by file |
 
-Osi się nie scala i nie ustawia w jednym rankingu, tak jak Matt nie scala Standards ze Spec.
-Reviewerzy devkitu nie zgłaszają smelli ani zgodności ze specem, żeby nic nie było raportowane dwa razy.
+The axes are not merged or ranked together, just as Matt doesn't merge Standards with Spec.
+devkit's reviewers don't report smells or spec compliance, so nothing is reported twice.
 
-### 5. Sytuacje poza głównym flow
+### 5. Situations outside the main flow
 
-| Sytuacja | Od czego zacząć | Rola devkitu |
+| Situation | Where to start | devkit's role |
 |---|---|---|
-| Decyzja architektoniczna | `/grill-with-docs` (zapisze ADR) | wskaźnik ADR-a w `CLAUDE.md`, komentarz `ADR-NNNN` w kodzie (`documenting-code`) |
-| Trudny lub sporadyczny bug | `/diagnosing-bugs` | `test-runner` daje komendę odtwarzającą błąd, czyli pętlę z Fazy 1 |
-| Czerwone CI | `devkit:test-runner` | gdy klasyfikacja to „needs diagnosis”, przejdź do `/diagnosing-bugs` |
-| Awaria w klastrze | `devkit:cluster-investigator` | poprawka przez GitOps, potem oś Risk (`platform-reviewer`) |
-| Wolne zapytanie, migracja | `devkit:postgres-reviewer` | EXPLAIN jako pętla dla `/diagnosing-bugs` |
-| Upgrade biblioteki | `devkit:docs-researcher`, a gdy wynik ma zostać w repo, `/research` | zmiana decyzji: nowy ADR przez `/grill-with-docs` |
-| Zgłoszenia z zewnątrz | `/triage` | brak (tickety z `/to-tickets` się nie triażuje) |
-| Porządki w architekturze | `/improve-codebase-architecture` (słownik: `codebase-design`) | skille wiedzy dają kontekst stacku przy wybranym kandydacie |
-| Nauka | `/teach` (plan, wiele sesji) albo `/devkit:mentor` (przy zadaniu) | mentor ćwiczy kamienie milowe z `/teach` na realnym kodzie |
+| Architecture decision | `/grill-with-docs` (writes the ADR) | ADR pointer in `CLAUDE.md`, an `ADR-NNNN` comment in code (`documenting-code`) |
+| Hard or intermittent bug | `/diagnosing-bugs` | `test-runner` provides the command that reproduces the bug, i.e. the Phase 1 loop |
+| Red CI | `devkit:test-runner` | when the classification is "needs diagnosis", move on to `/diagnosing-bugs` |
+| Cluster failure | `devkit:cluster-investigator` | fix through GitOps, then the Risk axis (`platform-reviewer`) |
+| Slow query, migration | `devkit:postgres-reviewer` | EXPLAIN as the loop for `/diagnosing-bugs` |
+| Library upgrade | `devkit:docs-researcher`, or `/research` when the result should stay in the repo | a changed decision: a new ADR through `/grill-with-docs` |
+| External reports | `/triage` | none (tickets from `/to-tickets` are not triaged) |
+| Architecture cleanup | `/improve-codebase-architecture` (glossary: `codebase-design`) | knowledge skills give stack context for the chosen candidate |
+| Learning | `/teach` (plan, many sessions) or `/devkit:mentor` (on a task) | the mentor practices `/teach` milestones on real code |
 
-### 6. Czego unikać
+### 6. What to avoid
 
-- `/devkit:review-changes` **zamiast** `/code-review`. To dodatkowa oś, a nie zamiennik.
-- ADR-ów w innym formacie niż `domain-modeling`. Devkit nie ma już własnego szablonu ADR.
-- Dawania `implementation-worker` ticketu z otwartym blokerem albo bez uzgodnionych seamów.
-- Triażowania ticketów, które wyprodukował `/to-tickets`. Są gotowe dla agenta z założenia.
-- Edycji skilli Matta. Dopasowania rób w devkicie albo w `## Workflow` w `CLAUDE.md` projektu.
-- Drugiego frameworka procesowego obok tych dwóch.
+- `/devkit:review-changes` **instead of** `/code-review`. It is an additional axis, not a replacement.
+- ADRs in a format other than `domain-modeling`'s. devkit no longer has its own ADR template.
+- Giving `implementation-worker` a ticket with an open blocker or without agreed seams.
+- Triaging tickets produced by `/to-tickets`. They are agent-ready by design.
+- Editing Matt's skills. Make adjustments in devkit or in `## Workflow` in the project's `CLAUDE.md`.
+- A second process framework alongside these two.
 
-### Bez skilli Matta
+### Without Matt's skills
 
-Devkit działa też sam: skille wiedzy, reviewerzy, `test-runner`, `cluster-investigator` i hook.
-Odwołania do `/code-review`, `tdd`, `domain-modeling` i `docs/agents/` zostaną wtedy pominięte,
-a oś Risk działa jako zwykłe review. Devkit nie prowadzi jednak procesu i nie pisze ADR-ów.
+devkit also works on its own: knowledge skills, reviewers, `test-runner`, `cluster-investigator` and the hook.
+References to `/code-review`, `tdd`, `domain-modeling` and `docs/agents/` are then skipped,
+and the Risk axis works as a regular review. devkit does not, however, run a process or write ADRs.
 
 ---
 
-## Agenci
+## Agents
 
-W sesji mają prefiks `devkit:`, np. `devkit:code-reviewer`.
+In a session they have the `devkit:` prefix, e.g. `devkit:code-reviewer`.
 
-| Agent | Kiedy używać | Model | Effort | Zapisuje? |
+| Agent | When to use | Model | Effort | Writes? |
 |---|---|---|---|---|
-| `implementation-worker` | jeden ticket z frontieru (blokery zamknięte) albo jedno niezależne zadanie z kryteriami akceptacji. `/tdd` na seamach ze specu, osobny **git worktree**. | inherit | z sesji | tak (w worktree) |
-| `code-reviewer` | oś Risk: poprawność, regresje, luki w testach, **nieaktualna dokumentacja i `CONTEXT.md`**, brak ADR-a (smelle i zgodność ze specem zostawia `/code-review`) | sonnet | high | nie |
-| `security-reviewer` | endpointy, uprawnienia, wejście od użytkownika, uploady, sekrety, CI, obsługa tokenów i HTML we froncie | inherit | xhigh | nie |
-| `postgres-reviewer` | migracje, modele, SQL, ciężkie zapytania ORM, zapytania przestrzenne (PostGIS) | inherit | high | nie |
-| `platform-reviewer` | Dockerfile, compose, k8s/Helm/Kustomize, ArgoCD, pipeline'y CI | inherit | high | nie |
-| `frontend-reviewer` | `.tsx`/`.ts`: stany UI, efekty, dostępność, typy na granicy API, XSS, spójność z design systemem, wydajność, mapy. Robi też **zrzuty ekranu**, jeśli UI działa. | inherit | high | nie |
-| `test-runner` | testy, lintery i sprawdzanie typów (pytest, vitest, playwright, tsc…) oraz diagnoza błędów, bez zalewania głównego kontekstu; końcowy przebieg w `/implement`, trudne przypadki przekazuje do `/diagnosing-bugs` | sonnet | medium | nie |
-| `cluster-investigator` | coś nie działa w klastrze: CrashLoop, Pending, ArgoCD OutOfSync, Tekton. Używa **kubectl tylko do odczytu**. | sonnet | high | nie |
-| `docs-researcher` | odpowiedź zależy od wersji biblioteki lub narzędzia: upgrade, nowa opcja, deprecacje; także agent dla `/research` o bibliotekach | sonnet | medium | nie |
+| `implementation-worker` | one ticket from the frontier (blockers closed) or one independent task with acceptance criteria. `/tdd` on the seams from the spec, a separate **git worktree**. | inherit | from session | yes (in the worktree) |
+| `code-reviewer` | Risk axis: correctness, regressions, test gaps, **stale documentation and `CONTEXT.md`**, a missing ADR (smells and spec compliance are left to `/code-review`) | sonnet | high | no |
+| `security-reviewer` | endpoints, permissions, user input, uploads, secrets, CI, token handling and HTML in the frontend | inherit | xhigh | no |
+| `postgres-reviewer` | migrations, models, SQL, heavy ORM queries, spatial queries (PostGIS) | inherit | high | no |
+| `platform-reviewer` | Dockerfile, compose, k8s/Helm/Kustomize, ArgoCD, CI pipelines | inherit | high | no |
+| `frontend-reviewer` | `.tsx`/`.ts`: UI states, effects, accessibility, types at the API boundary, XSS, design system consistency, performance, maps. Also takes **screenshots** if the UI is running. | inherit | high | no |
+| `test-runner` | tests, linters and type checks (pytest, vitest, playwright, tsc…) and failure diagnosis, without flooding the main context; the final run in `/implement`, hands hard cases over to `/diagnosing-bugs` | sonnet | medium | no |
+| `cluster-investigator` | something is broken in the cluster: CrashLoop, Pending, ArgoCD OutOfSync, Tekton. Uses **read-only kubectl**. | sonnet | high | no |
+| `docs-researcher` | the answer depends on a library or tool version: upgrade, new option, deprecations; also the agent for `/research` about libraries | sonnet | medium | no |
 
-**Effort** jest ustawiony jawnie tam, gdzie jakość nie może zależeć od tego, na jakim poziomie
-akurat pracujesz w sesji. Bez tego pola agent dziedziczy poziom sesji
+**Effort** is set explicitly where quality must not depend on the level you happen to be
+working at in the session. Without this field the agent inherits the session's level
 ([ADR-0008](docs/adr/0008-explicit-effort-per-role.md)).
-Do eksploracji kodu służy wbudowany agent **`Explore`** ([ADR-0004](docs/adr/0004-use-builtin-explore.md)).
+Code exploration uses the built-in **`Explore`** agent ([ADR-0004](docs/adr/0004-use-builtin-explore.md)).
 
 ---
 
-## Skille
+## Skills
 
-### Procesy
+### Processes
 
-| Skill | Wywołanie | Co robi |
+| Skill | Invocation | What it does |
 |---|---|---|
-| `review-changes` | `/devkit:review-changes [fixed-point]`, po `/code-review` | oś **Risk**: kieruje diff do właściwych reviewerów **równolegle**, łączy ich wyniki, sam sprawdza każde znalezisko critical/high i raportuje osobno od Standards i Spec |
-| `mentor` | `/devkit:mentor [temat]` albo „naucz mnie…” | nauka przy realnym zadaniu: model mentalny, zadania `TODO(human)`, podpowiedzi stopniowane, podsumowanie, `LEARNING.md`. Plan nauki na wiele sesji: `/teach` |
-| `to-research-questions` | `/devkit:to-research-questions <ticket>` przed `/grill-with-docs` | krok QRSPI: zamienia ticket na pytania o obecny kod bez śladu intencji, dla ślepego `/research` w świeżej sesji |
-| `to-design-discussion` | `/devkit:to-design-discussion` po `/grill-with-docs` | krok QRSPI: dokument około 200 linii do review przez właściciela kodu przed `/to-spec`; każdy wskaźnik do kodu sprawdzony |
-| `building-ui` | przy tworzeniu widoków, komponentów, stylów | design system projektu → cel ekranu → budowa z tokenów i komponentów → wszystkie stany → **zrzuty ekranu przed „gotowe”** |
+| `review-changes` | `/devkit:review-changes [fixed-point]`, after `/code-review` | **Risk** axis: routes the diff to the right reviewers **in parallel**, merges their results, verifies every critical/high finding itself and reports separately from Standards and Spec |
+| `mentor` | `/devkit:mentor [topic]` or "teach me…" | learning on a real task: mental model, `TODO(human)` tasks, graduated hints, summary, `LEARNING.md`. A multi-session learning plan: `/teach` |
+| `to-research-questions` | `/devkit:to-research-questions <ticket>` before `/grill-with-docs` | QRSPI step: turns a ticket into questions about the current code with no trace of the intent, for a blind `/research` in a fresh session |
+| `to-design-discussion` | `/devkit:to-design-discussion` after `/grill-with-docs` | QRSPI step: a document of about 200 lines for review by the code owner before `/to-spec`; every pointer to code verified |
+| `building-ui` | when creating views, components, styles | project design system → screen goal → build from tokens and components → all states → **screenshots before "done"** |
 
-### Wiedza (ładuje się sama, gdy pracujesz na pasujących plikach lub tematach)
+### Knowledge (loads by itself when you work on matching files or topics)
 
-| Skill | Włącza się przy |
+| Skill | Activates on |
 |---|---|
 | `django-conventions` | `models.py`, `views.py`, `serializers.py`, `migrations/`, `settings*` |
-| `fastapi-conventions` | pracy z FastAPI (po opisie) |
-| `frontend-stack` | łączeniu frontendu z API (po opisie): klient i typy z OpenAPI, kontrola dryfu w CI, zod dla danych spoza API; testy frontu (MSW, `QueryClient` per test, mapy poza jsdom, Playwright) |
-| `web-maps` | mapach w React (po opisie): MapLibre vs OpenLayers, EPSG:2180 na mapie, MVT z PostGIS, błędy walidacji na mapie |
-| `postgres-postgis` | `*.sql`, `migrations/`, `alembic/versions/`, zapytaniach przestrzennych |
-| `geospatial-validation` | pracy nad walidatorem danych geo i webserwisem (po opisie) |
+| `fastapi-conventions` | work with FastAPI (by description) |
+| `frontend-stack` | connecting the frontend to the API (by description): client and types from OpenAPI, drift check in CI, zod for data from outside the API; frontend tests (MSW, `QueryClient` per test, maps outside jsdom, Playwright) |
+| `web-maps` | maps in React (by description): MapLibre vs OpenLayers, EPSG:2180 on a map, MVT from PostGIS, validation errors on a map |
+| `postgres-postgis` | `*.sql`, `migrations/`, `alembic/versions/`, spatial queries |
+| `geospatial-validation` | work on the geodata validator and web service (by description) |
 | `kubernetes-manifests` | `kustomization.yaml`, `Chart.yaml`, `values*.yaml`, `k8s/`, `manifests/`, `argocd/`… |
-| `container-images` | `Dockerfile*`, `.dockerignore`, `compose*.yml` (Python/uv, GDAL, obrazy frontendu, multi-arch) |
+| `container-images` | `Dockerfile*`, `.dockerignore`, `compose*.yml` (Python/uv, GDAL, frontend images, multi-arch) |
 | `ci-pipelines` | `.github/workflows/`, `.gitlab-ci.yml`, `tekton/` |
-| `documenting-code` | pisaniu README, docstringów, komentarzy, runbooków; decyduje, co gdzie trafia (`CONTEXT.md`, ADR, tracker, `docs/`) |
-| `review-standards` | wklejany reviewerom: wagi znalezisk, wymagane dowody, format (niewidoczny w menu `/`) |
+| `documenting-code` | writing READMEs, docstrings, comments, runbooks; decides what goes where (`CONTEXT.md`, ADR, tracker, `docs/`) |
+| `review-standards` | preloaded into reviewers: finding severities, required evidence, format (hidden from the `/` menu) |
 
 ---
 
-## Jak korzystać: wywoływanie
+## How to use: invocation
 
-| Chcę… | Jak |
+| I want to… | How |
 |---|---|
-| uruchomić skill | `/devkit:review-changes main` albo po prostu opisz zadanie: model sam dobierze skill |
-| użyć konkretnego agenta | napisz „użyj cluster-investigator, żeby…” albo `@agent-devkit:cluster-investigator …` |
-| kilka agentów naraz | „odpal security-reviewer i postgres-reviewer równolegle na tym diffie” |
-| sprawdzić, co jest załadowane | `/agents` (agenci) i menu `/` (skille) |
-| tryb nauki na całą sesję | `/devkit:mentor` na początku sesji, albo wbudowany styl `/output-style learning` |
-| review ryzyka po `/code-review` | `/devkit:review-changes <ten sam fixed-point>` |
+| run a skill | `/devkit:review-changes main`, or just describe the task: the model picks the skill itself |
+| use a specific agent | write "use cluster-investigator to…" or `@agent-devkit:cluster-investigator …` |
+| several agents at once | "run security-reviewer and postgres-reviewer in parallel on this diff" |
+| check what is loaded | `/agents` (agents) and the `/` menu (skills) |
+| learning mode for the whole session | `/devkit:mentor` at the start of the session, or the built-in style `/output-style learning` |
+| risk review after `/code-review` | `/devkit:review-changes <same fixed-point>` |
 
-Wskazówka: agenci dostają **tylko to, co napiszesz w poleceniu**, bez historii rozmowy. Podawaj
-cel, pliki, ograniczenia („tabela ma ~40M wierszy”, „działa na arm64 Pi”, „dev server na :5173”).
-Skill `review-changes` robi to za Ciebie.
+Tip: agents get **only what you write in the prompt**, without the conversation history. Give
+the goal, files, constraints ("the table has ~40M rows", "runs on an arm64 Pi", "dev server on :5173").
+The `review-changes` skill does this for you.
 
 ---
 
-## Workflowy
+## Workflows
 
-Workflowy zakładają, że w projekcie są skille Matta (patrz
-[Praca obok skilli Matta Pococka](#praca-obok-skilli-matta-pococka)). Workflowy 1–2 i 12–13 to
-główny flow Matta z punktami wpięcia devkitu. Pozostałe to soczewki stackowe, które w ten flow
-wchodzą.
+The workflows assume Matt's skills are in the project (see
+[Working alongside Matt Pocock's skills](#working-alongside-matt-pococks-skills)). Workflows 1–2 and 12–13 are
+Matt's main flow with devkit's hook-in points. The rest are stack lenses that fit into that flow.
 
-| # | Sytuacja | Główne elementy |
+| # | Situation | Main elements |
 |---|---|---|
-| 1 | [Codzienna zmiana](#1-codzienna-zmiana-mały-feature-bugfix) | `/tdd` lub `/implement` + `/code-review` + oś Risk |
-| 2 | [Większy feature, praca równoległa](#2-większy-feature-spec-tickety-i-praca-równoległa) | `/grill-with-docs` → `/to-spec` → `/to-tickets` → `implementation-worker` × frontier |
-| 3 | [Feature fullstack](#3-feature-fullstack-api-w-django-lub-fastapi--widok-w-react) | backend → typy z OpenAPI → React |
-| 4 | [Nowy widok UI](#4-nowy-widok-ui) | (`/prototype`) + `building-ui` + pętla zrzutów ekranu + `frontend-reviewer` |
-| 5 | [Budowa design systemu](#5-budowa-design-systemu) | [`docs/design-system.md`](docs/design-system.md) |
-| 6 | [Mapa z danymi przestrzennymi](#6-mapa-z-danymi-przestrzennymi) | `web-maps` + `postgres-postgis` |
-| 7 | [Migracja bazy i PostGIS](#7-migracja-bazy-i-zapytania-postgis) | `postgres-reviewer` + EXPLAIN |
-| 8 | [Awaria w klastrze](#8-coś-nie-działa-w-klastrze-k3s) | `cluster-investigator` → GitOps |
-| 9 | [Nauka](#9-nauka-homelab-platform-engineering-frontend) | `/devkit:mentor` przy zadaniu, `/teach` na wiele sesji |
-| 10 | [Upgrade, nowa technologia](#10-upgrade-lub-nowa-technologia) | `docs-researcher` / `/research` |
-| 11 | [Czerwone CI](#11-czerwone-ci) | `test-runner` + `ci-pipelines` → `/diagnosing-bugs` |
-| 12 | [Decyzja architektoniczna](#12-decyzja-architektoniczna) | `/grill-with-docs` → ADR |
-| 13 | [Start nowego projektu](#13-start-nowego-projektu) | devkit + skille Matta + szablon `CLAUDE.md` + `/setup-matt-pocock-skills` |
+| 1 | [Everyday change](#1-everyday-change-small-feature-bugfix) | `/tdd` or `/implement` + `/code-review` + Risk axis |
+| 2 | [Larger feature, parallel work](#2-larger-feature-spec-tickets-and-parallel-work) | `/grill-with-docs` → `/to-spec` → `/to-tickets` → `implementation-worker` × frontier |
+| 3 | [Fullstack feature](#3-fullstack-feature-api-in-django-or-fastapi--view-in-react) | backend → types from OpenAPI → React |
+| 4 | [New UI view](#4-new-ui-view) | (`/prototype`) + `building-ui` + screenshot loop + `frontend-reviewer` |
+| 5 | [Building a design system](#5-building-a-design-system) | [`docs/design-system.md`](docs/design-system.md) |
+| 6 | [Map with spatial data](#6-map-with-spatial-data) | `web-maps` + `postgres-postgis` |
+| 7 | [Database migration and PostGIS](#7-database-migration-and-postgis-queries) | `postgres-reviewer` + EXPLAIN |
+| 8 | [Cluster failure](#8-something-is-broken-in-the-k3s-cluster) | `cluster-investigator` → GitOps |
+| 9 | [Learning](#9-learning-homelab-platform-engineering-frontend) | `/devkit:mentor` on a task, `/teach` across many sessions |
+| 10 | [Upgrade, new technology](#10-upgrade-or-new-technology) | `docs-researcher` / `/research` |
+| 11 | [Red CI](#11-red-ci) | `test-runner` + `ci-pipelines` → `/diagnosing-bugs` |
+| 12 | [Architecture decision](#12-architecture-decision) | `/grill-with-docs` → ADR |
+| 13 | [Starting a new project](#13-starting-a-new-project) | devkit + Matt's skills + `CLAUDE.md` template + `/setup-matt-pocock-skills` |
 
-### 1. Codzienna zmiana (mały feature, bugfix)
+### 1. Everyday change (small feature, bugfix)
 
 ```
-Ty: opisujesz zmianę (niejasna? krótkie /grill-with-docs)
-  → /tdd dla jednego zachowania albo /implement w tej samej sesji
-      (skille wiedzy włączają się same po plikach)
-  → /code-review main                  ## Standards + ## Spec ("no spec available" bez ticketu)
+You: describe the change (unclear? a short /grill-with-docs)
+  → /tdd for one behavior or /implement in the same session
+      (knowledge skills switch on by themselves based on files)
+  → /code-review main                  ## Standards + ## Spec ("no spec available" without a ticket)
   → /devkit:review-changes main        ## Risk
-      ├─ code-reviewer       (zawsze)
-      ├─ security-reviewer   (endpointy, uprawnienia, uploady, tokeny)
-      ├─ postgres-reviewer   (modele, migracje, zapytania)
+      ├─ code-reviewer       (always)
+      ├─ security-reviewer   (endpoints, permissions, uploads, tokens)
+      ├─ postgres-reviewer   (models, migrations, queries)
       ├─ platform-reviewer   (Docker, k8s, CI)
       └─ frontend-reviewer   (.tsx/.ts)
-  → poprawki → "odpal test-runner" → commit
+  → fixes → "run test-runner" → commit
 ```
 
-Najczęstszy tryb. Implementacja zostaje w głównej sesji, bo tam jest kontekst rozmowy.
-Trudny bug zamiast drobnej poprawki? Zacznij od `/diagnosing-bugs`.
+The most common mode. Implementation stays in the main session, because that's where the conversation context is.
+A hard bug instead of a small fix? Start with `/diagnosing-bugs`.
 
-### 2. Większy feature: spec, tickety i praca równoległa
-
-```
-1. /grill-with-docs → CONTEXT.md i ADR-y (skille wiedzy podsuwają decyzje stackowe)
-2. /to-spec  → seamy testów w "Testing Decisions" potwierdzasz Ty
-3. /to-tickets → tickety z blokerami w trackerze
-   (kroki 1–3 w jednym oknie kontekstu, bez /clear)
-4a. Po kolei: /implement per ticket, /clear przed następnym
-4b. Równolegle: tickety z frontieru → implementation-worker × N, "commit w worktree"
-      → raport per ticket: Status, kryteria akceptacji, weryfikacja
-5. Scalasz worktree → test-runner → /code-review → /devkit:review-changes → zamykasz tickety
-6. Kolejny frontier → wróć do 4
-```
-
-Szczegóły: [Tickety równolegle](#3-tickety-równolegle-frontier-i-implementation-worker).
-Tickety, które się zazębiają, rób po kolei, nawet jeśli formalnie nie blokują się nawzajem.
-
-### 3. Feature fullstack: API w Django lub FastAPI + widok w React
+### 2. Larger feature: spec, tickets and parallel work
 
 ```
-1. Backend: endpoint + serializer/schema + testy (django/fastapi-conventions, /tdd na seamie API)
-2. pnpm gen:api → typy i klient TS z OpenAPI (frontend-stack)
-     → zmiana w API, która psuje frontend, wychodzi przy tsc, a nie na produkcji
-3. Frontend: widok według workflow 4 (building-ui + frontend-stack)
+1. /grill-with-docs → CONTEXT.md and ADRs (knowledge skills suggest stack decisions)
+2. /to-spec  → you confirm the test seams in "Testing Decisions"
+3. /to-tickets → tickets with blockers in the tracker
+   (steps 1–3 in one context window, without /clear)
+4a. Sequentially: /implement per ticket, /clear before the next
+4b. In parallel: frontier tickets → implementation-worker × N, "commit in the worktree"
+      → report per ticket: Status, acceptance criteria, verification
+5. You merge the worktrees → test-runner → /code-review → /devkit:review-changes → close the tickets
+6. Next frontier → back to 4
+```
+
+Details: [Parallel tickets](#3-parallel-tickets-frontier-and-implementation-worker).
+Do tickets that overlap one by one, even if they formally don't block each other.
+
+### 3. Fullstack feature: API in Django or FastAPI + view in React
+
+```
+1. Backend: endpoint + serializer/schema + tests (django/fastapi-conventions, /tdd on the API seam)
+2. pnpm gen:api → TS types and client from OpenAPI (frontend-stack)
+     → an API change that breaks the frontend shows up in tsc, not in production
+3. Frontend: view following workflow 4 (building-ui + frontend-stack)
 4. /code-review → /devkit:review-changes → security + postgres (backend), frontend-reviewer (UI)
-5. test-runner: pytest + vitest; Playwright dla krytycznego flow
+5. test-runner: pytest + vitest; Playwright for the critical flow
 ```
 
-W `/to-tickets` taki feature to zwykle jeden pionowy ticket (tracer bullet: API + typy + widok),
-a nie osobne tickety „backend” i „frontend”.
+In `/to-tickets` such a feature is usually one vertical ticket (tracer bullet: API + types + view),
+not separate "backend" and "frontend" tickets.
 
-### 4. Nowy widok UI
-
-```
-1. "Zrób widok listy obserwacji z filtrem po gatunku"
-   (układ ekranu to otwarte pytanie? najpierw /prototype: kilka wariantów UI na jednej trasie)
-2. building-ui: Claude szuka design systemu (tokeny, components/ui, Storybook)
-     → 3–5 linii: cel ekranu, akcja główna, gęstość, regiony → akceptujesz strukturę
-3. Implementacja wyłącznie z tokenów i komponentów DS; stany loading/empty/error/overflow
-4. Pętla wizualna: npx playwright screenshot 375 px / 1280 px / dark → Claude ogląda PNG → poprawia
-5. /code-review → /devkit:review-changes → frontend-reviewer (kod + własne zrzuty) → poprawki
-```
-
-Bez działającego dev serwera lub Storybooka Claude ma powiedzieć wprost, że weryfikacji wizualnej
-nie było. Szczegóły i uzasadnienie: [ADR-0009](docs/adr/0009-ui-quality-through-design-system.md).
-
-### 5. Budowa design systemu
-
-Pełny przewodnik: **[`docs/design-system.md`](docs/design-system.md)**. W skrócie:
+### 4. New UI view
 
 ```
-Faza 0  decyzje w /grill-with-docs: charakter produktu, gęstość, fundament (shadcn/ui+Tailwind v4 | Mantine | Radix) → ADR
-Faza 1  tokeny: start z building-ui/assets/tokens.css → paleta, typografia, gęstość, kontrast → Storybook "Tokens"
-Faza 2  komponenty: inwentarz z listy ekranów → prymitywy → złożone → wzorce; każdy ze stories wszystkich stanów
-Faza 3  egzekwowanie: lint bez dowolnych wartości, testy wizualne stories w CI, sekcja Design w CLAUDE.md
-Potem   brakujący komponent → najpierw do DS, potem do feature; zmiana tokenu → zrzuty przed/po
+1. "Build a list view of observations with a species filter"
+   (is the screen layout an open question? /prototype first: several UI variants on one route)
+2. building-ui: Claude looks for the design system (tokens, components/ui, Storybook)
+     → 3–5 lines: screen goal, primary action, density, regions → you accept the structure
+3. Implementation only from DS tokens and components; loading/empty/error/overflow states
+4. Visual loop: npx playwright screenshot 375 px / 1280 px / dark → Claude looks at the PNG → fixes
+5. /code-review → /devkit:review-changes → frontend-reviewer (code + its own screenshots) → fixes
 ```
 
-### 6. Mapa z danymi przestrzennymi
+Without a running dev server or Storybook, Claude must say plainly that there was no visual
+verification. Details and rationale: [ADR-0009](docs/adr/0009-ui-quality-through-design-system.md).
+
+### 5. Building a design system
+
+Full guide: **[`docs/design-system.md`](docs/design-system.md)**. In short:
 
 ```
-"Warstwa wydzieleń leśnych na mapie, filtrowana po gatunku"
-  → web-maps: MapLibre (dane w 3857) czy OpenLayers (WMTS w 2180)?  (pytanie do /grill-with-docs, wynik: ADR)
-  → skala danych: GeoJSON < ~5k obiektów, powyżej MVT z PostGIS (ST_AsMVT) → postgres-reviewer
-  → building-ui (references/data-dense-and-maps): mapa + panel, bottom sheet na mobile, legenda
-  → stan widoku w URL, dane przez TanStack Query z bbox i AbortSignal
-  → frontend-reviewer: instancja mapy, sprzątanie efektów, dostępność kontrolek
+Phase 0  decisions in /grill-with-docs: product character, density, foundation (shadcn/ui+Tailwind v4 | Mantine | Radix) → ADR
+Phase 1  tokens: start from building-ui/assets/tokens.css → palette, typography, density, contrast → Storybook "Tokens"
+Phase 2  components: inventory from the list of screens → primitives → composites → patterns; each with stories for all states
+Phase 3  enforcement: lint without arbitrary values, visual tests of stories in CI, a Design section in CLAUDE.md
+Then     missing component → into the DS first, then into the feature; token change → before/after screenshots
 ```
 
-### 7. Migracja bazy i zapytania PostGIS
+### 6. Map with spatial data
 
 ```
-1. Piszesz model lub migrację (postgres-postgis podpowiada bezpieczne wzorce)
-2. python manage.py sqlmigrate app 00NN → "postgres-reviewer, oceń tę migrację; tabela ma ~N wierszy"
-3. Reviewer podaje poziom blokady i ryzyko oraz EXPLAIN (ANALYZE, BUFFERS) do uruchomienia
-4. Uruchamiasz EXPLAIN na danych zbliżonych do prod → wynik wklejasz → decyzja
+"A layer of forest stands on the map, filtered by species"
+  → web-maps: MapLibre (data in 3857) or OpenLayers (WMTS in 2180)?  (a question for /grill-with-docs, result: ADR)
+  → data scale: GeoJSON < ~5k features, above that MVT from PostGIS (ST_AsMVT) → postgres-reviewer
+  → building-ui (references/data-dense-and-maps): map + panel, bottom sheet on mobile, legend
+  → view state in the URL, data through TanStack Query with bbox and AbortSignal
+  → frontend-reviewer: map instance, effect cleanup, control accessibility
 ```
 
-Migracja dużej tabeli w `/to-tickets` to sekwencja expand–contract: osobne tickety na expand,
-migrację danych i contract, z blokerami między nimi.
-
-### 8. Coś nie działa w klastrze k3s
+### 7. Database migration and PostGIS queries
 
 ```
-"cluster-investigator: aplikacja forest-web nie odpowiada od rana"
-  → agent (tylko odczyt): context → get → describe → logs → events → argocd app get/diff
-  → raport: przyczyna (confirmed/likely) + dowody + proponowana poprawka
-Ty: poprawka w repo GitOps (nie kubectl apply!) → /devkit:review-changes (platform-reviewer) → commit → ArgoCD sync
+1. You write a model or migration (postgres-postgis suggests safe patterns)
+2. python manage.py sqlmigrate app 00NN → "postgres-reviewer, assess this migration; the table has ~N rows"
+3. The reviewer gives the lock level and risk, plus an EXPLAIN (ANALYZE, BUFFERS) to run
+4. You run EXPLAIN on prod-like data → paste the result → decision
 ```
 
-Agent sam nie naprawia. Hook zablokuje mu `apply`, `delete`, `exec` i wypisywanie Secretów.
-Przyczyna nie wychodzi z jednego przebiegu? `/diagnosing-bugs`, a `cluster-investigator` dostarcza mu dowodów.
+A migration of a large table in `/to-tickets` is an expand–contract sequence: separate tickets for expand,
+data migration and contract, with blockers between them.
 
-### 9. Nauka: homelab, platform engineering, frontend
-
-```
-/devkit:mentor postaw ArgoCD z app-of-apps na moim k3s
-  → model mentalny (≤10 linii) + typowe pułapki + link do dokumentacji
-  → Claude robi rusztowanie, Ty piszesz fragmenty TODO(human)
-  → "przewidź, co pokaże argocd app diff" → uruchomienie → porównanie
-  → review Twojego kodu jak od seniora → podsumowanie + ćwiczenie + wpis w LEARNING.md
-```
-
-Działa tak samo dla frontendu (np. „naucz mnie focus trap w Dialogu”) i Go/Rust. Powiedz
-„po prostu zrób”, a mentor przełączy się w normalny tryb.
-
-Chcesz poznać temat w wielu sesjach (plan, lekcje, powtórki)? `/teach` w osobnym katalogu,
-z misją opartą na Twoich projektach. Kamienie milowe ćwiczysz potem z `/devkit:mentor` na realnym kodzie.
-
-### 10. Upgrade lub nowa technologia
+### 8. Something is broken in the k3s cluster
 
 ```
-"docs-researcher: co się zmienia przy upgrade ArgoCD z 2.x na 3.x w naszym setupie?"
-  → agent sprawdza wersje w repo (Chart.yaml, lockfile) → oficjalne release notes → raport ze źródłami
-  (wynik ma zostać w repo? /research: ten sam research jako plik z cytatami)
-→ zmienia decyzję? /grill-with-docs → nowy ADR, który zastępuje stary
-→ /to-spec + /to-tickets (workflow 2) albo od razu workflow 1
+"cluster-investigator: the forest-web app hasn't been responding since this morning"
+  → agent (read-only): context → get → describe → logs → events → argocd app get/diff
+  → report: cause (confirmed/likely) + evidence + proposed fix
+You: fix in the GitOps repo (not kubectl apply!) → /devkit:review-changes (platform-reviewer) → commit → ArgoCD sync
 ```
 
-### 11. Czerwone CI
+The agent doesn't fix anything itself. The hook blocks its `apply`, `delete`, `exec` and printing of Secrets.
+The cause doesn't come out of a single run? `/diagnosing-bugs`, with `cluster-investigator` supplying the evidence.
+
+### 9. Learning: homelab, platform engineering, frontend
 
 ```
-Wklejasz link lub log z GitHub Actions, GitLaba albo Tektona → "test-runner, zdiagnozuj"
-  → odtwarza tymi samymi komendami co CI → klasyfikacja: bug / błędny test / środowisko / flaky / needs diagnosis
-  → poprawka w głównej sesji
-  → needs diagnosis: /diagnosing-bugs, a komenda od test-runner to jego pętla z Fazy 1
-Pipeline sam się sypie? → platform-reviewer + ci-pipelines (actionlint, glab ci lint, tkn)
+/devkit:mentor set up ArgoCD with app-of-apps on my k3s
+  → mental model (≤10 lines) + common pitfalls + a link to the docs
+  → Claude builds the scaffolding, you write the TODO(human) parts
+  → "predict what argocd app diff will show" → run → compare
+  → senior-style review of your code → summary + exercise + an entry in LEARNING.md
 ```
 
-### 12. Decyzja architektoniczna
+Works the same for frontend (e.g. "teach me focus trap in a Dialog") and Go/Rust. Say
+"just do it" and the mentor switches to normal mode.
+
+Want to learn a topic across many sessions (plan, lessons, reviews)? `/teach` in a separate directory,
+with a mission based on your projects. You then practice the milestones with `/devkit:mentor` on real code.
+
+### 10. Upgrade or new technology
 
 ```
-Rozmowa w /grill-with-docs: "geometrie trzymamy w 2180 czy 4326?" → decyzja
-  → domain-modeling zapisuje docs/adr/NNNN-....md (krótko; odrzucone opcje, gdy warto je pamiętać)
-  → nowe pojęcia trafiają do CONTEXT.md
-  → jednolinijkowy wskaźnik w CLAUDE.md projektu, komentarz ADR-NNNN przy kodzie (documenting-code)
+"docs-researcher: what changes when upgrading ArgoCD from 2.x to 3.x in our setup?"
+  → the agent checks versions in the repo (Chart.yaml, lockfile) → official release notes → report with sources
+  (should the result stay in the repo? /research: the same research as a file with citations)
+→ changes a decision? /grill-with-docs → a new ADR that supersedes the old one
+→ /to-spec + /to-tickets (workflow 2) or straight to workflow 1
 ```
 
-ADR powstaje, gdy decyzję trudno odwrócić, bez kontekstu jest zaskakująca i była prawdziwym
-wyborem między alternatywami (wszystkie trzy). `code-reviewer` zgłosi brak ADR-a według tego samego kryterium.
-
-### 13. Start nowego projektu
+### 11. Red CI
 
 ```
-1. Setup: devkit + skille Matta + szablon CLAUDE.md + /setup-matt-pocock-skills
-   (krok po kroku: "Praca obok skilli Matta Pococka" → "Setup nowego projektu")
-2. /grill-with-docs o samym projekcie: stack, CRS, fundament design systemu, deploy → pierwsze ADR-y i CONTEXT.md
-3. Frontend? → workflow 5 (design system) przed pierwszymi ekranami
-4. Pierwszy feature → workflow 2 (albo 1, jeśli jest mały)
+You paste a link or log from GitHub Actions, GitLab or Tekton → "test-runner, diagnose"
+  → reproduces with the same commands as CI → classification: bug / wrong test / environment / flaky / needs diagnosis
+  → fix in the main session
+  → needs diagnosis: /diagnosing-bugs, and the command from test-runner is its Phase 1 loop
+The pipeline itself is broken? → platform-reviewer + ci-pipelines (actionlint, glab ci lint, tkn)
+```
+
+### 12. Architecture decision
+
+```
+Conversation in /grill-with-docs: "do we store geometries in 2180 or 4326?" → decision
+  → domain-modeling writes docs/adr/NNNN-....md (short; rejected options when worth remembering)
+  → new terms go into CONTEXT.md
+  → a one-line pointer in the project's CLAUDE.md, an ADR-NNNN comment next to the code (documenting-code)
+```
+
+An ADR is written when the decision is hard to reverse, surprising without context, and was a real
+choice between alternatives (all three). `code-reviewer` flags a missing ADR by the same criterion.
+
+### 13. Starting a new project
+
+```
+1. Setup: devkit + Matt's skills + CLAUDE.md template + /setup-matt-pocock-skills
+   (step by step: "Working alongside Matt Pocock's skills" → "New project setup")
+2. /grill-with-docs about the project itself: stack, CRS, design system foundation, deploy → first ADRs and CONTEXT.md
+3. Frontend? → workflow 5 (design system) before the first screens
+4. First feature → workflow 2 (or 1, if it's small)
 ```
 
 ---
 
-## Bezpieczeństwo: hook read-only
+## Safety: the read-only hook
 
-Agenci dostarczani w pluginie ignorują `permissionMode` i `hooks` we frontmatterze. Dlatego tryb
-read-only wymusza hook `PreToolUse` na poziomie pluginu ([ADR-0003](docs/adr/0003-readonly-guard-hook.md)).
-Dotyczy: `code-reviewer`, `security-reviewer`, `postgres-reviewer`, `platform-reviewer`,
-`frontend-reviewer`, `test-runner`, `cluster-investigator`. **Główna sesja i `implementation-worker`
-nie są ograniczane.** Sub-agentów skilli Matta (np. osi Standards i Spec w `/code-review`) hook też
-nie dotyczy.
+Agents shipped in a plugin ignore `permissionMode` and `hooks` in their frontmatter. That's why
+read-only mode is enforced by a plugin-level `PreToolUse` hook ([ADR-0003](docs/adr/0003-readonly-guard-hook.md)).
+It applies to: `code-reviewer`, `security-reviewer`, `postgres-reviewer`, `platform-reviewer`,
+`frontend-reviewer`, `test-runner`, `cluster-investigator`. **The main session and `implementation-worker`
+are not restricted.** Neither are sub-agents of Matt's skills (e.g. the Standards and Spec axes in `/code-review`).
 
-Blokuje:
-- czasowniki zmieniające stan w `kubectl`/`helm`/`argocd`/`tkn`/`flux`/`terraform` (dozwolone
-  są tylko odczyty, `diff` i `apply --dry-run`);
-- `logs -f` i `get -w` (zawieszają agenta);
-- wypisywanie wartości Secretów;
+It blocks:
+- state-changing verbs in `kubectl`/`helm`/`argocd`/`tkn`/`flux`/`terraform` (only reads,
+  `diff` and `apply --dry-run` are allowed);
+- `logs -f` and `get -w` (they hang the agent);
+- printing Secret values;
 - `docker push`/`run`, `compose up`/`down`;
 - `git push`/`commit`/`reset`/`stash`;
-- DML/DDL przez `psql`;
-- `npm`/`pnpm`/`yarn add|install|update|publish` (dozwolone `npm ci` i `install --frozen-lockfile`);
-- poprawianie plików przez lintery i formattery: `--fix`, `--write`, `ruff format` / `black` bez `--check`;
-- zapis plików z shella (`rm`, `mv`, `sed -i`, przekierowanie `>` do pliku…).
+- DML/DDL through `psql`;
+- `npm`/`pnpm`/`yarn add|install|update|publish` (`npm ci` and `install --frozen-lockfile` are allowed);
+- fixing files with linters and formatters: `--fix`, `--write`, `ruff format` / `black` without `--check`;
+- writing files from the shell (`rm`, `mv`, `sed -i`, `>` redirection to a file…).
 
-Dozwolone są m.in. testy, lintery w trybie sprawdzania, `tsc --noEmit` i `npx playwright screenshot`
-(zrzuty do `/tmp`).
+Allowed are, among others, tests, linters in check mode, `tsc --noEmit` and `npx playwright screenshot`
+(screenshots to `/tmp`).
 
-Hook łapie pomyłki, ale nie celowe obejście. Prawdziwą granicą dla klastra jest kubeconfig
-z ServiceAccountem z rolą `view`, która nie widzi też Secretów:
+The hook catches mistakes, not deliberate circumvention. The real boundary for the cluster is a kubeconfig
+with a ServiceAccount bound to the `view` role, which also cannot see Secrets:
 
 ```bash
 kubectl create sa claude-readonly -n kube-system
 kubectl create clusterrolebinding claude-readonly --clusterrole=view \
   --serviceaccount=kube-system:claude-readonly
-# zbuduj kubeconfig dla tego SA i uruchamiaj: KUBECONFIG=~/.kube/claude-readonly.yaml claude
+# build a kubeconfig for this SA and run: KUBECONFIG=~/.kube/claude-readonly.yaml claude
 ```
 
 ---
 
-## Serwery LSP
+## LSP servers
 
-devkit rejestruje w [`.lsp.json`](.lsp.json) dwa serwery języka
-([ADR-0016](docs/adr/0016-lsp-servers-in-plugin.md)). Po każdej edycji pliku Claude dostaje błędy
-typów i brakujące importy (`Found N new diagnostic issues`, rozwinięcie: `Ctrl+O`), a narzędzie
-`LSP` szuka definicji i referencji po symbolach.
+devkit registers two language servers in [`.lsp.json`](.lsp.json)
+([ADR-0016](docs/adr/0016-lsp-servers-in-plugin.md)). After every file edit Claude gets type errors
+and missing imports (`Found N new diagnostic issues`, expand with `Ctrl+O`), and the `LSP`
+tool finds definitions and references by symbol.
 
-| Serwer | Pliki | Instalacja binarki (raz na maszynę) |
+| Server | Files | Installing the binary (once per machine) |
 |---|---|---|
 | `typescript-language-server` | `.ts` `.tsx` `.mts` `.cts` `.js` `.jsx` `.mjs` `.cjs` | `npm install -g typescript-language-server typescript` |
-| `pyright-langserver` | `.py` `.pyi` | `uv tool install pyright` (albo `pipx install pyright`, `npm install -g pyright`) |
+| `pyright-langserver` | `.py` `.pyi` | `uv tool install pyright` (or `pipx install pyright`, `npm install -g pyright`) |
 
-- Binarka musi być na `PATH` powłoki, z której startuje `claude`. Brak widać w `/plugin` → **Errors**
-  (`Executable not found in $PATH`). Po instalacji wystarczy kolejna edycja pliku.
-- TypeScript bierze `tsserver` z `node_modules` projektu, więc typy zgadzają się z wersją projektu.
-  Pyright czyta `pyrightconfig.json` albo `[tool.pyright]` w `pyproject.toml` i potrzebuje aktywnego
-  venv (`.venv` w katalogu projektu), żeby rozwiązać importy. W projekcie Django dołóż `django-stubs`.
-- Wyłącz oficjalne `typescript-lsp` i `pyright-lsp`, jeśli je masz: dwa serwery dla tych samych
-  plików dublują diagnostykę.
-
----
-
-## Dokumentacja i decyzje
-
-Podejście: **dokumentuj „dlaczego”, generuj „co”, pilnuj aktualności w review**
-([ADR-0006](docs/adr/0006-documentation-strategy.md)). Treści dla modelu są po angielsku,
-dla ludzi po polsku ([ADR-0005](docs/adr/0005-language-policy.md)).
-
-| Dokument | Po co |
-|---|---|
-| [`docs/dokumentacja.md`](docs/dokumentacja.md) | jak prowadzimy dokumentację: mapa, cykl życia, checklista przed commitem |
-| [`docs/design-system.md`](docs/design-system.md) | jak zbudować design system i pracować z nim z Claude |
-| [`skills/documenting-code`](skills/documenting-code/SKILL.md) | reguły dokumentacji, z których korzysta model |
-| [`CLAUDE.md`](CLAUDE.md) | konwencje dla pracy nad tym repo |
-| [`templates/CLAUDE.project.md`](templates/CLAUDE.project.md) | szablon `CLAUDE.md` dla projektów |
-
-Decyzje dotyczące samego devkitu:
-
-| ADR | Decyzja |
-|---|---|
-| [0001](docs/adr/0001-distribute-as-plugin.md) | plugin instalowany per projekt |
-| [0002](docs/adr/0002-agents-are-roles-skills-are-knowledge.md) | agenci to role, wiedza w skillach |
-| [0003](docs/adr/0003-readonly-guard-hook.md) | read-only wymusza hook, a nie prompt |
-| [0004](docs/adr/0004-use-builtin-explore.md) | eksploracja przez wbudowany `Explore` |
-| [0005](docs/adr/0005-language-policy.md) | model po angielsku, ludzie po polsku |
-| [0006](docs/adr/0006-documentation-strategy.md) | dokumentujemy „dlaczego”, generujemy „co” |
-| [0007](docs/adr/0007-frontend-lens-reviewer.md) | frontend: skille + `frontend-reviewer` |
-| [0008](docs/adr/0008-explicit-effort-per-role.md) | jawny `effort` per rola |
-| [0009](docs/adr/0009-ui-quality-through-design-system.md) | jakość UI przez design system i zrzuty, bez agenta-designera |
-| [0010](docs/adr/0010-typescript-files-only-as-assets.md) | bez agentów od TS; pliki TS/CSS tylko jako assety |
-| [0011](docs/adr/0011-codex-variant-as-independent-copy.md) | wariant dla Codex CLI jako niezależna kopia w `codex/` |
-| [0012](docs/adr/0012-codex-guard-as-plugin-hook.md) | guard read-only w Codeksie jako hook pluginu filtrowany po `agent_type` |
-| [0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md) | proces należy do skilli Matta Pococka; devkit to wiedza i role, bez skilla `adr` |
-| [0014](docs/adr/0014-knowledge-skills-hold-only-what-the-model-lacks.md) | skille wiedzy tylko z tym, czego model nie ma; React i TS zastępuje `frontend-stack` |
-| [0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md) | kroki QRSPI (`to-research-questions`, `to-design-discussion`) wypełniają luki we flow Matta |
-| [0016](docs/adr/0016-lsp-servers-in-plugin.md) | serwery LSP (TypeScript, Pyright) w `.lsp.json` pluginu |
-| [0017](docs/adr/0017-drop-codex-variant.md) | rezygnacja z wariantu dla Codex CLI; zastępuje 0011 i 0012 |
-| [0018](docs/adr/0018-english-only.md) | całe repo po angielsku; zastępuje 0005 |
+- The binary must be on the `PATH` of the shell `claude` starts from. A missing one shows up in `/plugin` → **Errors**
+  (`Executable not found in $PATH`). After installing, the next file edit is enough.
+- TypeScript uses `tsserver` from the project's `node_modules`, so types match the project's version.
+  Pyright reads `pyrightconfig.json` or `[tool.pyright]` in `pyproject.toml` and needs an active
+  venv (`.venv` in the project directory) to resolve imports. In a Django project add `django-stubs`.
+- Disable the official `typescript-lsp` and `pyright-lsp` if you have them: two servers for the same
+  files duplicate diagnostics.
 
 ---
 
-## Rozwijanie devkitu
+## Documentation and decisions
 
-Konwencje dla pracy nad tym repo są w [`CLAUDE.md`](CLAUDE.md). W skrócie:
+Approach: **document the "why", generate the "what", keep it current in review**
+([ADR-0006](docs/adr/0006-documentation-strategy.md)). Everything in the repo is in English
+([ADR-0018](docs/adr/0018-english-only.md)).
+
+| Document | Purpose |
+|---|---|
+| [`docs/documentation.md`](docs/documentation.md) | how we keep documentation: map, lifecycle, pre-commit checklist |
+| [`docs/design-system.md`](docs/design-system.md) | how to build a design system and work with it with Claude |
+| [`skills/documenting-code`](skills/documenting-code/SKILL.md) | documentation rules the model uses |
+| [`CLAUDE.md`](CLAUDE.md) | conventions for working on this repo |
+| [`templates/CLAUDE.project.md`](templates/CLAUDE.project.md) | `CLAUDE.md` template for projects |
+
+Decisions about devkit itself:
+
+| ADR | Decision |
+|---|---|
+| [0001](docs/adr/0001-distribute-as-plugin.md) | plugin installed per project |
+| [0002](docs/adr/0002-agents-are-roles-skills-are-knowledge.md) | agents are roles, knowledge lives in skills |
+| [0003](docs/adr/0003-readonly-guard-hook.md) | read-only is enforced by a hook, not a prompt |
+| [0004](docs/adr/0004-use-builtin-explore.md) | exploration through the built-in `Explore` |
+| [0005](docs/adr/0005-language-policy.md) | model-facing text in English, human-facing in Polish; superseded by 0018 |
+| [0006](docs/adr/0006-documentation-strategy.md) | we document the "why", generate the "what" |
+| [0007](docs/adr/0007-frontend-lens-reviewer.md) | frontend: skills + `frontend-reviewer` |
+| [0008](docs/adr/0008-explicit-effort-per-role.md) | explicit `effort` per role |
+| [0009](docs/adr/0009-ui-quality-through-design-system.md) | UI quality through a design system and screenshots, no designer agent |
+| [0010](docs/adr/0010-typescript-files-only-as-assets.md) | no TS agents; TS/CSS files only as assets |
+| [0011](docs/adr/0011-codex-variant-as-independent-copy.md) | Codex CLI variant as an independent copy in `codex/`; superseded by 0017 |
+| [0012](docs/adr/0012-codex-guard-as-plugin-hook.md) | read-only guard in Codex as a plugin hook filtered by `agent_type`; superseded by 0017 |
+| [0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md) | the process belongs to Matt Pocock's skills; devkit is knowledge and roles, no `adr` skill |
+| [0014](docs/adr/0014-knowledge-skills-hold-only-what-the-model-lacks.md) | knowledge skills hold only what the model lacks; `frontend-stack` replaces React and TS |
+| [0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md) | QRSPI steps (`to-research-questions`, `to-design-discussion`) fill gaps in Matt's flow |
+| [0016](docs/adr/0016-lsp-servers-in-plugin.md) | LSP servers (TypeScript, Pyright) in the plugin's `.lsp.json` |
+| [0017](docs/adr/0017-drop-codex-variant.md) | dropping the Codex CLI variant; supersedes 0011 and 0012 |
+| [0018](docs/adr/0018-english-only.md) | the whole repo in English; supersedes 0005 |
+
+---
+
+## Developing devkit
+
+Conventions for working on this repo are in [`CLAUDE.md`](CLAUDE.md). In short:
 
 ```bash
-claude plugin validate .                 # manifesty
-python3 hooks/test_guard_readonly.py     # testy hooka
-claude --plugin-dir .                    # test na żywo
+claude plugin validate .                 # manifests
+python3 hooks/test_guard_readonly.py     # hook tests
+claude --plugin-dir .                    # live test
 ```
 
-- Nowa technologia to nowy **skill**, a nie nowy agent.
-- Nie dubluj skilli procesowych Matta (grill, spec, tickety, tdd, review Standards/Spec, ADR-y,
-  `/teach`). Opis nowego skilla nie może konkurować z ich triggerami; wpinaj się w ich kroki ([ADR-0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md)).
-- Nowy krok procesu tylko tam, gdzie flow Matta ma lukę, i zawsze z wynikiem oddawanym jednemu z jego kroków, jak QRSPI ([ADR-0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md)).
-- Nowy agent read-only wymaga `disallowedTools`, wpisu w `READONLY_AGENTS` i testu.
-- Nowy asset wymaga uzasadnienia: jaką decyzję niesie i dlaczego nie da się go wygenerować.
-- Istotna zmiana podejścia to nowy ADR w `docs/adr/`.
-- Każda zmiana zachowania oznacza podbicie `version` w `.claude-plugin/plugin.json`.
+- A new technology is a new **skill**, not a new agent.
+- Don't duplicate Matt's process skills (grill, spec, tickets, tdd, Standards/Spec review, ADRs,
+  `/teach`). A new skill's description must not compete with their triggers; plug into their steps ([ADR-0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md)).
+- A new process step only where Matt's flow has a gap, and always with its output handed to one of his steps, like QRSPI ([ADR-0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md)).
+- A new read-only agent needs `disallowedTools`, an entry in `READONLY_AGENTS` and a test.
+- A new asset needs a justification: what decision it carries and why it can't be generated.
+- A significant change of approach is a new ADR in `docs/adr/`.
+- Every behavior change means bumping `version` in `.claude-plugin/plugin.json`.
 
 ---
 
-## Zawartość repo
+## Repository contents
 
 ```
 .claude-plugin/
-  plugin.json              # manifest pluginu "devkit"
-  marketplace.json         # marketplace "dampe" (source: ./)
-.lsp.json                  # serwery LSP: TypeScript, Pyright
-agents/                    # 9 agentów (role)
-skills/                    # 16 skilli (wiedza i procesy)
-  <name>/SKILL.md          #   instrukcja
-  <name>/references/       #   cięższe materiały, czytane na żądanie
-  building-ui/assets/      #   tokens.css: startowe tokeny design systemu
+  plugin.json              # "devkit" plugin manifest
+  marketplace.json         # "dampe" marketplace (source: ./)
+.lsp.json                  # LSP servers: TypeScript, Pyright
+agents/                    # 9 agents (roles)
+skills/                    # 16 skills (knowledge and processes)
+  <name>/SKILL.md          #   instructions
+  <name>/references/       #   heavier material, read on demand
+  building-ui/assets/      #   tokens.css: starter design system tokens
 hooks/
-  hooks.json               # rejestracja PreToolUse → guard
-  guard_readonly.py        # hook read-only
-  test_guard_readonly.py   # testy hooka
+  hooks.json               # PreToolUse → guard registration
+  guard_readonly.py        # read-only hook
+  test_guard_readonly.py   # hook tests
 templates/
-  CLAUDE.project.md        # szablon CLAUDE.md dla projektów
+  CLAUDE.project.md        # CLAUDE.md template for projects
 docs/
-  dokumentacja.md          # jak prowadzimy dokumentację
-  design-system.md         # workflow design systemu
-  adr/                     # decyzje (0001–0018)
-CLAUDE.md                  # instrukcje dla Claude przy pracy nad tym repo
+  documentation.md         # how we keep documentation
+  design-system.md         # design system workflow
+  adr/                     # decisions (0001–0018)
+CLAUDE.md                  # instructions for Claude when working on this repo
 ```
