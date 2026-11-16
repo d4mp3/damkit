@@ -166,8 +166,12 @@ def strip_prefix(seg: list[str]) -> list[str]:
             seg = seg[2:]
         elif head in {"xargs", "watch"}:
             seg = [t for t in seg[1:] if not t.startswith("-")]
-        elif head == "k3s" and len(seg) > 1 and seg[1] == "kubectl":
+        elif head in {"k3s", "k0s", "microk8s"} and len(seg) > 1 and seg[1] == "kubectl":
             seg = seg[1:]
+        elif head == "minikube" and len(seg) > 1 and seg[1] == "kubectl":
+            # `minikube kubectl -- <args>`: the args after `--` go to kubectl
+            rest = seg[2:]
+            seg = ["kubectl", *(rest[1:] if rest[:1] == ["--"] else rest)]
         else:
             break
     return seg
