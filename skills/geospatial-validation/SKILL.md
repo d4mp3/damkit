@@ -64,7 +64,7 @@ For "these features must not change between dataset versions":
 
 - Match features by `feature_key`, never by fid or row order.
 - Geometry fingerprint: `shapely.normalize(g)` → `shapely.set_precision(g, grid)` →
-  WKB → sha256. The grid (e.g. 0.01 m in EPSG:2180) absorbs float noise from re-exports.
+  WKB → sha256. The grid (e.g. 0.01 m in a metric CRS) absorbs float noise from re-exports.
   Without it every re-export looks like a change.
 - Attribute fingerprint: canonical JSON of the selected immutable fields (sorted keys,
   normalized types: `"1"` vs `1`, dates to ISO).
