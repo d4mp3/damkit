@@ -33,10 +33,11 @@ knowledge and specialized agents that plug into the steps of that process
 7. [Workflows](#workflows)
 8. [Safety: the read-only hook](#safety-the-read-only-hook)
 9. [LSP servers](#lsp-servers)
-10. [Documentation and decisions](#documentation-and-decisions)
-11. [Developing geostack](#developing-geostack)
-12. [Repository contents](#repository-contents)
-13. [License](#license)
+10. [Status line (optional)](#status-line-optional)
+11. [Documentation and decisions](#documentation-and-decisions)
+12. [Developing geostack](#developing-geostack)
+13. [Repository contents](#repository-contents)
+14. [License](#license)
 
 ---
 
@@ -578,6 +579,22 @@ tool finds definitions and references by symbol.
 
 ---
 
+## Status line (optional)
+
+A plugin can't set the status line, so `statusline/statusline-command.sh` is a separate script you
+point your user settings at. It shows the directory and git status (Starship-like), model, effort,
+thinking, context use, the 5-hour and 7-day rate limits, tokens spent since the last `/compact` and
+the logged-in account. It needs `jq`.
+
+```json
+{ "statusLine": { "type": "command", "command": "bash ~/dev/geostack/statusline/statusline-command.sh" } }
+```
+
+Tokens are summed from the session transcript: input, output and cache writes, deduplicated by
+message id. Cache reads are left out because they re-count the whole context on every turn.
+
+---
+
 ## Documentation and decisions
 
 Approach: **document the "why", generate the "what", keep it current in review**
@@ -655,6 +672,8 @@ skills/                    # 18 skills (knowledge and processes)
   <name>/references/       #   heavier material, read on demand
   building-ui/assets/      #   tokens.css: starter design system tokens
   setup-geostack/assets/   #   CLAUDE.project.md: template for projects' CLAUDE.md
+statusline/
+  statusline-command.sh    # optional status line for user settings
 hooks/
   hooks.json               # PreToolUse → guard registration
   guard_readonly.py        # read-only hook
