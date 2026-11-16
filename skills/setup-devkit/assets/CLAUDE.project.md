@@ -53,13 +53,13 @@ devkit adds stack knowledge, specialist agents and two optional steps; it never 
 ## Design
 - Design system: tokens in `<src/styles/tokens.css | packages/ui/tokens.css>`, components in `<components/ui/>`,
   Storybook: `pnpm storybook` (<url>)
-- Product character: <e.g. calm, content-first, data-dense tool for foresters; not marketing-like>
+- Product character: <e.g. calm, content-first, data-dense tool for field staff; not marketing-like>
 - Density: <comfortable for blog/edu, compact for maps/statistics/validator>
 - Layout patterns: <e.g. map full-screen + side panel; content pages max-width 72ch>
 - Rules: tokens only, no arbitrary Tailwind values; a missing component goes into the design system first
 
 ## Data & GIS
-- Storage CRS: EPSG:2180. API/interchange CRS: EPSG:4326. <pointer to the ADR>
+- Storage CRS: <e.g. EPSG:2180, 27700, a UTM zone>. API/interchange CRS: EPSG:4326. <pointer to the ADR>
 - Large tables: <name ≈ rows>. Migrations on them follow expand/contract.
 
 ## Deployment

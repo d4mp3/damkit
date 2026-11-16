@@ -35,6 +35,8 @@ Collect only what the model could not cheaply infer later:
 - **Stack**: which template sections apply. No frontend → drop `## Frontend` and `## Design`.
   No spatial data → drop `## Data & GIS`. No Kubernetes or GitOps → drop `## Deployment`.
 - **Settled decisions**: existing ADRs (`docs/adr/`) that constrain everyday coding become one-line pointers.
+  So does what the code has already settled: the SRID of geometry columns in models and migrations is
+  the storage CRS. Only with no ADR and no geometry columns is the CRS left for `/grill-with-docs`.
 - **Language hints** for step 3: UI strings in components or i18n files, the language of README and
   docs, and the language of recent commit messages (`git log -20 --format=%s`).
 
