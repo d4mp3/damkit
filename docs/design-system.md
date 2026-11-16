@@ -4,8 +4,6 @@ A how-to guide for React/TypeScript frontends.
 The rules the model uses on every view are in the skill
 [`building-ui`](../skills/building-ui/SKILL.md).
 
-> Last verified: 2026-09-29
-
 ## Why
 
 The model knows design principles, but every session designs from scratch. Without a design system you get

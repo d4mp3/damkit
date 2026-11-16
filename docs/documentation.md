@@ -4,8 +4,6 @@ A guide for people. The detailed writing rules, which the model also uses, are i
 [`skills/documenting-code/SKILL.md`](../skills/documenting-code/SKILL.md). This file does not repeat them,
 it only shows how to apply them day to day.
 
-> Last verified: 2026-09-29
-
 ## The rule in one sentence
 
 Document what cannot be read from the code (**why**, constraints, decisions, operations).
@@ -44,7 +42,7 @@ Generate what can be generated from the code. Skip the rest.
 | Change of behavior, name, command, env variable | documentation update **in the same diff** | `code-reviewer` flags outdated documentation |
 | The model makes the same mistake a second time | one line in `CLAUDE.md` | — |
 | A document stopped being true and nobody will maintain it | you delete it | — |
-| A runbook or guide was tested live | you update `Last verified:` | — |
+| You ran a runbook's commands against the live system | you update its `Last verified:` date and versions | — |
 | New or changed UI component | story with all states in the same diff | skill `building-ui`, `frontend-reviewer` |
 
 ## Checklist before commit

@@ -32,7 +32,7 @@ For each piece of information, ask in this order:
 | What to build and why (spec, tickets) | the issue tracker | Via /to-spec and /to-tickets, as `docs/agents/issue-tracker.md` says. Not in `docs/`. |
 | How to run, test and deploy | `README.md` | A quickstart that CI actually executes, or at least the same commands CI runs. |
 | Facts an AI assistant needs | `CLAUDE.md` | Short (aim for under 100 lines), only what isn't inferable, with pointers instead of copies. |
-| How to operate or recover | `docs/runbooks/*.md` | Task-oriented, copy-pasteable commands, with a "last verified" date. |
+| How to operate or recover | `docs/runbooks/*.md` | Task-oriented, copy-pasteable commands, with a `Last verified:` date and tool versions. |
 | Longer domain explanation (forestry, GIS rules) | `docs/explanation/*.md` | Only what a glossary entry can't hold. Linked from `CONTEXT.md`, uses its terms, links to code instead of restating it. |
 
 This follows the Diátaxis split: tutorials, how-to guides (runbooks), reference (generated),
@@ -50,7 +50,10 @@ the design-system foundation, a service split, a new infrastructure component.
 - **One source of truth.** Link to the canonical place and don't copy. Two copies means one is wrong.
 - **Same change, same PR.** When behavior changes, update the docs that describe it in the same diff.
   If a doc no longer matches and nobody will maintain it, delete it.
-- **Date what decays.** Runbooks and setup guides carry `Last verified: YYYY-MM-DD (versions)`.
+- **Date what decays.** A runbook or guide whose commands depend on tool versions carries
+  `Last verified: YYYY-MM-DD (tool versions)`, e.g. `Last verified: 2026-11-16 (ArgoCD 3.1, k3s 1.31)`,
+  updated only when someone runs the commands again. Guides about method or principles carry no date:
+  an unmaintained date claims a check that never happened.
 - **No marketing, no filler.** Every sentence either instructs, constrains or explains a reason.
 
 ## Comments: good vs noise
