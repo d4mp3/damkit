@@ -1,7 +1,7 @@
 # geostack
 
 A Claude Code plugin for everyday work and growth in the
-**Python/Django/FastAPI · React/TypeScript · PostgreSQL/PostGIS · GIS data, web maps and QGIS plugins · Docker · Kubernetes (k3s) · GitOps · CI/CD** stack.
+**Python/Django/FastAPI · React/TypeScript · PostgreSQL/PostGIS · GIS data, web maps and QGIS plugins · Docker · Kubernetes · GitOps · CI/CD** stack.
 
 geostack provides:
 - **agents (subagents)** for tasks worth isolating: implementation in a separate worktree,
@@ -343,7 +343,7 @@ Matt's main flow with geostack's hook-in points. The rest are stack lenses that 
 | 5 | [Building a design system](#5-building-a-design-system) | [`docs/design-system.md`](docs/design-system.md) |
 | 6 | [Map with spatial data](#6-map-with-spatial-data) | `web-maps` + `postgres-postgis` |
 | 7 | [Database migration and PostGIS](#7-database-migration-and-postgis-queries) | `postgres-reviewer` + EXPLAIN |
-| 8 | [Cluster failure](#8-something-is-broken-in-the-k3s-cluster) | `cluster-investigator` → GitOps |
+| 8 | [Cluster failure](#8-something-is-broken-in-the-cluster) | `cluster-investigator` → GitOps |
 | 9 | [Learning](#9-learning-homelab-platform-engineering-frontend) | `/geostack:mentor` on a task, `/teach` across many sessions |
 | 10 | [Upgrade, new technology](#10-upgrade-or-new-technology) | `docs-researcher` / `/research` |
 | 11 | [Red CI](#11-red-ci) | `test-runner` + `ci-pipelines` → `/diagnosing-bugs` |
@@ -450,7 +450,7 @@ Then     missing component → into the DS first, then into the feature; token c
 A migration of a large table in `/to-tickets` is an expand–contract sequence: separate tickets for expand,
 data migration and contract, with blockers between them.
 
-### 8. Something is broken in the k3s cluster
+### 8. Something is broken in the cluster
 
 ```
 "cluster-investigator: the forest-web app hasn't been responding since this morning"
@@ -531,8 +531,8 @@ It applies to: `code-reviewer`, `security-reviewer`, `postgres-reviewer`, `platf
 are not restricted.** Neither are sub-agents of Matt's skills (e.g. the Standards and Spec axes in `/code-review`).
 
 It blocks:
-- state-changing verbs in `kubectl`/`helm`/`argocd`/`tkn`/`flux`/`terraform` (only reads,
-  `diff` and `apply --dry-run` are allowed);
+- state-changing verbs in `kubectl`/`oc`/`helm`/`argocd`/`tkn`/`flux`/`terraform`, also through
+  `k3s`/`k0s`/`microk8s`/`minikube kubectl` (only reads, `diff` and `apply --dry-run` are allowed);
 - `logs -f` and `get -w` (they hang the agent);
 - printing Secret values;
 - `docker push`/`run`, `compose up`/`down`;
@@ -635,6 +635,7 @@ Decisions about geostack itself:
 | [0020](docs/adr/0020-domain-and-region-come-from-the-project.md) | geostack serves any GIS project; domain, region and CRS come from the project |
 | [0021](docs/adr/0021-rename-to-geostack.md) | the plugin is renamed from devkit to geostack |
 | [0022](docs/adr/0022-qgis-plugins-skill.md) | QGIS plugins are in scope, as one `qgis-plugins` knowledge skill |
+| [0023](docs/adr/0023-cluster-comes-from-the-project.md) | Kubernetes support is distribution-neutral; the cluster comes from the project |
 
 ---
 
@@ -681,7 +682,7 @@ hooks/
 docs/
   documentation.md         # how we keep documentation
   design-system.md         # design system workflow
-  adr/                     # decisions (0001–0022)
+  adr/                     # decisions (0001–0023)
 CLAUDE.md                  # instructions for Claude when working on this repo
 LICENSE                    # MIT
 ```
