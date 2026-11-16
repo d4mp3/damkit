@@ -612,6 +612,7 @@ Decisions about devkit itself:
 | [0017](docs/adr/0017-drop-codex-variant.md) | dropping the Codex CLI variant; supersedes 0011 and 0012 |
 | [0018](docs/adr/0018-english-only.md) | the whole repo in English; supersedes 0005 |
 | [0019](docs/adr/0019-setup-devkit-writes-project-claude-md.md) | `setup-devkit` writes the project `CLAUDE.md` and its languages; skills stop assuming Polish |
+| [0020](docs/adr/0020-domain-and-region-come-from-the-project.md) | devkit serves any GIS project; domain, region and CRS come from the project |
 
 ---
 
@@ -656,6 +657,6 @@ hooks/
 docs/
   documentation.md         # how we keep documentation
   design-system.md         # design system workflow
-  adr/                     # decisions (0001–0019)
+  adr/                     # decisions (0001–0020)
 CLAUDE.md                  # instructions for Claude when working on this repo
 ```
