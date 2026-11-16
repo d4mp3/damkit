@@ -1,6 +1,6 @@
 # ADR-0005: Treści dla modelu po angielsku, treści dla ludzi po polsku
 
-- Status: Accepted
+- Status: Superseded by [ADR-0018](0018-english-only.md)
 - Date: 2026-09-29
 
 ## Context
