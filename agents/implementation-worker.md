@@ -45,11 +45,25 @@ without re-reading everything.
 2. Run the narrowest relevant tests, then the project's lint and type checks for the touched files.
 3. Fix failures you caused. Report failures you didn't cause; don't fix them.
 
+## Committing
+
+You work on your own branch in your own worktree, and the parent can only merge commits, so
+commit your change there without being asked. Committing here touches nothing outside your
+branch, and the parent can still drop it.
+
+- With changes (`done` or `partial`), make one commit for the task. Follow the project's commit
+  conventions: the commit-message language from CLAUDE.md `## Language`, the style of `git log`.
+  Name the ticket id in the message. Mark a `partial` commit as incomplete in the message.
+- With no changes (`blocked` before editing), don't commit.
+- If a pre-commit hook fails, fix the cause and commit again. Never pass `--no-verify`.
+
 ## Handoff (this exact shape)
 
 ```
 Status: done | blocked | partial
 Ticket: <id/path, or "none">
+Branch: <your worktree's branch>
+Commit: <sha, or "none">
 Summary: <1-3 sentences>
 Files changed: <path — why>
 Decisions: <choices the parent should know about, with the reason>
@@ -58,5 +72,5 @@ Verification: <commands run → result>
 Open issues: <risks, follow-ups, or "none">
 ```
 
-Do not commit, push, merge or rebase unless the brief says so. Don't run /code-review or
-review-changes yourself: the parent reviews after merging the worktree.
+Never push, merge or rebase: the parent merges your branch. Don't run /code-review or
+review-changes yourself: the parent reviews once, after merging the workers' branches.

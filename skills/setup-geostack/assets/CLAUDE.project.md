@@ -23,7 +23,7 @@ geostack adds stack knowledge, specialist agents and two optional steps; it neve
   as a separate `## Risk` section. Don't merge or rerank it with Standards and Spec.
 - Final test/lint/type run: delegate to geostack:test-runner.
 - Tickets whose blockers are all done may run in parallel, one geostack:implementation-worker
-  per ticket; review once after merging the worktrees.
+  per ticket. Each worker commits on its own branch; review once after merging those branches.
 
 ## Language
 - Conversation: <e.g. Polish>. Code, identifiers and comments: English.

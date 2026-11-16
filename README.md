@@ -212,16 +212,14 @@ they can be done in parallel, each in its own worktree:
 
 ```
 "Tickets #12, #13 and #15 have their blockers closed. Give each to a separate implementation-worker,
- in parallel; commit in the worktree"
-  → worker: ticket + parent spec → CONTEXT.md, ADRs → /tdd on the seams from the spec → report
-       (Status, Ticket, acceptance criteria met/not met, verification)
+ in parallel"
+  → worker: ticket + parent spec → CONTEXT.md, ADRs → /tdd on the seams from the spec → commit on its branch
+       → report (Status, Ticket, Branch, Commit, acceptance criteria met/not met, verification)
   → a worker without agreed seams or with an open blocker ends as "blocked" and guesses nothing
-You merge the worktrees → geostack:test-runner → /code-review → /geostack:review-changes → close the tickets
+You merge the workers' branches → geostack:test-runner → /code-review → /geostack:review-changes → close the tickets
   → new frontier
 ```
 
-- "commit in the worktree" is needed in the prompt, because the worker doesn't commit by default, and without
-  commits there is nothing to merge.
 - Workers don't run review. You review once, on the merged diff.
 - Do tickets that overlap (shared files, consecutive expand–contract steps) one by one.
 
@@ -273,7 +271,7 @@ In a session they have the `geostack:` prefix, e.g. `geostack:code-reviewer`.
 
 | Agent | When to use | Model | Effort | Writes? |
 |---|---|---|---|---|
-| `implementation-worker` | one ticket from the frontier (blockers closed) or one independent task with acceptance criteria. `/tdd` on the seams from the spec, a separate **git worktree**. | inherit | from session | yes (in the worktree) |
+| `implementation-worker` | one ticket from the frontier (blockers closed) or one independent task with acceptance criteria. `/tdd` on the seams from the spec, a separate **git worktree**; commits on its own branch, never pushes. | inherit | from session | yes (in the worktree) |
 | `code-reviewer` | Risk axis: correctness, regressions, test gaps, **stale documentation and `CONTEXT.md`**, a missing ADR (smells and spec compliance are left to `/code-review`) | sonnet | high | no |
 | `security-reviewer` | endpoints, permissions, user input, uploads, secrets, CI, token handling and HTML in the frontend | inherit | xhigh | no |
 | `postgres-reviewer` | migrations, models, SQL, heavy ORM queries, spatial queries (PostGIS) | inherit | high | no |
@@ -388,9 +386,9 @@ A hard bug instead of a small fix? Start with `/diagnosing-bugs`.
 3. /to-tickets → tickets with blockers in the tracker
    (steps 1–3 in one context window, without /clear)
 4a. Sequentially: /implement per ticket, /clear before the next
-4b. In parallel: frontier tickets → implementation-worker × N, "commit in the worktree"
-      → report per ticket: Status, acceptance criteria, verification
-5. You merge the worktrees → test-runner → /code-review → /geostack:review-changes → close the tickets
+4b. In parallel: frontier tickets → implementation-worker × N, each commits on its own branch
+      → report per ticket: Status, Branch, acceptance criteria, verification
+5. You merge the workers' branches → test-runner → /code-review → /geostack:review-changes → close the tickets
 6. Next frontier → back to 4
 ```
 
