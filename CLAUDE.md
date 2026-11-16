@@ -17,9 +17,12 @@ All text in the repo, including README and docs/, is in English (ADR-0018).
 - devkit adds a process step only where Matt's flow has none, and the step hands its output to
   one of his (ADR-0015). Today these are the QRSPI steps: `to-research-questions` (ticket →
   questions for a blind `/research` in a fresh session) and `to-design-discussion` (after
-  `/grill-with-docs` → document for a code-owner review → `/to-spec`). They read Matt's
+  `/grill-with-docs` → document for a code-owner review → `/to-spec`), plus `setup-devkit`
+  (project `CLAUDE.md` → `/setup-matt-pocock-skills`, ADR-0019). They read Matt's
   `docs/agents/*.md` and use his terms; a new step follows the same rules.
-- A QRSPI step's `description` names the artifact it produces ("Turn a ticket into research
+- Skills don't assume a language for the user's projects: UI copy, locale and docs language come
+  from the project's `## Language` section, which `setup-devkit` writes (ADR-0019).
+- A process step's `description` names the artifact it produces ("Turn a ticket into research
   questions…"): the artifact is the trigger word, so the when-to-use rule below doesn't apply to them.
 - Agents are stack-agnostic roles; technology knowledge goes into skills (ADR-0002).
   Don't add "<tech>-expert" agents.
