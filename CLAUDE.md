@@ -18,7 +18,7 @@ All text in the repo, including README and docs/, is in English (ADR-0018).
   one of his (ADR-0015). Today these are the QRSPI steps: `to-research-questions` (ticket →
   questions for a blind `/research` in a fresh session) and `to-design-discussion` (after
   `/grill-with-docs` → document for a code-owner review → `/to-spec`), plus `setup-geostack`
-  (project `CLAUDE.md` → `/setup-matt-pocock-skills`, ADR-0019). They read Matt's
+  (project `CLAUDE.md` and `.claude/settings.json` → `/setup-matt-pocock-skills`, ADR-0019, ADR-0024). They read Matt's
   `docs/agents/*.md` and use his terms; a new step follows the same rules.
 - Skills and agents don't assume a language, domain, country, CRS or cluster for the user's projects:
   UI copy, locale and docs language come from the project's `## Language` section (ADR-0019), the
