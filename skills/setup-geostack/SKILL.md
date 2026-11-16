@@ -37,6 +37,13 @@ Collect only what the model could not cheaply infer later:
 - **Settled decisions**: existing ADRs (`docs/adr/`) that constrain everyday coding become one-line pointers.
   So does what the code has already settled: the SRID of geometry columns in models and migrations is
   the storage CRS. Only with no ADR and no geometry columns is the CRS left for `/grill-with-docs`.
+- **Design**: where the design system lives is a fact: the tokens file, the components directory, the
+  Storybook script and URL. Product character, density and layout patterns are decisions: take them
+  from an ADR or existing docs, otherwise write `<decide in /grill-with-docs>`.
+- **Deployment**: read what the repo shows: the registry and image names from CI push steps, the build
+  system, ArgoCD Applications (app name, GitOps repo URL), Helm/Kustomize directories, and node
+  architecture from `nodeSelector`/`kubernetes.io/arch` or multi-arch builds. Don't ask about the rest:
+  the deployment layout is a decision, so leave the placeholder.
 - **Language hints** for step 3: UI strings in components or i18n files, the language of README and
   docs, and the language of recent commit messages (`git log -20 --format=%s`).
 
@@ -48,7 +55,9 @@ Ask in one round, with the hints from step 2 as proposed answers:
 - the UI copy language and tone (e.g. informal vs formal address), only if there is a UI;
 - the locale for numbers, dates and units (e.g. `pl-PL`), only if there is a UI;
 - the language of human-facing docs (README, `docs/`, ADRs) and of commit messages;
-- "What this is", only if README doesn't answer it in a sentence or two.
+- "What this is", only if README doesn't answer it in a sentence or two;
+- learning goals, optional: what the user wants to build or learn by hand in this project. `mentor` and
+  `/teach` take their mission from it. A skip is a valid answer: then drop `## Learning goals`.
 
 The `## Language` section is what `building-ui`, `frontend-stack` and the QRSPI steps read, so
 don't skip it, even when every answer is English.
@@ -61,7 +70,9 @@ don't skip it, even when every answer is English.
   disagree (e.g. a test command CI no longer runs), ask instead of choosing.
 - Keep it short: every line is loaded on every turn. Drop example values the project doesn't use.
 
-Show the user the resulting file, or the added sections for an existing one. Don't commit.
+Show the user the resulting file, or the added sections for an existing one, followed by a list of the
+placeholders left in it: `<decide in /grill-with-docs>` ones for the first grill, and facts you couldn't
+find for the user to fill in. Don't commit.
 
 ### 5. Hand off
 

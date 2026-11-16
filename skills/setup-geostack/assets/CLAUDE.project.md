@@ -63,7 +63,7 @@ geostack adds stack knowledge, specialist agents and two optional steps; it neve
 - Large tables: <name ≈ rows>. Migrations on them follow expand/contract.
 
 ## Deployment
-- Target: k3s (<arm64 Pi | amd64 VPS>), GitOps repo: <url/path>, ArgoCD app: <name>
+- Target: <cluster and node architectures, e.g. k3s on arm64 + amd64>, GitOps repo: <url/path>, ArgoCD app: <name>
 - Images: <registry>/<project>/<app>, built by <GitHub Actions | GitLab CI | Tekton>
 
 ## Conventions & decisions
