@@ -1,6 +1,6 @@
 ---
 name: web-maps
-description: Use when building or debugging interactive web maps in a React/TypeScript frontend - MapLibre GL JS, OpenLayers or Leaflet, vector tiles (MVT) from PostGIS, large GeoJSON layers, EPSG:2180 data on a web map, Polish WMS/WMTS services (Geoportal, BDL), map performance, syncing map state with URL and React state, showing validation errors on a map.
+description: Use when building or debugging interactive web maps in a React/TypeScript frontend - MapLibre GL JS, OpenLayers or Leaflet, vector tiles (MVT) from PostGIS, large GeoJSON layers, data in a national grid or other non-Mercator CRS (e.g. EPSG:2180, EPSG:27700) on a web map, national WMS/WMTS services (e.g. Polish Geoportal, BDL), map performance, syncing map state with URL and React state, showing validation errors on a map.
 ---
 
 # Web maps
@@ -10,12 +10,14 @@ description: Use when building or debugging interactive web maps in a React/Type
 | Need | Choice |
 |---|---|
 | Fast vector tiles, smooth zoom, data-driven styling, 3D terrain | **MapLibre GL JS** (react-map-gl/maplibre wrapper) |
-| **Native EPSG:2180** or other non-Mercator projections, WMS/WMTS in 2180, heavy GIS tooling (editing, measuring) | **OpenLayers** |
+| **Native non-Mercator projections** (national grids such as EPSG:2180 or 27700), WMS/WMTS published in them, heavy GIS tooling (editing, measuring) | **OpenLayers** |
 | Simple markers and popups on raster tiles | Leaflet (react-leaflet) |
 
-MapLibre renders **only Web Mercator (EPSG:3857)**. Data stored in 2180 must be served
-reprojected (PostGIS `ST_Transform(geom, 3857)` in `ST_AsMVT` or 4326 GeoJSON). Polish national
-WMTS services published only in 2180 need OpenLayers + `proj4` registration:
+MapLibre renders **only Web Mercator (EPSG:3857)**. Data stored in the project's projected CRS
+(`## Data & GIS` in `CLAUDE.md`) must be served reprojected (PostGIS `ST_Transform(geom, 3857)` in
+`ST_AsMVT` or 4326 GeoJSON). National WMTS services published only in their own grid (e.g. the
+Polish Geoportal in EPSG:2180) need OpenLayers + `proj4` registration. The example registers 2180;
+take the definition for your CRS from epsg.io:
 
 ```ts
 import proj4 from "proj4";
@@ -25,9 +27,9 @@ proj4.defs("EPSG:2180",
 register(proj4);
 ```
 
-Coordinates in 2180, 4326 and 3857 share one TypeScript type (`[number, number]`). Where more
+Coordinates in the storage CRS, 4326 and 3857 share one TypeScript type (`[number, number]`). Where more
 than one CRS lives in the client, brand them so a missing transform fails at compile time:
-`type Xy2180 = [number, number] & { readonly __crs: "EPSG:2180" }`.
+e.g. `type Xy2180 = [number, number] & { readonly __crs: "EPSG:2180" }`.
 
 ## Data volume decides the transport
 
@@ -57,7 +59,7 @@ Always filter by the current bbox and zoom. Never ship a whole forest-district l
 - Clustering for dense points (built into MapLibre sources: `cluster: true`).
 - Heavy client-side geometry (turf) on large sets goes to a Web Worker.
 
-## Showing validation errors (the validator web service)
+## Showing validation errors (a validation web service)
 
 Use the error contract from the geospatial-validation skill. The service returns errors as a
 FeatureCollection with the `location` point per error. Render it as its own source:
@@ -68,5 +70,5 @@ FeatureCollection with the `location` point per error. Render it as its own sour
 
 ## Attribution and terms
 
-Show the attribution for every base layer (OSM, Geoportal/GUGiK, BDL). Check the usage limits of public
+Show the attribution for every base layer (OSM, national geoportals such as Geoportal/GUGiK or BDL). Check the usage limits of public
 WMS/WMTS services before putting them behind a busy public site. Cache or proxy if allowed.

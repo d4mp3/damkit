@@ -296,7 +296,7 @@ Code exploration uses the built-in **`Explore`** agent ([ADR-0004](docs/adr/0004
 | `django-conventions` | `models.py`, `views.py`, `serializers.py`, `migrations/`, `settings*` |
 | `fastapi-conventions` | work with FastAPI (by description) |
 | `frontend-stack` | connecting the frontend to the API (by description): client and types from OpenAPI, drift check in CI, zod for data from outside the API; frontend tests (MSW, `QueryClient` per test, maps outside jsdom, Playwright) |
-| `web-maps` | maps in React (by description): MapLibre vs OpenLayers, EPSG:2180 on a map, MVT from PostGIS, validation errors on a map |
+| `web-maps` | maps in React (by description): MapLibre vs OpenLayers, a national CRS (e.g. EPSG:2180) on a map, MVT from PostGIS, validation errors on a map |
 | `postgres-postgis` | `*.sql`, `migrations/`, `alembic/versions/`, spatial queries |
 | `geospatial-validation` | work on the geodata validator and web service (by description) |
 | `kubernetes-manifests` | `kustomization.yaml`, `Chart.yaml`, `values*.yaml`, `k8s/`, `manifests/`, `argocd/`… |
