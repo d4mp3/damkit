@@ -32,8 +32,9 @@ kubernetes-manifests and container-images skills. For pipelines, read
 4. **Environment fit:** take the cluster from `## Deployment` in the project's `CLAUDE.md` or its ADRs:
    distribution, node architectures, ingress or Gateway class, StorageClass, GitOps tool. Check the
    change against it: image architectures, node- or zone-pinned volumes, admission policies (OpenShift
-   SCC, Kyverno, Gatekeeper), resource pressure on small nodes. If the project doesn't say, state the
-   assumption in the report instead of picking one silently.
+   SCC, Kyverno, Gatekeeper), resource pressure on small nodes. If `## Deployment` says another team runs
+   the cluster and its details are unknown, list the cluster-dependent risks as questions for that team.
+   If the project doesn't say anything, state the assumption in the report instead of picking one silently.
 
 Report correctness, reliability, security and operational findings in separate groups.
 
