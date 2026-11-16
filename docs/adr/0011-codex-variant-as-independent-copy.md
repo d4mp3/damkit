@@ -1,6 +1,6 @@
 # ADR-0011: Wariant dla Codex CLI jako niezależna kopia w `codex/`
 
-- Status: Accepted; część o guardzie read-only zastąpiona przez [ADR-0012](0012-codex-guard-as-plugin-hook.md)
+- Status: Superseded by [ADR-0017](0017-drop-codex-variant.md); wcześniej część o guardzie read-only zastąpiona przez [ADR-0012](0012-codex-guard-as-plugin-hook.md)
 - Date: 2026-09-29
 
 ## Context

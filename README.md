@@ -601,6 +601,7 @@ Decyzje dotyczące samego devkitu:
 | [0014](docs/adr/0014-knowledge-skills-hold-only-what-the-model-lacks.md) | skille wiedzy tylko z tym, czego model nie ma; React i TS zastępuje `frontend-stack` |
 | [0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md) | kroki QRSPI (`to-research-questions`, `to-design-discussion`) wypełniają luki we flow Matta |
 | [0016](docs/adr/0016-lsp-servers-in-plugin.md) | serwery LSP (TypeScript, Pyright) w `.lsp.json` pluginu |
+| [0017](docs/adr/0017-drop-codex-variant.md) | rezygnacja z wariantu dla Codex CLI; zastępuje 0011 i 0012 |
 
 ---
 
@@ -646,7 +647,7 @@ templates/
 docs/
   dokumentacja.md          # jak prowadzimy dokumentację
   design-system.md         # workflow design systemu
-  adr/                     # decyzje (0001–0016)
+  adr/                     # decyzje (0001–0017)
 CLAUDE.md                  # instrukcje dla Claude przy pracy nad tym repo
 _archive/agents-v1/        # poprzednie wersje agentów (niewczytywane)
 ```

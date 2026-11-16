@@ -1,6 +1,6 @@
 # ADR-0012: Guard read-only w Codeksie jako hook pluginu filtrowany po `agent_type`
 
-- Status: Accepted (zastępuje część ADR-0011 dotyczącą guarda)
+- Status: Superseded by [ADR-0017](0017-drop-codex-variant.md); wcześniej zastępował część ADR-0011 dotyczącą guarda
 - Date: 2026-09-29
 
 ## Context
