@@ -58,7 +58,7 @@ claude plugin marketplace update dampe
 
 Test without installing: `claude --plugin-dir ~/dev/geostack`.
 
-A new project together with Matt's skills: [step-by-step setup](#1-new-project-setup-once).
+A new project together with Matt's skills: [step-by-step setup](docs/workflows.md#set-up-a-new-project).
 In short: plugin → `npx skills@latest add mattpocock/skills` → `/geostack:setup-geostack` (writes `CLAUDE.md` and `.claude/settings.json`)
 → `/setup-matt-pocock-skills`.
 
@@ -124,144 +124,8 @@ in two ways:
 | Prototype | `/prototype` (logic or UI variants) | `building-ui` builds the chosen structure for real, in the design system |
 | Agent safety | `git-guardrails-claude-code` (optional) | read-only hook for reviewers; both hooks work side by side |
 
-### 1. New project setup (once)
-
-```bash
-cd ~/dev/my-project
-claude plugin install geostack@dampe --scope project          # 1. geostack (writes .claude/settings.json)
-npx skills@latest add mattpocock/skills                     # 2. Matt's skills (.claude/skills + skills-lock.json)
-claude                                                      # in the session:
-  /geostack:setup-geostack                                      # 3. CLAUDE.md + .claude/settings.json
-  /setup-matt-pocock-skills                                 # 4. tracker, triage labels, CONTEXT.md/ADR layout
-```
-
-`/geostack:setup-geostack` reads commands and the stack from the repo and asks only what it can't read:
-the languages of the conversation, UI copy (with tone and locale), docs and commit messages, and
-optional learning goals for `/geostack:mentor`, and the cluster when the repo doesn't show it ("run by the ops
-team, details unknown" is a valid answer). It ends with a list of the placeholders still open.
-It also writes the shared `.claude/settings.json` and copies two hooks to `.claude/hooks/`:
-- deny rules for what can't be undone, and ask before a push or a PR;
-- `format.sh` formats every file Claude edits (ruff format, prettier);
-- `check.sh` blocks the end of a turn until the changed files pass ruff and mypy, or eslint and tsc;
-- the geostack plugin itself.
-
-Personal settings such as `defaultMode: "auto"`, `autoMode` or the status line stay in your user
-settings. How all of it works, what runs when, and how it relates to pre-commit and CI:
-**[`docs/project-settings.md`](docs/project-settings.md)**.
-Skills such as `building-ui` take the UI language from that `## Language` section. Decisions (CRS,
-map library, design system foundation, deployment) stay as placeholders for the first `/grill-with-docs`
-([ADR-0019](docs/adr/0019-setup-devkit-writes-project-claude-md.md)). Running it again only fills what is missing.
-
-The order matters. `/setup-matt-pocock-skills` edits the existing `CLAUDE.md` (it appends the
-`## Agent skills` block and the `docs/agents/*.md` files) rather than creating a separate `AGENTS.md`. If you run
-it before `/geostack:setup-geostack`, it asks which file to create, and the `## Workflow` rules may end up
-in a different place than Matt's pointers. Prefer doing it by hand? Copy
-[`skills/setup-geostack/assets/CLAUDE.project.md`](skills/setup-geostack/assets/CLAUDE.project.md) to `CLAUDE.md` and fill it in.
-
-After installation:
-- **Don't** create `CONTEXT.md` and `docs/adr/` up front. They appear on the first `/grill-with-docs`.
-- Remove Matt's skills the project doesn't need, e.g. `migrate-to-shoehorn` and
-  `scaffold-exercises` in a project without TS courses, or `setup-pre-commit` (Husky) when you use
-  `pre-commit`. Every unneeded skill description is context spent on every turn and a chance that
-  the wrong skill fires.
-- **Don't enable a second process framework alongside** (e.g. superpowers). It duplicates grilling,
-  planning, TDD, review and debugging, so skills from three sources compete for the same triggers.
-  To disable it in a project: `"enabledPlugins": {"superpowers@claude-plugins-official": false}`
-  in `.claude/settings.json`.
-
-### 2. Main flow with geostack's hook-in points
-
-```
-[optional, a ticket in code the session doesn't know]
-/geostack:to-research-questions <ticket>  questions about the current code, without the intent
-  → /research in a fresh session (only the questions file) → <area>-research.md
-  ▼
-/grill-with-docs                      interview → CONTEXT.md + ADRs (with the ticket and the research file)
-  │  geostack: knowledge skills suggest questions and sensible defaults (CRS, validator exit codes,
-  │          design system foundation, GitOps layout); docs-researcher when the answer depends on a version
-  │
-  ├─ the question needs working code? → /handoff → /prototype → /handoff with conclusions
-  │     geostack: web-maps and building-ui for a map or screen prototype
-  ├─ worth showing the design to the code owner? → /geostack:to-design-discussion
-  │     ~200 lines: current and target state, Follow/Avoid patterns, decisions D1…, open questions;
-  │     you resolve review comments in the same session
-  ▼
-/to-spec → /to-tickets                spec and tickets with blockers in the tracker
-  │  the "Testing Decisions" section = seams; implementation-worker works only on them
-  ▼
-/implement  (one ticket, /clear before the next)
-  │  /tdd red → green; knowledge skills switch on by themselves based on file paths
-  │  final run of tests, linters and types → geostack:test-runner (logs outside the context)
-  │  /code-review <fixed-point>       ## Standards + ## Spec
-  │  /geostack:review-changes <same fixed-point>   ## Risk   (when the diff touches auth, the database,
-  │                                                          infrastructure or the frontend)
-  ▼
-fixes → commit (pre-commit hook, if there is one)
-```
-
-Do steps 1–3 (grill, spec, tickets) in one context window, without `/clear`. Every `/implement`
-starts with a fresh context, so geostack's reviewers take the intent from the ticket, not from the conversation.
-
-A small change without a spec: description → `/tdd` (or `/implement` in the same session) → `/code-review` →
-`/geostack:review-changes` → commit. The Spec axis then reports "no spec available", and that's fine.
-
-### 3. Parallel tickets: frontier and `implementation-worker`
-
-Matt does tickets one by one. When several tickets have all their blockers closed (the **frontier**),
-they can be done in parallel, each in its own worktree:
-
-```
-"Tickets #12, #13 and #15 have their blockers closed. Give each to a separate implementation-worker,
- in parallel"
-  → worker: ticket + parent spec → CONTEXT.md, ADRs → /tdd on the seams from the spec → commit on its branch
-       → report (Status, Ticket, Branch, Commit, acceptance criteria met/not met, verification)
-  → a worker without agreed seams or with an open blocker ends as "blocked" and guesses nothing
-You merge the workers' branches → geostack:test-runner → /code-review → /geostack:review-changes → close the tickets
-  → new frontier
-```
-
-- Workers don't run review. You review once, on the merged diff.
-- Do tickets that overlap (shared files, consecutive expand–contract steps) one by one.
-
-### 4. Review: three axes, reported separately
-
-| Axis | From | Asks about | Who |
-|---|---|---|---|
-| **Standards** | `/code-review` (Matt) | does the code follow the repo's documented standards; code smells (Fowler) | Matt's sub-agent |
-| **Spec** | `/code-review` (Matt) | does the diff do what the ticket or spec asked for; missing requirements, excess scope | Matt's sub-agent |
-| **Risk** | `/geostack:review-changes` | what will break: correctness, regressions, test gaps, security, migration locks, deploy, UI states, stale docs and `CONTEXT.md` | `code-reviewer` + specialists by file |
-
-The axes are not merged or ranked together, just as Matt doesn't merge Standards with Spec.
-geostack's reviewers don't report smells or spec compliance, so nothing is reported twice.
-
-### 5. Situations outside the main flow
-
-| Situation | Where to start | geostack's role |
-|---|---|---|
-| Architecture decision | `/grill-with-docs` (writes the ADR) | ADR pointer in `CLAUDE.md`, an `ADR-NNNN` comment in code (`documenting-code`) |
-| Hard or intermittent bug | `/diagnosing-bugs` | `test-runner` provides the command that reproduces the bug, i.e. the Phase 1 loop |
-| Red CI | `geostack:test-runner` | when the classification is "needs diagnosis", move on to `/diagnosing-bugs` |
-| Cluster failure | `geostack:cluster-investigator` | fix through GitOps, then the Risk axis (`platform-reviewer`) |
-| Slow query, migration | `geostack:postgres-reviewer` | EXPLAIN as the loop for `/diagnosing-bugs` |
-| Library upgrade | `geostack:docs-researcher`, or `/research` when the result should stay in the repo | a changed decision: a new ADR through `/grill-with-docs` |
-| External reports | `/triage` | none (tickets from `/to-tickets` are not triaged) |
-| Architecture cleanup | `/improve-codebase-architecture` (glossary: `codebase-design`) | knowledge skills give stack context for the chosen candidate |
-| Learning | `/teach` (plan, many sessions) or `/geostack:mentor` (on a task) | the mentor practices `/teach` milestones on real code |
-
-### 6. What to avoid
-
-- `/geostack:review-changes` **instead of** `/code-review`. It is an additional axis, not a replacement.
-- ADRs in a format other than `domain-modeling`'s. geostack no longer has its own ADR template.
-- Giving `implementation-worker` a ticket with an open blocker or without agreed seams.
-- Triaging tickets produced by `/to-tickets`. They are agent-ready by design.
-- Editing Matt's skills. Make adjustments in geostack or in `## Workflow` in the project's `CLAUDE.md`.
-- A second process framework alongside these two.
-
-### Without Matt's skills
-
-geostack also works on its own: knowledge skills, reviewers, `test-runner`, `cluster-investigator` and the hook.
-References to `/code-review`, `tdd`, `domain-modeling` and `docs/agents/` are then skipped,
-and the Risk axis works as a regular review. geostack does not, however, run a process or write ADRs.
+How the two work together, step by step, from setup to parallel tickets and the three review axes:
+**[`docs/workflows.md`](docs/workflows.md)**. geostack also works without Matt's skills; that page says what changes.
 
 ---
 
@@ -339,195 +203,10 @@ The `review-changes` skill does this for you.
 
 ## Workflows
 
-The workflows assume Matt's skills are in the project (see
-[Working alongside Matt Pocock's skills](#working-alongside-matt-pococks-skills)). Workflows 1–2 and 12–13 are
-Matt's main flow with geostack's hook-in points. The rest are stack lenses that fit into that flow.
-
-| # | Situation | Main elements |
-|---|---|---|
-| 1 | [Everyday change](#1-everyday-change-small-feature-bugfix) | `/tdd` or `/implement` + `/code-review` + Risk axis |
-| 2 | [Larger feature, parallel work](#2-larger-feature-spec-tickets-and-parallel-work) | `/grill-with-docs` → `/to-spec` → `/to-tickets` → `implementation-worker` × frontier |
-| 3 | [Fullstack feature](#3-fullstack-feature-api-in-django-or-fastapi--view-in-react) | backend → types from OpenAPI → React |
-| 4 | [New UI view](#4-new-ui-view) | (`/prototype`) + `building-ui` + screenshot loop + `frontend-reviewer` |
-| 5 | [Building a design system](#5-building-a-design-system) | [`docs/design-system.md`](docs/design-system.md) |
-| 6 | [Map with spatial data](#6-map-with-spatial-data) | `web-maps` + `postgres-postgis` |
-| 7 | [Database migration and PostGIS](#7-database-migration-and-postgis-queries) | `postgres-reviewer` + EXPLAIN |
-| 8 | [Cluster failure](#8-something-is-broken-in-the-cluster) | `cluster-investigator` → GitOps |
-| 9 | [Learning](#9-learning-homelab-platform-engineering-frontend) | `/geostack:mentor` on a task, `/teach` across many sessions |
-| 10 | [Upgrade, new technology](#10-upgrade-or-new-technology) | `docs-researcher` / `/research` |
-| 11 | [Red CI](#11-red-ci) | `test-runner` + `ci-pipelines` → `/diagnosing-bugs` |
-| 12 | [Architecture decision](#12-architecture-decision) | `/grill-with-docs` → ADR |
-| 13 | [Starting a new project](#13-starting-a-new-project) | geostack + Matt's skills + `/geostack:setup-geostack` + `/setup-matt-pocock-skills` |
-
-### 1. Everyday change (small feature, bugfix)
-
-```
-You: describe the change (unclear? a short /grill-with-docs)
-  → /tdd for one behavior or /implement in the same session
-      (knowledge skills switch on by themselves based on files)
-  → /code-review main                  ## Standards + ## Spec ("no spec available" without a ticket)
-  → /geostack:review-changes main        ## Risk
-      ├─ code-reviewer       (always)
-      ├─ security-reviewer   (endpoints, permissions, uploads, tokens)
-      ├─ postgres-reviewer   (models, migrations, queries)
-      ├─ platform-reviewer   (Docker, k8s, CI)
-      └─ frontend-reviewer   (.tsx/.ts)
-  → fixes → "run test-runner" → commit
-```
-
-The most common mode. Implementation stays in the main session, because that's where the conversation context is.
-A hard bug instead of a small fix? Start with `/diagnosing-bugs`.
-
-### 2. Larger feature: spec, tickets and parallel work
-
-```
-1. /grill-with-docs → CONTEXT.md and ADRs (knowledge skills suggest stack decisions)
-2. /to-spec  → you confirm the test seams in "Testing Decisions"
-3. /to-tickets → tickets with blockers in the tracker
-   (steps 1–3 in one context window, without /clear)
-4a. Sequentially: /implement per ticket, /clear before the next
-4b. In parallel: frontier tickets → implementation-worker × N, each commits on its own branch
-      → report per ticket: Status, Branch, acceptance criteria, verification
-5. You merge the workers' branches → test-runner → /code-review → /geostack:review-changes → close the tickets
-6. Next frontier → back to 4
-```
-
-Details: [Parallel tickets](#3-parallel-tickets-frontier-and-implementation-worker).
-Do tickets that overlap one by one, even if they formally don't block each other.
-
-### 3. Fullstack feature: API in Django or FastAPI + view in React
-
-```
-1. Backend: endpoint + serializer/schema + tests (django/fastapi-conventions, /tdd on the API seam)
-2. pnpm gen:api → TS types and client from OpenAPI (frontend-stack)
-     → an API change that breaks the frontend shows up in tsc, not in production
-3. Frontend: view following workflow 4 (building-ui + frontend-stack)
-4. /code-review → /geostack:review-changes → security + postgres (backend), frontend-reviewer (UI)
-5. test-runner: pytest + vitest; Playwright for the critical flow
-```
-
-In `/to-tickets` such a feature is usually one vertical ticket (tracer bullet: API + types + view),
-not separate "backend" and "frontend" tickets.
-
-### 4. New UI view
-
-```
-1. "Build a list view of observations with a species filter"
-   (is the screen layout an open question? /prototype first: several UI variants on one route)
-2. building-ui: Claude looks for the design system (tokens, components/ui, Storybook)
-     → 3–5 lines: screen goal, primary action, density, regions → you accept the structure
-3. Implementation only from DS tokens and components; loading/empty/error/overflow states
-4. Visual loop: npx playwright screenshot 375 px / 1280 px / dark → Claude looks at the PNG → fixes
-5. /code-review → /geostack:review-changes → frontend-reviewer (code + its own screenshots) → fixes
-```
-
-Without a running dev server or Storybook, Claude must say plainly that there was no visual
-verification. Details and rationale: [ADR-0009](docs/adr/0009-ui-quality-through-design-system.md).
-
-### 5. Building a design system
-
-Full guide: **[`docs/design-system.md`](docs/design-system.md)**. In short:
-
-```
-Phase 0  decisions in /grill-with-docs: product character, density, foundation (shadcn/ui+Tailwind v4 | Mantine | Radix) → ADR
-Phase 1  tokens: start from building-ui/assets/tokens.css → palette, typography, density, contrast → Storybook "Tokens"
-Phase 2  components: inventory from the list of screens → primitives → composites → patterns; each with stories for all states
-Phase 3  enforcement: lint without arbitrary values, visual tests of stories in CI, a Design section in CLAUDE.md
-Then     missing component → into the DS first, then into the feature; token change → before/after screenshots
-```
-
-### 6. Map with spatial data
-
-```
-"A layer of forest stands on the map, filtered by species"
-  → web-maps: MapLibre (data in 3857) or OpenLayers (WMTS in 2180)?  (a question for /grill-with-docs, result: ADR)
-  → data scale: GeoJSON < ~5k features, above that MVT from PostGIS (ST_AsMVT) → postgres-reviewer
-  → building-ui (references/data-dense-and-maps): map + panel, bottom sheet on mobile, legend
-  → view state in the URL, data through TanStack Query with bbox and AbortSignal
-  → frontend-reviewer: map instance, effect cleanup, control accessibility
-```
-
-### 7. Database migration and PostGIS queries
-
-```
-1. You write a model or migration (postgres-postgis suggests safe patterns)
-2. python manage.py sqlmigrate app 00NN → "postgres-reviewer, assess this migration; the table has ~N rows"
-3. The reviewer gives the lock level and risk, plus an EXPLAIN (ANALYZE, BUFFERS) to run
-4. You run EXPLAIN on prod-like data → paste the result → decision
-```
-
-A migration of a large table in `/to-tickets` is an expand–contract sequence: separate tickets for expand,
-data migration and contract, with blockers between them.
-
-### 8. Something is broken in the cluster
-
-```
-"cluster-investigator: the forest-web app hasn't been responding since this morning"
-  → agent (read-only): context → get → describe → logs → events → argocd app get/diff
-  → report: cause (confirmed/likely) + evidence + proposed fix
-You: fix in the GitOps repo (not kubectl apply!) → /geostack:review-changes (platform-reviewer) → commit → ArgoCD sync
-```
-
-The agent doesn't fix anything itself. The hook blocks its `apply`, `delete`, `exec` and printing of Secrets.
-The cause doesn't come out of a single run? `/diagnosing-bugs`, with `cluster-investigator` supplying the evidence.
-
-### 9. Learning: homelab, platform engineering, frontend
-
-```
-/geostack:mentor set up ArgoCD with app-of-apps on my k3s
-  → mental model (≤10 lines) + common pitfalls + a link to the docs
-  → Claude builds the scaffolding, you write the TODO(human) parts
-  → "predict what argocd app diff will show" → run → compare
-  → senior-style review of your code → summary + exercise + an entry in LEARNING.md
-```
-
-Works the same for frontend (e.g. "teach me focus trap in a Dialog") and Go/Rust. Say
-"just do it" and the mentor switches to normal mode.
-
-Want to learn a topic across many sessions (plan, lessons, reviews)? `/teach` in a separate directory,
-with a mission based on your projects. You then practice the milestones with `/geostack:mentor` on real code.
-
-### 10. Upgrade or new technology
-
-```
-"docs-researcher: what changes when upgrading ArgoCD from 2.x to 3.x in our setup?"
-  → the agent checks versions in the repo (Chart.yaml, lockfile) → official release notes → report with sources
-  (should the result stay in the repo? /research: the same research as a file with citations)
-→ changes a decision? /grill-with-docs → a new ADR that supersedes the old one
-→ /to-spec + /to-tickets (workflow 2) or straight to workflow 1
-```
-
-### 11. Red CI
-
-```
-You paste a link or log from GitHub Actions, GitLab or Tekton → "test-runner, diagnose"
-  → reproduces with the same commands as CI → classification: bug / wrong test / environment / flaky / needs diagnosis
-  → fix in the main session
-  → needs diagnosis: /diagnosing-bugs, and the command from test-runner is its Phase 1 loop
-The pipeline itself is broken? → platform-reviewer + ci-pipelines (actionlint, glab ci lint, tkn)
-```
-
-### 12. Architecture decision
-
-```
-Conversation in /grill-with-docs: "do we store geometries in 2180 or 4326?" → decision
-  → domain-modeling writes docs/adr/NNNN-....md (short; rejected options when worth remembering)
-  → new terms go into CONTEXT.md
-  → a one-line pointer in the project's CLAUDE.md, an ADR-NNNN comment next to the code (documenting-code)
-```
-
-An ADR is written when the decision is hard to reverse, surprising without context, and was a real
-choice between alternatives (all three). `code-reviewer` flags a missing ADR by the same criterion.
-
-### 13. Starting a new project
-
-```
-1. Setup: geostack + Matt's skills + /geostack:setup-geostack + /setup-matt-pocock-skills
-   (step by step: "Working alongside Matt Pocock's skills" → "New project setup")
-2. /grill-with-docs about the project itself: stack, CRS, design system foundation, deploy → first ADRs and CONTEXT.md
-3. Frontend? → workflow 5 (design system) before the first screens
-4. First feature → workflow 2 (or 1, if it's small)
-```
+Step-by-step guides for everyday situations (a small change, parallel tickets, a new UI view, a map
+with PostGIS data, a migration, a broken cluster, red CI, learning on a task…) are in
+**[`docs/workflows.md`](docs/workflows.md)**. Start from its [situation index](docs/workflows.md#find-your-situation),
+or ask in a session: `/geostack:ask <your situation>`.
 
 ---
 
@@ -613,6 +292,7 @@ Approach: **document the "why", generate the "what", keep it current in review**
 | Document | Purpose |
 |---|---|
 | [`docs/documentation.md`](docs/documentation.md) | how we keep documentation: map, lifecycle, pre-commit checklist |
+| [`docs/workflows.md`](docs/workflows.md) | step-by-step workflows with Matt Pocock's skills, indexed by situation; `/geostack:ask` answers from it |
 | [`docs/design-system.md`](docs/design-system.md) | how to build a design system and work with it with Claude |
 | [`docs/project-settings.md`](docs/project-settings.md) | what setup puts in a project's `.claude/`: deny/ask rules, the format and check hooks, user vs project settings, pre-commit and CI |
 | [`skills/documenting-code`](skills/documenting-code/SKILL.md) | documentation rules the model uses |
@@ -695,6 +375,7 @@ hooks/
   test_guard_readonly.py   # hook tests
 docs/
   documentation.md         # how we keep documentation
+  workflows.md             # step-by-step workflows, indexed by situation
   design-system.md         # design system workflow
   project-settings.md      # project .claude/: rules, hooks, user vs project settings
   adr/                     # decisions (0001–0025)
