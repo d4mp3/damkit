@@ -158,6 +158,7 @@ Code exploration uses the built-in **`Explore`** agent ([ADR-0004](docs/adr/0004
 
 | Skill | Invocation | What it does |
 |---|---|---|
+| `ask` | `/geostack:ask <your situation>` | which workflow, agent or skill fits your situation: reads [`docs/workflows.md`](docs/workflows.md), checks what the project has set up, and walks you through the steps for your case. Questions about Matt's process go to `/ask-matt` |
 | `review-changes` | `/geostack:review-changes [fixed-point]`, after `/code-review` | **Risk** axis: routes the diff to the right reviewers **in parallel**, merges their results, verifies every critical/high finding itself and reports separately from Standards and Spec |
 | `mentor` | `/geostack:mentor [topic]` or "teach me…" | learning on a real task: mental model, `TODO(human)` tasks, graduated hints, summary, `LEARNING.md`. A multi-session learning plan: `/teach` |
 | `to-research-questions` | `/geostack:to-research-questions <ticket>` before `/grill-with-docs` | QRSPI step: turns a ticket into questions about the current code with no trace of the intent, for a blind `/research` in a fresh session |
@@ -188,6 +189,7 @@ Code exploration uses the built-in **`Explore`** agent ([ADR-0004](docs/adr/0004
 
 | I want to… | How |
 |---|---|
+| find out which workflow fits | `/geostack:ask <your situation>`, e.g. `/geostack:ask a migration on a 40M-row table` |
 | run a skill | `/geostack:review-changes main`, or just describe the task: the model picks the skill itself |
 | use a specific agent | write "use cluster-investigator to…" or `@agent-geostack:cluster-investigator …` |
 | several agents at once | "run security-reviewer and postgres-reviewer in parallel on this diff" |
@@ -330,6 +332,7 @@ Decisions about geostack itself:
 | [0023](docs/adr/0023-cluster-comes-from-the-project.md) | Kubernetes support is distribution-neutral; the cluster comes from the project |
 | [0024](docs/adr/0024-setup-writes-project-settings.md) | `setup-geostack` also writes the project's shared `.claude/settings.json` |
 | [0025](docs/adr/0025-check-hooks-ship-as-scripts.md) | format and check hooks ship as scripts copied into the project |
+| [0026](docs/adr/0026-ask-skill-routes-to-workflows.md) | workflows live in `docs/workflows.md`; the user-invoked `ask` skill answers from it |
 
 ---
 
@@ -362,7 +365,7 @@ claude --plugin-dir .                    # live test
   marketplace.json         # "dampe" marketplace (source: ./)
 .lsp.json                  # LSP servers: TypeScript, Pyright
 agents/                    # 9 agents (roles)
-skills/                    # 18 skills (knowledge and processes)
+skills/                    # 19 skills (knowledge and processes)
   <name>/SKILL.md          #   instructions
   <name>/references/       #   heavier material, read on demand
   building-ui/assets/      #   tokens.css: starter design system tokens
@@ -378,7 +381,7 @@ docs/
   workflows.md             # step-by-step workflows, indexed by situation
   design-system.md         # design system workflow
   project-settings.md      # project .claude/: rules, hooks, user vs project settings
-  adr/                     # decisions (0001–0025)
+  adr/                     # decisions (0001–0026)
 .claude/settings.json      # this repo's deny rules and Stop hook (guard tests)
 CLAUDE.md                  # instructions for Claude when working on this repo
 LICENSE                    # MIT

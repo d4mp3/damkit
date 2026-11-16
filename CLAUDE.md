@@ -48,3 +48,6 @@ All text in the repo, including README and docs/, is in English (ADR-0018).
 - Documentation follows `skills/documenting-code`. Record this repo's decisions as ADRs in `docs/adr/`
   in the existing format (Context/Decision/Alternatives/Consequences), and when adding one,
   add a row to the ADR table in README.md.
+- Workflows live only in `docs/workflows.md`, and the `ask` skill answers from it (ADR-0026). A new
+  or changed agent, skill or step goes into the workflow that uses it, and a new workflow gets a row
+  in its situation index. Keep the format: **When**, numbered steps with an explicit actor, **Watch out**.
