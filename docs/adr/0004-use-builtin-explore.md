@@ -1,23 +1,23 @@
-# ADR-0004: Eksploracja kodu przez wbudowanego agenta Explore zamiast własnego `codebase-explorer`
+# ADR-0004: Code exploration uses the built-in Explore agent instead of our own `codebase-explorer`
 
 - Status: Accepted
 - Date: 2026-09-29
 
 ## Context
 
-Pierwsza wersja miała `codebase-explorer` (haiku, tylko odczyt). Claude Code ma wbudowanego agenta
-`Explore` o tym samym przeznaczeniu. Dwa agenci o tym samym opisie sprawiają, że główna sesja
-wybiera między nimi przypadkowo.
+The first version had `codebase-explorer` (haiku, read-only). Claude Code has a built-in agent
+`Explore` with the same purpose. Two agents with the same description make the main session
+pick between them at random.
 
 ## Decision
 
-Usuwamy `codebase-explorer`. Do eksploracji służy `Explore`. Poprzednia wersja jest w `_archive/agents-v1/`.
+We remove `codebase-explorer`. `Explore` is used for exploration. The previous version is in `_archive/agents-v1/`.
 
 ## Alternatives considered
 
-- **Zostawić i wyspecjalizować** (np. analiza historii gita): nie było konkretnej potrzeby.
-  Wrócimy do tego, jeśli `Explore` okaże się niewystarczający.
+- **Keep it and specialize it** (e.g. git history analysis): there was no concrete need.
+  We will come back to this if `Explore` turns out to be insufficient.
 
 ## Consequences
 
-Jeden agent mniej do utrzymania i brak konkurujących opisów przy delegowaniu.
+One agent less to maintain and no competing descriptions when delegating.

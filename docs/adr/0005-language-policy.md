@@ -1,26 +1,26 @@
-# ADR-0005: Treści dla modelu po angielsku, treści dla ludzi po polsku
+# ADR-0005: Model-facing text in English, human-facing text in Polish
 
 - Status: Superseded by [ADR-0018](0018-english-only.md)
 - Date: 2026-09-29
 
 ## Context
 
-Repo zawiera dwa rodzaje tekstu. Jeden czyta głównie model: prompty agentów, skille, `CLAUDE.md`.
-Drugi czytam głównie ja: README, ADR-y, `docs/`. Mieszanie języków w obrębie jednego rodzaju
-utrudnia utrzymanie.
+The repo contains two kinds of text. One is read mainly by the model: agent prompts, skills, `CLAUDE.md`.
+The other is read mainly by me: README, ADRs, `docs/`. Mixing languages within one kind
+makes maintenance harder.
 
 ## Decision
 
-- **Po angielsku:** `agents/`, `skills/`, `CLAUDE.md`, komentarze w kodzie i nazwy. Terminologia
-  techniczna i nazwy narzędzi są po angielsku, a opisy skilli dopasowują się też do angielskich zapytań.
-- **Po polsku:** `README.md`, `docs/` (w tym ADR-y).
-- Skille, które zwracają się do mnie (np. `mentor`), odpowiadają w języku rozmowy.
+- **In English:** `agents/`, `skills/`, `CLAUDE.md`, code comments and names. Technical
+  terminology and tool names are in English, and skill descriptions also match English queries.
+- **In Polish:** `README.md`, `docs/` (including ADRs).
+- Skills that talk to me (e.g. `mentor`) answer in the language of the conversation.
 
 ## Alternatives considered
 
-- **Wszystko po angielsku**: gotowe do publikacji, ale README i ADR-y piszę i czytam głównie ja.
-- **Wszystko po polsku**: prompty mieszałyby polski z angielską terminologią.
+- **Everything in English**: ready for publishing, but I am the one who mostly writes and reads README and ADRs.
+- **Everything in Polish**: prompts would mix Polish with English terminology.
 
 ## Consequences
 
-Jeśli kiedyś upublicznię plugin, do przetłumaczenia będą tylko README i `docs/`.
+If I ever make the plugin public, only README and `docs/` will need translating.

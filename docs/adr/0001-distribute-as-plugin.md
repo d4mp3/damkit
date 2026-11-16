@@ -1,29 +1,29 @@
-# ADR-0001: devkit jest dystrybuowany jako plugin Claude Code instalowany per projekt
+# ADR-0001: devkit is distributed as a Claude Code plugin installed per project
 
 - Status: Accepted
 - Date: 2026-09-29
 
 ## Context
 
-Konfiguracja (agenci, skille) ma być uniwersalna i używana w wielu projektach: walidator CLI,
-webserwis walidacji, platforma leśna, homelab k3s. Pierwotna wersja leżała w luźnych plikach
-`agents/*.yaml`, których Claude Code nie wczytywał, bo obsługuje tylko pliki `.md`. Chcę też
-decydować, w których projektach devkit jest aktywny.
+The configuration (agents, skills) should be universal and used across many projects: a CLI validator,
+a validation web service, a forestry platform, a k3s homelab. The original version lived in loose
+`agents/*.yaml` files, which Claude Code did not load, because it only supports `.md` files. I also
+want to decide in which projects devkit is active.
 
 ## Decision
 
-Repo jest jednocześnie pluginem (`.claude-plugin/plugin.json`) i marketplace'em
-(`.claude-plugin/marketplace.json`, `source: "./"`). W projektach instaluję go przez
+The repo is both a plugin (`.claude-plugin/plugin.json`) and a marketplace
+(`.claude-plugin/marketplace.json`, `source: "./"`). I install it in projects with
 `claude plugin install devkit@dampe --scope project`.
 
 ## Alternatives considered
 
-- **Symlink do `~/.claude`**: aktywne wszędzie, bez kontroli per projekt i bez wersjonowania.
-- **Kopiowanie plików do `.claude/` projektu**: kopie szybko się rozjeżdżają.
+- **Symlink into `~/.claude`**: active everywhere, with no per-project control and no versioning.
+- **Copying files into the project's `.claude/`**: the copies quickly drift apart.
 
 ## Consequences
 
-- Plus: jedno źródło prawdy, wersja w `plugin.json`, instalacja jedną komendą.
-- Minus: nazwy mają prefiks (`devkit:code-reviewer`, `/devkit:mentor`).
-- Minus: agenci pluginu ignorują `permissionMode`, `hooks` i `mcpServers` (patrz ADR-0003).
-- Minus: plugin nie może dostarczać `rules/`. Wiedzę zależną od ścieżek przenoszą skille z polem `paths`.
+- Plus: one source of truth, a version in `plugin.json`, installation with one command.
+- Minus: names have a prefix (`devkit:code-reviewer`, `/devkit:mentor`).
+- Minus: plugin agents ignore `permissionMode`, `hooks` and `mcpServers` (see ADR-0003).
+- Minus: a plugin cannot ship `rules/`. Path-dependent knowledge is carried by skills with a `paths` field.

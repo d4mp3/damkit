@@ -1,33 +1,33 @@
-# ADR-0008: Jawny `effort` dla agentów, których jakość nie może zależeć od sesji
+# ADR-0008: Explicit `effort` for agents whose quality must not depend on the session
 
 - Status: Accepted
 - Date: 2026-09-29
 
 ## Context
 
-Pole `effort` pominięte w agencie oznacza, że agent **dziedziczy poziom z sesji**. Obsługiwane
-wartości to `low`, `medium`, `high`, `xhigh`, `max`, zależnie od modelu. Wartości `inherit` nie ma.
-W pierwszej wersji `effort` miał tylko `test-runner`. Skutek: przy sesji na `low` (szybkie
-pytanie) security review też szłoby na `low`, a przy sesji na `max` `test-runner` niepotrzebnie
-by się rozmyślał i przepalał tokeny.
+When the `effort` field is omitted in an agent, the agent **inherits the level from the session**. Supported
+values are `low`, `medium`, `high`, `xhigh`, `max`, depending on the model. There is no `inherit` value.
+In the first version only `test-runner` had `effort`. The result: with a session on `low` (a quick
+question) a security review would also run on `low`, and with a session on `max` `test-runner` would
+overthink for no reason and burn tokens.
 
 ## Decision
 
-| Agent | effort | Powód |
+| Agent | effort | Reason |
 |---|---|---|
-| `security-reviewer` | `xhigh` | przeoczona podatność kosztuje najwięcej. `max` odrzucony: skłonny do nadmiernej analizy i fałszywych alarmów. |
-| `code-reviewer`, `postgres-reviewer`, `platform-reviewer`, `frontend-reviewer` | `high` | wyszukiwanie przypadków brzegowych i weryfikacja |
-| `cluster-investigator` | `high` | stawianie i odrzucanie hipotez |
-| `test-runner`, `docs-researcher` | `medium` | zadanie dobrze określone, liczy się szybkość |
-| `implementation-worker` | *(dziedziczy)* | trudność wynika z zadania, a tę już wyraża poziom, na którym pracujesz w sesji |
+| `security-reviewer` | `xhigh` | a missed vulnerability costs the most. `max` rejected: prone to overanalysis and false alarms. |
+| `code-reviewer`, `postgres-reviewer`, `platform-reviewer`, `frontend-reviewer` | `high` | searching for edge cases and verification |
+| `cluster-investigator` | `high` | forming and rejecting hypotheses |
+| `test-runner`, `docs-researcher` | `medium` | the task is well defined, speed matters |
+| `implementation-worker` | *(inherits)* | difficulty comes from the task, and that is already expressed by the level you work at in the session |
 
 ## Alternatives considered
 
-- **Nie ustawiać nigdzie**: jakość review zależałaby od przypadkowego ustawienia sesji.
-- **`max` dla wszystkich reviewerów**: wysoki koszt, a dokumentacja ostrzega przed nadmierną analizą.
+- **Don't set it anywhere**: review quality would depend on an incidental session setting.
+- **`max` for all reviewers**: high cost, and the documentation warns against overanalysis.
 
 ## Consequences
 
-- Koszt review jest przewidywalny. Jeśli okaże się za wysoki, pierwszy kandydat do obniżenia to
-  `code-reviewer` na `medium`.
-- Na modelach bez `xhigh` Claude Code zejdzie do najbliższego niższego poziomu.
+- Review cost is predictable. If it turns out too high, the first candidate for lowering is
+  `code-reviewer` to `medium`.
+- On models without `xhigh`, Claude Code falls back to the nearest lower level.

@@ -1,33 +1,33 @@
-# ADR-0002: Agenci to role, wiedza o technologiach jest w skillach
+# ADR-0002: Agents are roles, technology knowledge lives in skills
 
 - Status: Accepted
 - Date: 2026-09-29
 
 ## Context
 
-Kusi tworzenie agentów-ekspertów (`python-expert`, `django-expert`, `k8s-expert`). Subagent
-startuje jednak bez kontekstu rozmowy, a przekazanie zadania gubi ustalenia. Sama „ekspertyza”
-niewiele wnosi, bo model zna te technologie. Pierwsza wersja agentów miała też długie checklisty
-specyficzne dla stacku, wpisane w prompty reviewerów. To rozprasza uwagę i skłania do raportowania
-czegoś w każdej kategorii.
+It is tempting to create expert agents (`python-expert`, `django-expert`, `k8s-expert`). A subagent,
+however, starts without the conversation context, and handing over a task loses what was agreed.
+"Expertise" alone adds little, because the model already knows these technologies. The first version
+of the agents also had long stack-specific checklists written into the reviewer prompts. This
+scatters attention and pushes the model to report something in every category.
 
 ## Decision
 
-- Subagent powstaje tylko wtedy, gdy daje: izolację kontekstu (dużo czytania, logów, stron WWW),
-  inne uprawnienia (read-only), równoległość albo niezależne spojrzenie (review).
-- Agenci są niezależni od stacku: rola, metoda, format wyniku.
-- Wiedza o technologiach jest w skillach. Ładują się na żądanie (po opisie lub `paths`) albo są
-  wklejane agentowi przez `skills:`.
-- Fakty o konkretnym projekcie są w `CLAUDE.md` tego projektu.
+- A subagent is created only when it provides: context isolation (lots of reading, logs, web pages),
+  different permissions (read-only), parallelism or an independent view (review).
+- Agents are stack-agnostic: role, method, output format.
+- Technology knowledge lives in skills. They load on demand (by description or `paths`) or are
+  preloaded into an agent via `skills:`.
+- Facts about a specific project live in that project's `CLAUDE.md`.
 
 ## Alternatives considered
 
-- **Agenci-eksperci per technologia**: tracą kontekst rozmowy, a wiedza dubluje się między agentami.
-- **Wszystko w jednym dużym `CLAUDE.md`**: ładuje się zawsze i zjada kontekst także wtedy, gdy nie jest potrzebne.
+- **Expert agents per technology**: they lose the conversation context, and knowledge is duplicated across agents.
+- **Everything in one large `CLAUDE.md`**: it always loads and eats context even when it is not needed.
 
 ## Consequences
 
-- Wiedza o np. PostGIS jest napisana raz i używana przez główną sesję, `postgres-reviewer`
-  i `implementation-worker`.
-- Nowa technologia oznacza nowy skill, a nie nowego agenta.
-- Reviewerzy mają wspólny skill `review-standards` (wagi, dowody, format znalezisk).
+- Knowledge about e.g. PostGIS is written once and used by the main session, `postgres-reviewer`
+  and `implementation-worker`.
+- A new technology means a new skill, not a new agent.
+- Reviewers share the `review-standards` skill (weights, evidence, finding format).

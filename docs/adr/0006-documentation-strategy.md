@@ -1,32 +1,32 @@
-# ADR-0006: Dokumentujemy „dlaczego”, generujemy „co”, pilnujemy aktualności w review
+# ADR-0006: We document the "why", generate the "what", and check freshness in review
 
-- Status: Accepted; część o skillu `adr` zastąpiona przez [ADR-0013](0013-process-belongs-to-matt-pocock-skills.md)
+- Status: Accepted; the part about the `adr` skill superseded by [ADR-0013](0013-process-belongs-to-matt-pocock-skills.md)
 - Date: 2026-09-29
 
 ## Context
 
-Model czyta kod szybko i trafnie, więc opis tego, co robi kod, jest nadmiarowy. Taki opis się
-starzeje, a nieaktualna dokumentacja wprowadza w błąd, bo model jej ufa. Z kodu nie da się jednak
-odczytać powodów decyzji, odrzuconych opcji, ograniczeń domenowych ani wiedzy operacyjnej.
+The model reads code quickly and accurately, so a description of what the code does is redundant. Such a description
+goes stale, and outdated documentation misleads, because the model trusts it. Code, however, does not reveal
+the reasons behind decisions, rejected options, domain constraints or operational knowledge.
 
 ## Decision
 
-- Zasady pisania dokumentacji są w skillu `documenting-code`. To jedno źródło prawdy, z którego
-  korzystają model i ja.
-- Decyzje zapisujemy jako ADR-y (skill `adr`, `/devkit:adr`). Zaakceptowanego ADR-a nie edytujemy,
-  tylko zastępujemy nowym.
-- Nie ma osobnego agenta do dokumentacji. „Dlaczego” jest w rozmowie głównej sesji, a subagent
-  startuje bez niej.
-- `code-reviewer` zgłasza dokumentację, którą diff uczynił nieaktualną, oraz brak ADR-a przy
-  decyzjach trudnych do odwrócenia.
+- The rules for writing documentation live in the `documenting-code` skill. It is the single source of truth
+  used by both the model and me.
+- We record decisions as ADRs (the `adr` skill, `/devkit:adr`). An accepted ADR is not edited,
+  only superseded by a new one.
+- There is no separate documentation agent. The "why" is in the main session's conversation, and a subagent
+  starts without it.
+- `code-reviewer` reports documentation that the diff made outdated, and a missing ADR for
+  decisions that are hard to reverse.
 
 ## Alternatives considered
 
-- **Agent `docs-writer`**: pisałby opisy kodu, czyli dokładnie to, czego nie chcemy.
-- **Brak dokumentacji („kod jest dokumentacją”)**: gubi powody i wiedzę operacyjną.
+- **A `docs-writer` agent**: it would write descriptions of code, which is exactly what we don't want.
+- **No documentation ("the code is the documentation")**: loses the reasons and operational knowledge.
 
 ## Consequences
 
-- Dokumentacja jest mniejsza, ale każdy jej element niesie informację spoza kodu.
-- Kontrakty (OpenAPI, JSON Schema reguł walidatora, `--help`) generujemy w CI.
-- To repo stosuje te zasady samo na sobie: README, `CLAUDE.md`, `docs/adr/`.
+- Documentation is smaller, but every piece of it carries information that is not in the code.
+- Contracts (OpenAPI, JSON Schema for validator rules, `--help`) are generated in CI.
+- This repo applies these rules to itself: README, `CLAUDE.md`, `docs/adr/`.
