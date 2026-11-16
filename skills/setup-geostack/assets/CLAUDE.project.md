@@ -1,6 +1,6 @@
 # <Project name>
 
-<!-- Template for /devkit:setup-devkit, which fills it from the repo and removes this comment.
+<!-- Template for /geostack:setup-geostack, which fills it from the repo and removes this comment.
      By hand: copy to the project root as CLAUDE.md, fill it in, then run /setup-matt-pocock-skills:
      it appends its own `## Agent skills` block here. Keep it short: only what the model can't infer
      from the code. Delete the sections that don't apply, but keep `## Workflow` and `## Language`. -->
@@ -10,19 +10,19 @@
 
 ## Workflow
 Process follows Matt Pocock's skills (/grill-with-docs → /to-spec → /to-tickets → /implement).
-devkit adds stack knowledge, specialist agents and two optional steps; it never replaces a step.
-- Ticket in code the session doesn't know yet: /devkit:to-research-questions first, answer them
+geostack adds stack knowledge, specialist agents and two optional steps; it never replaces a step.
+- Ticket in code the session doesn't know yet: /geostack:to-research-questions first, answer them
   with /research in a fresh session (only the questions file, never the ticket), then
   /grill-with-docs with the ticket and the research file.
-- Design worth a code owner's review before the spec: /devkit:to-design-discussion after
+- Design worth a code owner's review before the spec: /geostack:to-design-discussion after
   /grill-with-docs, resolve the review in the same session, then /to-spec.
-- Project ADRs and `CONTEXT.md` override devkit skills; the contracts those skills describe are
+- Project ADRs and `CONTEXT.md` override geostack skills; the contracts those skills describe are
   proposals until an ADR settles them.
 - After /code-review: if the diff touches auth/permissions/input parsing, models/migrations/SQL,
-  Docker/k8s/CI or frontend, run /devkit:review-changes on the same fixed point and report it
+  Docker/k8s/CI or frontend, run /geostack:review-changes on the same fixed point and report it
   as a separate `## Risk` section. Don't merge or rerank it with Standards and Spec.
-- Final test/lint/type run: delegate to devkit:test-runner.
-- Tickets whose blockers are all done may run in parallel, one devkit:implementation-worker
+- Final test/lint/type run: delegate to geostack:test-runner.
+- Tickets whose blockers are all done may run in parallel, one geostack:implementation-worker
   per ticket; review once after merging the worktrees.
 
 ## Language
@@ -70,5 +70,5 @@ devkit adds stack knowledge, specialist agents and two optional steps; it never 
 - <non-obvious rules, e.g. "never call external APIs inside a transaction">
 - <one-line pointers to ADRs that constrain everyday coding, e.g. "Geometries stored in EPSG:2180, see docs/adr/0003-storage-crs.md">
 
-## Learning goals (optional, used by /devkit:mentor)
+## Learning goals (optional, used by /geostack:mentor)
 - <e.g. "I want to write the NetworkPolicies and ArgoCD ApplicationSets myself">

@@ -1,15 +1,15 @@
 ---
-name: setup-devkit
-description: "Write or complete the project's CLAUDE.md with devkit's workflow, the project's commands and its language settings. Run once per project, before /setup-matt-pocock-skills."
+name: setup-geostack
+description: "Write or complete the project's CLAUDE.md with geostack's workflow, the project's commands and its language settings. Run once per project, before /setup-matt-pocock-skills."
 disable-model-invocation: true
 ---
 
-# Setup devkit
+# Setup geostack
 
-Write the project's `CLAUDE.md` from `${CLAUDE_PLUGIN_ROOT}/skills/setup-devkit/assets/CLAUDE.project.md`,
+Write the project's `CLAUDE.md` from `${CLAUDE_PLUGIN_ROOT}/skills/setup-geostack/assets/CLAUDE.project.md`,
 filled with what the repo shows and what only the user knows. It is the step before
 `/setup-matt-pocock-skills`, which appends its `## Agent skills` block to the `CLAUDE.md` it finds.
-Running in this order keeps devkit's `## Workflow` rules and Matt's pointers in one file.
+Running in this order keeps geostack's `## Workflow` rules and Matt's pointers in one file.
 
 This skill records **facts**, not decisions. Storage CRS, map library, design system foundation and
 deployment layout are decisions: they belong to `/grill-with-docs` and end in ADRs. Where the repo has
@@ -21,7 +21,7 @@ not settled one yet, leave the template's placeholder and mark it `<decide in /g
 
 - `CLAUDE.md` exists → you will **complete** it, never rewrite it. Note which template sections it lacks.
 - Only `AGENTS.md` exists → ask which file holds the project instructions and work on that one.
-- `## Agent skills` is already present → `/setup-matt-pocock-skills` ran first. That's fine: add devkit's
+- `## Agent skills` is already present → `/setup-matt-pocock-skills` ran first. That's fine: add geostack's
   sections above that block and leave it untouched.
 
 ### 2. Read the repo
@@ -56,7 +56,7 @@ don't skip it, even when every answer is English.
 ### 4. Write
 
 - New file: fill the template, drop the sections that don't apply and the template comment.
-  Keep `## Workflow` verbatim: it is how Matt's `/implement` learns when to call devkit's agents.
+  Keep `## Workflow` verbatim: it is how Matt's `/implement` learns when to call geostack's agents.
 - Existing file: add only the missing sections and missing command lines. When the file and the repo
   disagree (e.g. a test command CI no longer runs), ask instead of choosing.
 - Keep it short: every line is loaded on every turn. Drop example values the project doesn't use.

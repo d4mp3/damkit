@@ -76,7 +76,7 @@ DISABLE_SERVER_SIDE_CURSORS = True
 
 When editing CLAUDE.md or AGENTS.md, the writing-for-agents skill governs how to word it; this
 section only says what belongs there. The `## Agent skills` block is owned by
-`/setup-matt-pocock-skills`, and `## Workflow` by the devkit template: don't rewrite them in passing.
+`/setup-matt-pocock-skills`, and `## Workflow` by the geostack template: don't rewrite them in passing.
 
 - Put in it the commands, the architecture in 3–10 bullets, conventions the code doesn't enforce, and the deploy target.
 - Keep out of it the code tours, style rules a linter enforces, and anything duplicated from README.

@@ -1,6 +1,6 @@
 ---
 name: review-changes
-description: Use after /code-review, or when the user asks for a risk, security, database, infrastructure or frontend review of a diff - "sprawdź ryzyko", "security review", "oceń migrację". Routes the diff to devkit's specialist reviewers in parallel and reports a separate Risk axis next to /code-review's Standards and Spec.
+description: Use after /code-review, or when the user asks for a risk, security, database, infrastructure or frontend review of a diff - "sprawdź ryzyko", "security review", "oceń migrację". Routes the diff to geostack's specialist reviewers in parallel and reports a separate Risk axis next to /code-review's Standards and Spec.
 argument-hint: "[fixed-point]"
 ---
 
@@ -36,11 +36,11 @@ the ticket is usually the only reliable source.
 
 | Reviewer | Dispatch when the diff touches |
 |---|---|
-| `devkit:code-reviewer` | always (correctness, regressions, test gaps, doc drift) |
-| `devkit:security-reviewer` | auth, permissions, views/endpoints, serializers, file upload/parsing, subprocess, templates, settings, secrets, CORS/CSRF, dependency manifests, CI workflows, frontend auth/token handling, rendering of user-generated HTML |
-| `devkit:postgres-reviewer` | models, migrations, `*.sql`, ORM-heavy code (querysets, `annotate`, raw SQL), spatial queries |
-| `devkit:platform-reviewer` | Dockerfile, compose, k8s/Helm/Kustomize/ArgoCD, CI pipelines, deploy scripts |
-| `devkit:frontend-reviewer` | `*.tsx`/`*.ts`/`*.jsx`, frontend build config (`vite.config.*`, `tsconfig*`, `package.json`), generated API client, map components |
+| `geostack:code-reviewer` | always (correctness, regressions, test gaps, doc drift) |
+| `geostack:security-reviewer` | auth, permissions, views/endpoints, serializers, file upload/parsing, subprocess, templates, settings, secrets, CORS/CSRF, dependency manifests, CI workflows, frontend auth/token handling, rendering of user-generated HTML |
+| `geostack:postgres-reviewer` | models, migrations, `*.sql`, ORM-heavy code (querysets, `annotate`, raw SQL), spatial queries |
+| `geostack:platform-reviewer` | Dockerfile, compose, k8s/Helm/Kustomize/ArgoCD, CI pipelines, deploy scripts |
+| `geostack:frontend-reviewer` | `*.tsx`/`*.ts`/`*.jsx`, frontend build config (`vite.config.*`, `tsconfig*`, `package.json`), generated API client, map components |
 
 Dispatch all selected reviewers **in one message** (parallel). Give each one:
 - the fixed point and the list of files relevant to its lens
