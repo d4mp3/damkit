@@ -133,7 +133,8 @@ claude                                                      # in the session:
 ```
 
 `/geostack:setup-geostack` reads commands and the stack from the repo and asks only what it can't read:
-the languages of the conversation, UI copy (with tone and locale), docs and commit messages.
+the languages of the conversation, UI copy (with tone and locale), docs and commit messages, and
+optional learning goals for `/geostack:mentor`. It ends with a list of the placeholders still open.
 Skills such as `building-ui` take the UI language from that `## Language` section. Decisions (CRS,
 map library, design system foundation, deployment) stay as placeholders for the first `/grill-with-docs`
 ([ADR-0019](docs/adr/0019-setup-devkit-writes-project-claude-md.md)). Running it again only fills what is missing.
