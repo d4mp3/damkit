@@ -1,8 +1,9 @@
 # <Project name>
 
-<!-- Copy to the project root as CLAUDE.md, then run /setup-matt-pocock-skills: it appends
-     its own `## Agent skills` block here. Keep it short: only what the model can't infer
-     from the code. Delete the sections that don't apply, but keep `## Workflow`. -->
+<!-- Template for /devkit:setup-devkit, which fills it from the repo and removes this comment.
+     By hand: copy to the project root as CLAUDE.md, fill it in, then run /setup-matt-pocock-skills:
+     it appends its own `## Agent skills` block here. Keep it short: only what the model can't infer
+     from the code. Delete the sections that don't apply, but keep `## Workflow` and `## Language`. -->
 
 ## What this is
 <1–3 sentences: purpose, users, where it runs.>

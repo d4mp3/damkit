@@ -81,7 +81,7 @@ What can be checked automatically doesn't go into the prompt:
 - Visual tests: Playwright `toHaveScreenshot()` on stories. They are stable, unlike
   map tiles.
 - CI: lint + visual component tests on changes in `components/ui/`.
-- The project's `CLAUDE.md`: the **Design** section from the template (`templates/CLAUDE.project.md`), that is
+- The project's `CLAUDE.md`: the **Design** section from the template (`skills/setup-devkit/assets/CLAUDE.project.md`), that is
   where the tokens and components are, the product's character, density, rules for UI copy.
 
 ## Daily work with Claude

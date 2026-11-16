@@ -58,7 +58,7 @@ Test without installing: `claude --plugin-dir ~/dev/devkit`.
 
 A new project together with Matt's skills: [step-by-step setup](#1-new-project-setup-once).
 In short: plugin → `npx skills@latest add mattpocock/skills` → the
-[`templates/CLAUDE.project.md`](templates/CLAUDE.project.md) template as `CLAUDE.md` → `/setup-matt-pocock-skills`.
+[`skills/setup-devkit/assets/CLAUDE.project.md`](skills/setup-devkit/assets/CLAUDE.project.md) template as `CLAUDE.md` → `/setup-matt-pocock-skills`.
 
 **Requirements:** `python3` (hook), LSP servers on `PATH` (once per machine, [details](#lsp-servers)), and optionally the tools used by skills and agents:
 `kubeconform`, `kube-linter`, `hadolint`, `actionlint`, `trivy`, Playwright (UI screenshots).
@@ -126,7 +126,7 @@ in two ways:
 cd ~/dev/my-project
 claude plugin install devkit@dampe --scope project          # 1. devkit (writes .claude/settings.json)
 npx skills@latest add mattpocock/skills                     # 2. Matt's skills (.claude/skills + skills-lock.json)
-cp ~/dev/devkit/templates/CLAUDE.project.md CLAUDE.md       # 3. template: fill it in, keep the ## Workflow section
+cp ~/dev/devkit/skills/setup-devkit/assets/CLAUDE.project.md CLAUDE.md       # 3. template: fill it in, keep the ## Workflow section
 claude                                                      # 4. in the session:
   /setup-matt-pocock-skills                                 #    tracker, triage labels, CONTEXT.md/ADR layout
 ```
@@ -578,7 +578,7 @@ Approach: **document the "why", generate the "what", keep it current in review**
 | [`docs/design-system.md`](docs/design-system.md) | how to build a design system and work with it with Claude |
 | [`skills/documenting-code`](skills/documenting-code/SKILL.md) | documentation rules the model uses |
 | [`CLAUDE.md`](CLAUDE.md) | conventions for working on this repo |
-| [`templates/CLAUDE.project.md`](templates/CLAUDE.project.md) | `CLAUDE.md` template for projects |
+| [`skills/setup-devkit/assets/CLAUDE.project.md`](skills/setup-devkit/assets/CLAUDE.project.md) | `CLAUDE.md` template for projects |
 
 Decisions about devkit itself:
 
