@@ -16,8 +16,7 @@ geostack provides:
 
 geostack is designed to work **alongside Matt Pocock's skills** ([`mattpocock/skills`](https://github.com/mattpocock/skills)):
 Matt runs the process (from idea through spec and tickets to commit), and geostack provides stack
-knowledge and specialized agents that plug into the steps of that process
-([ADR-0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md)). How to combine them:
+knowledge and specialized agents that plug into the steps of that process. How to combine them:
 [Working alongside Matt Pocock's skills](#working-alongside-matt-pococks-skills).
 
 ---
@@ -34,7 +33,7 @@ knowledge and specialized agents that plug into the steps of that process
 8. [Safety: the read-only hook](#safety-the-read-only-hook)
 9. [LSP servers](#lsp-servers)
 10. [Status line (optional)](#status-line-optional)
-11. [Documentation and decisions](#documentation-and-decisions)
+11. [Documentation](#documentation)
 12. [Developing geostack](#developing-geostack)
 13. [Repository contents](#repository-contents)
 14. [License](#license)
@@ -70,7 +69,7 @@ Agents check what is installed and don't assume the rest.
 
 ## How it is built
 
-Three layers, each with a different responsibility ([ADR-0002](docs/adr/0002-agents-are-roles-skills-are-knowledge.md)):
+Three layers, each with a different responsibility:
 
 | Layer | Where | What it holds | When it loads |
 |---|---|---|---|
@@ -82,8 +81,7 @@ What goes where:
 - **Agent** only when you need context isolation (lots of logs, files, web pages),
   different permissions (read-only), parallelism or an independent view (review).
   We don't create agents like `django-expert`, `typescript-expert` or "UI/UX designer": they lose
-  the conversation context, and the model knows these technologies anyway ([ADR-0010](docs/adr/0010-typescript-files-only-as-assets.md),
-  [ADR-0009](docs/adr/0009-ui-quality-through-design-system.md)).
+  the conversation context, and the model knows these technologies anyway.
 - **Skill** for knowledge and processes. The value is in what the model doesn't know: your conventions,
   pitfalls and ways of verifying.
 - **Asset** (a file in `skills/<name>/assets/`) only when a concrete file carries decisions better
@@ -95,8 +93,7 @@ What goes where:
 
 ## Working alongside Matt Pocock's skills
 
-**Matt runs the process, geostack provides knowledge and specialists**
-([ADR-0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md)). Matt's skills are not
+**Matt runs the process, geostack provides knowledge and specialists**. Matt's skills are not
 edited, because they update from upstream (`skills-lock.json`). So geostack adapts instead,
 in two ways:
 
@@ -109,8 +106,8 @@ in two ways:
 
 | Area | Matt | geostack |
 |---|---|---|
-| Project setup | `/setup-matt-pocock-skills` | `/geostack:setup-geostack` writes `CLAUDE.md` before it: workflow, commands, languages ([ADR-0019](docs/adr/0019-setup-devkit-writes-project-claude-md.md)), and `.claude/settings.json`: deny rules, check hooks, the plugin ([ADR-0024](docs/adr/0024-setup-writes-project-settings.md)) |
-| From idea to commit | `/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` (with `/tdd`) | two optional QRSPI steps in the gaps of the flow: `/geostack:to-research-questions` before the grill, `/geostack:to-design-discussion` before the spec ([ADR-0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md)) |
+| Project setup | `/setup-matt-pocock-skills` | `/geostack:setup-geostack` writes `CLAUDE.md` before it: workflow, commands, languages, and `.claude/settings.json`: deny rules, check hooks, the plugin |
+| From idea to commit | `/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` (with `/tdd`) | two optional steps in the gaps of the flow: `/geostack:to-research-questions` before the grill, `/geostack:to-design-discussion` before the spec |
 | Domain glossary | `CONTEXT.md` (`domain-modeling`) | skills use its terms |
 | Decisions | ADRs in the `domain-modeling` format, written by `/grill-with-docs` | `code-reviewer` flags a missing ADR; knowledge skills suggest decisions typical for the stack |
 | Tracker, labels | `docs/agents/*.md` (`/setup-matt-pocock-skills`), `/triage` | the worker and `review-changes` read tickets according to `docs/agents/issue-tracker.md` |
@@ -146,9 +143,8 @@ In a session they have the `geostack:` prefix, e.g. `geostack:code-reviewer`.
 | `docs-researcher` | the answer depends on a library or tool version: upgrade, new option, deprecations; also the agent for `/research` about libraries | sonnet | medium | no |
 
 **Effort** is set explicitly where quality must not depend on the level you happen to be
-working at in the session. Without this field the agent inherits the session's level
-([ADR-0008](docs/adr/0008-explicit-effort-per-role.md)).
-Code exploration uses the built-in **`Explore`** agent ([ADR-0004](docs/adr/0004-use-builtin-explore.md)).
+working at in the session. Without this field the agent inherits the session's level.
+Code exploration uses the built-in **`Explore`** agent.
 
 ---
 
@@ -215,7 +211,7 @@ or ask in a session: `/geostack:ask <your situation>`.
 ## Safety: the read-only hook
 
 Agents shipped in a plugin ignore `permissionMode` and `hooks` in their frontmatter. That's why
-read-only mode is enforced by a plugin-level `PreToolUse` hook ([ADR-0003](docs/adr/0003-readonly-guard-hook.md)).
+read-only mode is enforced by a plugin-level `PreToolUse` hook.
 It applies to: `code-reviewer`, `security-reviewer`, `postgres-reviewer`, `platform-reviewer`,
 `frontend-reviewer`, `test-runner`, `cluster-investigator`. **The main session and `implementation-worker`
 are not restricted.** Neither are sub-agents of Matt's skills (e.g. the Standards and Spec axes in `/code-review`).
@@ -249,8 +245,7 @@ kubectl create clusterrolebinding claude-readonly --clusterrole=view \
 
 ## LSP servers
 
-geostack registers two language servers in [`.lsp.json`](.lsp.json)
-([ADR-0016](docs/adr/0016-lsp-servers-in-plugin.md)). After every file edit Claude gets type errors
+geostack registers two language servers in [`.lsp.json`](.lsp.json). After every file edit Claude gets type errors
 and missing imports (`Found N new diagnostic issues`, expand with `Ctrl+O`), and the `LSP`
 tool finds definitions and references by symbol.
 
@@ -285,11 +280,9 @@ message id. Cache reads are left out because they re-count the whole context on 
 
 ---
 
-## Documentation and decisions
+## Documentation
 
-Approach: **document the "why", generate the "what", keep it current in review**
-([ADR-0006](docs/adr/0006-documentation-strategy.md)). Everything in the repo is in English
-([ADR-0018](docs/adr/0018-english-only.md)).
+Approach: **document the "why", generate the "what", keep it current in review**. Everything in the repo is in English.
 
 | Document | Purpose |
 |---|---|
@@ -303,36 +296,6 @@ Approach: **document the "why", generate the "what", keep it current in review**
 | [`skills/setup-geostack/assets/settings.project.json`](skills/setup-geostack/assets/settings.project.json) | base of the project's shared `.claude/settings.json` |
 | [`skills/setup-geostack/assets/hooks/`](skills/setup-geostack/assets/hooks/) | `format.sh` (PostToolUse) and `check.sh` (Stop), copied to the project's `.claude/hooks/` |
 
-Decisions about geostack itself:
-
-| ADR | Decision |
-|---|---|
-| [0001](docs/adr/0001-distribute-as-plugin.md) | plugin installed per project |
-| [0002](docs/adr/0002-agents-are-roles-skills-are-knowledge.md) | agents are roles, knowledge lives in skills |
-| [0003](docs/adr/0003-readonly-guard-hook.md) | read-only is enforced by a hook, not a prompt |
-| [0004](docs/adr/0004-use-builtin-explore.md) | exploration through the built-in `Explore` |
-| [0005](docs/adr/0005-language-policy.md) | model-facing text in English, human-facing in Polish; superseded by 0018 |
-| [0006](docs/adr/0006-documentation-strategy.md) | we document the "why", generate the "what" |
-| [0007](docs/adr/0007-frontend-lens-reviewer.md) | frontend: skills + `frontend-reviewer` |
-| [0008](docs/adr/0008-explicit-effort-per-role.md) | explicit `effort` per role |
-| [0009](docs/adr/0009-ui-quality-through-design-system.md) | UI quality through a design system and screenshots, no designer agent |
-| [0010](docs/adr/0010-typescript-files-only-as-assets.md) | no TS agents; TS/CSS files only as assets |
-| [0011](docs/adr/0011-codex-variant-as-independent-copy.md) | Codex CLI variant as an independent copy in `codex/`; superseded by 0017 |
-| [0012](docs/adr/0012-codex-guard-as-plugin-hook.md) | read-only guard in Codex as a plugin hook filtered by `agent_type`; superseded by 0017 |
-| [0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md) | the process belongs to Matt Pocock's skills; geostack is knowledge and roles, no `adr` skill |
-| [0014](docs/adr/0014-knowledge-skills-hold-only-what-the-model-lacks.md) | knowledge skills hold only what the model lacks; `frontend-stack` replaces React and TS |
-| [0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md) | QRSPI steps (`to-research-questions`, `to-design-discussion`) fill gaps in Matt's flow |
-| [0016](docs/adr/0016-lsp-servers-in-plugin.md) | LSP servers (TypeScript, Pyright) in the plugin's `.lsp.json` |
-| [0017](docs/adr/0017-drop-codex-variant.md) | dropping the Codex CLI variant; supersedes 0011 and 0012 |
-| [0018](docs/adr/0018-english-only.md) | the whole repo in English; supersedes 0005 |
-| [0019](docs/adr/0019-setup-devkit-writes-project-claude-md.md) | `setup-geostack` writes the project `CLAUDE.md` and its languages; skills stop assuming Polish |
-| [0020](docs/adr/0020-domain-and-region-come-from-the-project.md) | geostack serves any GIS project; domain, region and CRS come from the project |
-| [0021](docs/adr/0021-rename-to-geostack.md) | the plugin is renamed from devkit to geostack |
-| [0022](docs/adr/0022-qgis-plugins-skill.md) | QGIS plugins are in scope, as one `qgis-plugins` knowledge skill |
-| [0023](docs/adr/0023-cluster-comes-from-the-project.md) | Kubernetes support is distribution-neutral; the cluster comes from the project |
-| [0024](docs/adr/0024-setup-writes-project-settings.md) | `setup-geostack` also writes the project's shared `.claude/settings.json` |
-| [0025](docs/adr/0025-check-hooks-ship-as-scripts.md) | format and check hooks ship as scripts copied into the project |
-| [0026](docs/adr/0026-ask-skill-routes-to-workflows.md) | workflows live in `docs/workflows.md`; the user-invoked `ask` skill answers from it |
 
 ---
 
@@ -348,8 +311,8 @@ claude --plugin-dir .                    # live test
 
 - A new technology is a new **skill**, not a new agent.
 - Don't duplicate Matt's process skills (grill, spec, tickets, tdd, Standards/Spec review, ADRs,
-  `/teach`). A new skill's description must not compete with their triggers; plug into their steps ([ADR-0013](docs/adr/0013-process-belongs-to-matt-pocock-skills.md)).
-- A new process step only where Matt's flow has a gap, and always with its output handed to one of his steps, like QRSPI ([ADR-0015](docs/adr/0015-qrspi-steps-extend-matts-flow.md)).
+  `/teach`). A new skill's description must not compete with their triggers; plug into their steps.
+- A new process step only where Matt's flow has a gap, and always with its output handed to one of his steps, like QRSPI.
 - A new read-only agent needs `disallowedTools`, an entry in `READONLY_AGENTS` and a test.
 - A new asset needs a justification: what decision it carries and why it can't be generated.
 - A significant change of approach is a new ADR in `docs/adr/`.
@@ -381,7 +344,7 @@ docs/
   workflows.md             # step-by-step workflows, indexed by situation
   design-system.md         # design system workflow
   project-settings.md      # project .claude/: rules, hooks, user vs project settings
-  adr/                     # decisions (0001–0026)
+  adr/                     # decisions about geostack itself
 .claude/settings.json      # this repo's deny rules and Stop hook (guard tests)
 CLAUDE.md                  # instructions for Claude when working on this repo
 LICENSE                    # MIT

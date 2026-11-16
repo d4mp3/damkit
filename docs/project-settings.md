@@ -1,8 +1,7 @@
 # Project settings and hooks
 
 What `/geostack:setup-geostack` puts in a project besides `CLAUDE.md`, how each piece works, and
-what stays in your user settings. Decisions: [ADR-0024](adr/0024-setup-writes-project-settings.md),
-[ADR-0025](adr/0025-check-hooks-ship-as-scripts.md).
+what stays in your user settings.
 
 ## Who decides and who enforces
 

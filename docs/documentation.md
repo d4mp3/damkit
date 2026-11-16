@@ -2,8 +2,7 @@
 
 A guide for people. The detailed writing rules, which the model also uses, are in
 [`skills/documenting-code/SKILL.md`](../skills/documenting-code/SKILL.md). This file does not repeat them,
-it only shows how to apply them day to day. Rationale for the approach:
-[ADR-0006](adr/0006-documentation-strategy.md).
+it only shows how to apply them day to day.
 
 > Last verified: 2026-09-29
 
@@ -25,7 +24,7 @@ Generate what can be generated from the code. Skip the rest.
 | What it is, how to install and use it | `README.md` | people | [README](../README.md) |
 | Facts for the AI assistant | `CLAUDE.md` | model | [CLAUDE.md](../CLAUDE.md) |
 | Domain glossary: terms and synonyms we avoid | `CONTEXT.md` (skill `domain-modeling`) | both | (in projects) |
-| Decisions and their reasons | `docs/adr/NNNN-*.md` | both | [docs/adr/](adr/) |
+| Decisions and their reasons | `docs/adr/NNNN-*.md` | both | `docs/adr/` (linked only from other ADRs) |
 | What we build and why: spec, tickets | issue tracker (`/to-spec`, `/to-tickets`) | both | (in projects) |
 | Configuration of Matt's skills: tracker, labels, document layout | `docs/agents/*.md` | model | (in projects) |
 | How to do or fix something | `docs/runbooks/*.md` | people under stress | (in homelab projects) |

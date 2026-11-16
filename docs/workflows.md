@@ -1,8 +1,7 @@
 # Workflows
 
 How to get work done with geostack and Matt Pocock's skills, one situation at a time. Matt's skills
-run the process. geostack adds stack knowledge and specialist agents at certain steps
-([ADR-0013](adr/0013-process-belongs-to-matt-pocock-skills.md)).
+run the process. geostack adds stack knowledge and specialist agents at certain steps.
 
 To ask from inside a session instead of reading: `/geostack:ask <your situation>`.
 
@@ -195,8 +194,7 @@ before the design.
    [the main flow](#the-main-flow).
 
 **Watch out:** the researcher must not see the ticket. One that knows the goal reports the code
-that supports its favorite solution and skips the code that complicates it
-([ADR-0015](adr/0015-qrspi-steps-extend-matts-flow.md)).
+that supports its favorite solution and skips the code that complicates it.
 
 ## Design review by the code owner
 
@@ -239,7 +237,7 @@ review it before the spec is written.
 5. **You** review. `frontend-reviewer` checks the code and takes its own screenshots.
 
 **Watch out:** without a running dev server or Storybook, Claude must say plainly that nothing was
-checked visually ([ADR-0009](adr/0009-ui-quality-through-design-system.md)).
+checked visually.
 
 ## Building a design system
 

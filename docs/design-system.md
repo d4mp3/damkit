@@ -2,8 +2,7 @@
 
 A how-to guide for React/TypeScript frontends.
 The rules the model uses on every view are in the skill
-[`building-ui`](../skills/building-ui/SKILL.md). Rationale for the approach:
-[ADR-0009](adr/0009-ui-quality-through-design-system.md).
+[`building-ui`](../skills/building-ui/SKILL.md).
 
 > Last verified: 2026-09-29
 
