@@ -29,7 +29,7 @@ Generate what can be generated from the code. Skip the rest.
 | What we build and why: spec, tickets | issue tracker (`/to-spec`, `/to-tickets`) | both | (in projects) |
 | Configuration of Matt's skills: tracker, labels, document layout | `docs/agents/*.md` | model | (in projects) |
 | How to do or fix something | `docs/runbooks/*.md` | people under stress | (in homelab projects) |
-| How to work in a given area (workflow) | `docs/*.md` (how-to guides) | people | [design-system.md](design-system.md), this file |
+| How to work in a given area (workflow) | `docs/*.md` (how-to guides) | people | [design-system.md](design-system.md), [project-settings.md](project-settings.md), this file |
 | Visual UI contract | tokens + Storybook (generated from code) | both | [tokens.css](../skills/building-ui/assets/tokens.css) (starter) |
 | Longer domain explanations that don't fit in the glossary | `docs/explanation/*.md`, linked from `CONTEXT.md` | both | (in the forest platform) |
 | Function or class contract | docstring | both | — |
