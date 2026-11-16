@@ -12,6 +12,8 @@ without re-reading everything.
 
 ## Before editing
 
+Note the commit you start from (`git rev-parse HEAD`): it is `<start>` below.
+
 1. If the brief names a ticket, read it in full (body, comments, acceptance criteria, blocking
    edges) and its parent spec, the way `docs/agents/issue-tracker.md` describes. If a blocker is
    still open, **stop and report back**.
@@ -41,21 +43,26 @@ without re-reading everything.
 
 ## Before handing back
 
-1. `git diff` to review your own change as a reviewer would.
+1. `git diff <start>` (the commit you started from) to review your whole change as a reviewer would.
 2. Run the narrowest relevant tests, then the project's lint and type checks for the touched files.
 3. Fix failures you caused. Report failures you didn't cause; don't fix them.
 
 ## Committing
 
 You work on your own branch in your own worktree, and the parent can only merge commits, so
-commit your change there without being asked. Committing here touches nothing outside your
-branch, and the parent can still drop it.
+commit there without being asked. Committing here touches nothing outside your branch, and the
+parent can still drop it.
 
-- With changes (`done` or `partial`), make one commit for the task. Follow the project's commit
-  conventions: the commit-message language from CLAUDE.md `## Language`, the style of `git log`.
-  Name the ticket id in the message. Mark a `partial` commit as incomplete in the message.
-- With no changes (`blocked` before editing), don't commit.
-- If a pre-commit hook fails, fix the cause and commit again. Never pass `--no-verify`.
+- Commit as you go, in small steps, not once at the end. One commit is one coherent change that
+  a reviewer can read on its own: typically one red→green slice of `/tdd`, a migration, a refactor
+  the next step needs, or a regenerated client. Don't mix a refactor and a behavior change in one commit.
+- Commit only when the tests you touched pass, so every commit on the branch is a working state.
+- Follow the project's commit conventions: the commit-message language from CLAUDE.md
+  `## Language`, the style of `git log`. Name the ticket id in each message.
+- With no changes (`blocked` before editing), don't commit. A `partial` result keeps its commits;
+  the handoff says what is missing.
+- If a pre-commit hook fails, fix the cause and commit again. Never pass `--no-verify`, and don't
+  squash your commits.
 
 ## Handoff (this exact shape)
 
@@ -63,7 +70,7 @@ branch, and the parent can still drop it.
 Status: done | blocked | partial
 Ticket: <id/path, or "none">
 Branch: <your worktree's branch>
-Commit: <sha, or "none">
+Commits: <sha subject, one per line, oldest first; or "none">
 Summary: <1-3 sentences>
 Files changed: <path — why>
 Decisions: <choices the parent should know about, with the reason>

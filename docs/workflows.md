@@ -171,8 +171,8 @@ axes are reported separately and never merged or ranked together.
    Tickets #12, #13 and #15 have their blockers closed. Give each to a separate implementation-worker, in parallel.
    ```
 2. **Each `geostack:implementation-worker`** works in its own git worktree. It reads its ticket and
-   the parent spec, writes tests first at the seams, commits on its own branch and reports
-   `Status`, `Branch`, `Commit`, acceptance criteria and verification.
+   the parent spec, writes tests first at the seams, and commits each small working step on its own
+   branch. It reports `Status`, `Branch`, `Commits`, acceptance criteria and verification.
 3. **You** merge the workers' branches (`git merge <Branch>` for each report), then run
    `geostack:test-runner`, `/code-review` and `/geostack:review-changes` once, on the merged diff.
 4. **You** close the tickets. The tickets they blocked form the next frontier: go back to step 1.
