@@ -1,51 +1,51 @@
-# ADR-0013: Proces pracy należy do skilli Matta Pococka, devkit dostarcza wiedzę i role
+# ADR-0013: The work process belongs to Matt Pocock's skills; devkit provides knowledge and roles
 
-- Status: Accepted; uzupełniony przez [ADR-0015](0015-qrspi-steps-extend-matts-flow.md) (kroki QRSPI)
+- Status: Accepted; extended by [ADR-0015](0015-qrspi-steps-extend-matts-flow.md) (QRSPI steps)
 - Date: 2026-10-01
-- Supersedes: część ADR-0006 dotyczącą skilla `adr`
+- Supersedes: the part of ADR-0006 about the `adr` skill
 
 ## Context
 
-W projektach używam równocześnie devkitu i skilli Matta Pococka (`mattpocock/skills`). Matt
-definiuje pełny proces: `/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` (z `/tdd`
-i `/code-review`), a do tego słownik domeny w `CONTEXT.md`, format ADR (`domain-modeling`),
-tracker zadań w `docs/agents/` i wielosesyjną naukę (`/teach`). Devkit miał własne wersje części
-tych kroków: skill `adr` z innym formatem i innym progiem proponowania ADR-a, `review-changes`
-wyzwalany tymi samymi słowami co `/code-review`, workflow „plan → `implementation-worker`”
-konkurujący z ticketami oraz `mentor` z planami nauki. Dwa skille z tym samym triggerem
-sprawiają, że model wybiera między nimi przypadkowo (ten sam problem co w ADR-0004). Skilli Matta
-nie edytuję, bo są aktualizowane z upstreamu (`skills-lock.json`), więc dopasować musi się devkit.
+In projects I use devkit and Matt Pocock's skills (`mattpocock/skills`) at the same time. Matt
+defines the full process: `/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` (with `/tdd`
+and `/code-review`), plus a domain glossary in `CONTEXT.md`, an ADR format (`domain-modeling`),
+a task tracker in `docs/agents/` and multi-session learning (`/teach`). Devkit had its own versions of some
+of these steps: an `adr` skill with a different format and a different threshold for proposing an ADR, `review-changes`
+triggered by the same words as `/code-review`, a "plan → `implementation-worker`" workflow
+competing with tickets, and `mentor` with study plans. Two skills with the same trigger
+make the model pick between them at random (the same problem as in ADR-0004). I don't edit Matt's
+skills, because they are updated from upstream (`skills-lock.json`), so devkit has to adapt.
 
 ## Decision
 
-- Proces (od pomysłu do commita), słownik domeny, format ADR i tracker zadań należą do skilli Matta.
-  Devkit nie ma własnych wersji tych kroków.
-- Devkit dostarcza wiedzę o stacku (skille), role do izolacji i równoległości (agenci) oraz
-  hook read-only. Wpina się w konkretne kroki flow Matta:
-  - `review-changes` to trzecia oś review, **Risk**, uruchamiana po `/code-review` (Standards + Spec)
-    i raportowana osobno;
-  - `implementation-worker` realizuje tickety z frontieru (wszystkie blokery zamknięte) równolegle,
-    po jednym tickecie na worker, według `tdd` na seamach uzgodnionych w specu;
-  - `test-runner` wykonuje końcowy przebieg testów w `/implement`, `docs-researcher` obsługuje
-    `/research` o bibliotekach, `mentor` uczy przy realnym zadaniu, `/teach` prowadzi naukę wielosesyjną.
-- Skill `adr` usuwamy. ADR-y w projektach pisze `domain-modeling` (wywoływany przez `/grill-with-docs`).
-- ADR-y projektu i `CONTEXT.md` mają pierwszeństwo przed skillami devkitu. Kontrakty opisane
-  w skillach wiedzy (np. kody wyjścia walidatora) są domyślnymi propozycjami do grillowania, a nie faktami.
-- Połączenie żyje w dwóch miejscach: w opisach skilli devkitu (żeby nie konkurowały o triggery)
-  i w sekcji `## Workflow` szablonu `CLAUDE.md` projektu (ładuje się zawsze, więc `/implement` ją stosuje).
+- The process (from idea to commit), the domain glossary, the ADR format and the task tracker belong to Matt's skills.
+  Devkit has no own versions of these steps.
+- Devkit provides stack knowledge (skills), roles for isolation and parallelism (agents), and
+  the read-only hook. It plugs into specific steps of Matt's flow:
+  - `review-changes` is the third review axis, **Risk**, run after `/code-review` (Standards + Spec)
+    and reported separately;
+  - `implementation-worker` implements tickets from the frontier (all blockers closed) in parallel,
+    one ticket per worker, following `tdd` on the seams agreed in the spec;
+  - `test-runner` runs the final test pass in `/implement`, `docs-researcher` handles
+    `/research` about libraries, `mentor` teaches during a real task, `/teach` runs multi-session learning.
+- We remove the `adr` skill. ADRs in projects are written by `domain-modeling` (invoked by `/grill-with-docs`).
+- The project's ADRs and `CONTEXT.md` take precedence over devkit skills. Contracts described
+  in knowledge skills (e.g. validator exit codes) are default proposals to grill, not facts.
+- The connection lives in two places: in the devkit skill descriptions (so they don't compete for triggers)
+  and in the `## Workflow` section of the project `CLAUDE.md` template (it always loads, so `/implement` applies it).
 
 ## Alternatives considered
 
-- **Devkit z własnym pełnym procesem, bez Matta**: dublowałbym utrzymywany upstream i tracił
-  jego rozwój (grilling, tickety z blokerami, dwuosiowe review).
-- **Fork i edycja skilli Matta**: każda aktualizacja upstreamu oznaczałaby ręczne scalanie.
-- **Zostawić `adr` i `review-changes` bez zmian**: dwa formaty ADR w jednym `docs/adr/`
-  i podwójne review po każdym `/implement`.
+- **Devkit with its own full process, without Matt**: I would duplicate a maintained upstream and lose
+  its development (grilling, tickets with blockers, two-axis review).
+- **Fork and edit Matt's skills**: every upstream update would mean manual merging.
+- **Leave `adr` and `review-changes` unchanged**: two ADR formats in one `docs/adr/`
+  and a double review after every `/implement`.
 
 ## Consequences
 
-- Devkit jest mniejszy: nie ma skilla `adr` ani szablonu ADR dla projektów.
-- Bez skilli Matta w projekcie część odwołań (`/code-review`, `domain-modeling`, `tdd`) nie działa.
-  Devkit nadal daje wiedzę i reviewerów, ale nie prowadzi procesu.
-- To repo nadal zapisuje własne decyzje jako ADR-y w `docs/adr/` w dotychczasowym formacie.
-- Wariant `codex/` nie jest jeszcze dostosowany (ADR-0011: niezależna kopia).
+- Devkit is smaller: there is no `adr` skill and no ADR template for projects.
+- Without Matt's skills in a project, some references (`/code-review`, `domain-modeling`, `tdd`) don't work.
+  Devkit still provides knowledge and reviewers, but it does not drive the process.
+- This repo still records its own decisions as ADRs in `docs/adr/` in the existing format.
+- The `codex/` variant is not adapted yet (ADR-0011: independent copy).

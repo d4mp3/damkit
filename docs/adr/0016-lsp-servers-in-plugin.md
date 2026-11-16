@@ -1,37 +1,37 @@
-# ADR-0016: devkit dostarcza serwery LSP dla TypeScriptu i Pythona w `.lsp.json`
+# ADR-0016: devkit ships LSP servers for TypeScript and Python in `.lsp.json`
 
 - Status: Accepted
 - Date: 2026-11-14
 
 ## Context
 
-Z serwerem LSP Claude dostaje diagnostykę po każdej edycji (błędy typów, brakujące importy) i narzędzie
-`LSP` do nawigacji po symbolach zamiast szukania tekstem. Mój stack to TypeScript/React i Python
-(Django/FastAPI). Anthropic publikuje gotowe pluginy `typescript-lsp` i `pyright-lsp`
-w `claude-plugins-official`, ale instaluje się je osobno, a devkit jest instalowany per projekt (ADR-0001).
+With an LSP server, Claude gets diagnostics after every edit (type errors, missing imports) and the
+`LSP` tool for navigating symbols instead of searching text. My stack is TypeScript/React and Python
+(Django/FastAPI). Anthropic publishes ready-made `typescript-lsp` and `pyright-lsp` plugins
+in `claude-plugins-official`, but they are installed separately, and devkit is installed per project (ADR-0001).
 
 ## Decision
 
-devkit ma w katalogu głównym `.lsp.json` z dwoma serwerami: `typescript-language-server --stdio`
-(`.ts`, `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, `.cjs`) i `pyright-langserver --stdio`
-(`.py`, `.pyi`). Konfiguracja jest taka sama jak w oficjalnych pluginach. Binarek plugin nie
-dostarcza: instaluje się je raz na maszynę i muszą być na `PATH`.
+devkit has a `.lsp.json` in its root directory with two servers: `typescript-language-server --stdio`
+(`.ts`, `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, `.cjs`) and `pyright-langserver --stdio`
+(`.py`, `.pyi`). The configuration is the same as in the official plugins. The plugin doesn't
+ship the binaries: they are installed once per machine and must be on `PATH`.
 
 ## Alternatives considered
 
-- **`dependencies` na oficjalne `typescript-lsp` i `pyright-lsp`** (z
-  `allowCrossMarketplaceDependenciesOn` w `marketplace.json`): brak kopii konfiguracji, ale wyłączenie
-  któregoś z tych pluginów wyłącza cały devkit, a zależności spoza marketplace'u `dampe`
-  instalują się bez mojej kontroli.
-- **Instrukcja „zainstaluj oficjalne pluginy”** w README: jeden krok więcej w każdym projekcie,
-  łatwy do pominięcia.
-- **`basedpyright` zamiast `pyright`**: ostrzejsze domyślne reguły, ale osobna binarka i inne
-  zachowanie niż w oficjalnym pluginie. Wrócę do tego, jeśli `pyright` okaże się za słaby.
+- **`dependencies` on the official `typescript-lsp` and `pyright-lsp`** (with
+  `allowCrossMarketplaceDependenciesOn` in `marketplace.json`): no copy of the configuration, but disabling
+  either of those plugins disables all of devkit, and dependencies from outside the `dampe` marketplace
+  install without my control.
+- **An "install the official plugins" instruction** in the README: one more step in every project,
+  easy to skip.
+- **`basedpyright` instead of `pyright`**: stricter default rules, but a separate binary and different
+  behavior than in the official plugin. I'll come back to it if `pyright` turns out to be too weak.
 
 ## Consequences
 
-- Projekt z devkitem ma diagnostykę TS i Pythona bez dodatkowych pluginów.
-- Oficjalne `typescript-lsp`/`pyright-lsp` trzeba wyłączyć tam, gdzie działa devkit, bo inaczej
-  dla tych samych plików ruszą dwa serwery i diagnostyka się zdubluje.
-- Brak binarki nie psuje pluginu: `/plugin` → **Errors** pokazuje `Executable not found in $PATH`.
-- Wariant dla Codeksa (`codex/`) zostaje bez zmian: `.lsp.json` to mechanizm pluginów Claude Code.
+- A project with devkit has TS and Python diagnostics without extra plugins.
+- The official `typescript-lsp`/`pyright-lsp` have to be disabled where devkit runs, otherwise
+  two servers start for the same files and diagnostics get duplicated.
+- A missing binary doesn't break the plugin: `/plugin` → **Errors** shows `Executable not found in $PATH`.
+- The Codex variant (`codex/`) stays unchanged: `.lsp.json` is a Claude Code plugin mechanism.

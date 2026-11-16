@@ -1,48 +1,48 @@
-# ADR-0014: Skille wiedzy zawierają tylko to, czego model nie ma. React i TS zastępuje `frontend-stack`
+# ADR-0014: Knowledge skills hold only what the model lacks. `frontend-stack` replaces React and TS
 
 - Status: Accepted
 - Date: 2026-10-07
-- Supersedes: część ADR-0007 (trzy skille frontendu) i zdanie ADR-0010 o tym, że
-  `typescript-conventions` wymienia flagi i reguły do dołożenia
+- Supersedes: the part of ADR-0007 about three frontend skills, and the sentence in ADR-0010 saying that
+  `typescript-conventions` lists the flags and rules to add
 
 ## Context
 
-Przegląd skilli wiedzy pokazał, że `react-conventions` i `typescript-conventions` w większości
-powtarzały oficjalną dokumentację: miejsce stanu, „you might not need an effect”, klucze list,
-`unknown` zamiast `any`, discriminated unions, flagi `strict`. Frontier modele robią to same, więc
-takie linie nic nie zmieniają w zachowaniu, a kosztują kontekst i uwagę. Koszt był podwójny:
-`paths` na `*.ts`/`*.tsx` ładował oba skille do prawie każdego zadania frontendowego, a
-`frontend-reviewer` miał je wklejone w całości, czyli dokładnie te długie checklisty stackowe,
-które ADR-0002 opisuje jako rozpraszające reviewera.
+A review of the knowledge skills showed that `react-conventions` and `typescript-conventions` mostly
+repeated the official documentation: where state lives, "you might not need an effect", list keys,
+`unknown` instead of `any`, discriminated unions, `strict` flags. Frontier models do this on their own, so
+such lines change nothing in behavior, but they cost context and attention. The cost was double:
+`paths` on `*.ts`/`*.tsx` loaded both skills into almost every frontend task, and
+`frontend-reviewer` had them preloaded in full, which is exactly the long stack checklists
+that ADR-0002 describes as distracting the reviewer.
 
-Po odcięciu podręcznika zostało kilkanaście linii. Żadna nie dotyczy samego Reacta ani TS, tylko
-miejsc, w których elementy stacku się łączą: kontrakt backend → klient TS i harness testów.
+After cutting the textbook material, a dozen or so lines remained. None of them is about React or TS alone, only
+about the places where parts of the stack meet: the backend → TS client contract and the test harness.
 
 ## Decision
 
-- Linia w skillu wiedzy zostaje, jeśli spełnia jeden z warunków: model nie może tego wiedzieć
-  (środowisko, domena, decyzje), wie, ale sam tego nie robi, albo wie nieprecyzyjnie tam, gdzie
-  błąd dużo kosztuje. Pomocniczy test: czy kompetentny inżynier mógłby argumentować przeciwnie?
-  Jeśli nie, model zrobi to sam.
-- Usuwamy `react-conventions` i `typescript-conventions`. Zastępuje je `frontend-stack`: kontrakt
-  z backendem przez OpenAPI, `tsc --noEmit` obok builda Vite, zod dla danych spoza API, MSW,
-  `QueryClient` per test, mapy poza jsdom. Bez `paths`, ładuje się po opisie.
-- Branded types dla współrzędnych w różnych CRS trafiają do `web-maps`. Wybory stacku
-  (TanStack Query, RHF + zod, stan w URL) są w sekcji `## Frontend` szablonu `CLAUDE.md` projektu.
-- `frontend-reviewer` dostaje wklejone `review-standards`, `frontend-stack` i `building-ui`.
+- A line in a knowledge skill stays if it meets one of these conditions: the model can't know it
+  (environment, domain, decisions), knows it but doesn't do it on its own, or knows it imprecisely where
+  a mistake is costly. A helper test: could a competent engineer argue the opposite?
+  If not, the model will do it on its own.
+- We remove `react-conventions` and `typescript-conventions`. They are replaced by `frontend-stack`: the contract
+  with the backend through OpenAPI, `tsc --noEmit` alongside the Vite build, zod for data from outside the API, MSW,
+  a `QueryClient` per test, maps outside jsdom. No `paths`; it loads by description.
+- Branded types for coordinates in different CRSs go to `web-maps`. Stack choices
+  (TanStack Query, RHF + zod, state in the URL) are in the `## Frontend` section of the project `CLAUDE.md` template.
+- `frontend-reviewer` gets `review-standards`, `frontend-stack` and `building-ui` preloaded.
 
 ## Alternatives considered
 
-- **Przyciąć oba skille i zostawić osobno**: dwa opisy w kontekście i dwa triggery dla
-  kilkunastu linii, które i tak nie dotyczą żadnego z języków osobno.
-- **Usunąć bez zastępstwa**: kontrakt z OpenAPI zostałby tylko w szablonie projektu, a pułapki
-  testów (mocki hooków zamiast sieci, retry w `QueryClient`, mapa w jsdom) nie miałyby miejsca.
-- **Zostawić, bo „nie szkodzi”**: szkodzi, bo każda linia w kontekście rozmywa uwagę, a lista
-  kategorii w promptcie reviewera skłania go do zgłaszania czegoś w każdej z nich.
+- **Trim both skills and keep them separate**: two descriptions in context and two triggers for
+  a dozen or so lines that don't concern either language on its own anyway.
+- **Remove without a replacement**: the OpenAPI contract would remain only in the project template, and the
+  test pitfalls (mocking hooks instead of the network, retry in `QueryClient`, a map in jsdom) would have no place.
+- **Keep them, because "they don't hurt"**: they do hurt, because every line in context dilutes attention, and a list
+  of categories in the reviewer's prompt nudges it to report something in each of them.
 
 ## Consequences
 
-- Nowa linia w skillu wiedzy musi przejść powyższy test. Linie podręcznikowe się usuwa.
-- Gdy model dwa razy popełni ten sam błąd we froncie, poprawka trafia do `frontend-stack`.
-- Pozostałe skille wiedzy (Django, FastAPI, PostgreSQL, k8s, CI) czekają na ten sam przegląd.
-- Wariant `codex/` nadal ma stare skille (ADR-0011).
+- A new line in a knowledge skill must pass the test above. Textbook lines get removed.
+- When the model makes the same frontend mistake twice, the fix goes into `frontend-stack`.
+- The remaining knowledge skills (Django, FastAPI, PostgreSQL, k8s, CI) await the same review.
+- The `codex/` variant still has the old skills (ADR-0011).
