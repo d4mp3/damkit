@@ -20,9 +20,10 @@ All text in the repo, including README and docs/, is in English (ADR-0018).
   `/grill-with-docs` → document for a code-owner review → `/to-spec`), plus `setup-geostack`
   (project `CLAUDE.md` → `/setup-matt-pocock-skills`, ADR-0019). They read Matt's
   `docs/agents/*.md` and use his terms; a new step follows the same rules.
-- Skills don't assume a language, domain, country or CRS for the user's projects: UI copy, locale and
-  docs language come from the project's `## Language` section (ADR-0019), the storage CRS from
-  `## Data & GIS` (ADR-0020); `setup-geostack` writes both. Forestry, Poland and EPSG:2180 are examples only.
+- Skills and agents don't assume a language, domain, country, CRS or cluster for the user's projects:
+  UI copy, locale and docs language come from the project's `## Language` section (ADR-0019), the
+  storage CRS from `## Data & GIS` (ADR-0020), the cluster from `## Deployment` (ADR-0023);
+  `setup-geostack` writes all three. Forestry, Poland, EPSG:2180 and a k3s homelab are examples only.
 - A process step's `description` names the artifact it produces ("Turn a ticket into research
   questions…"): the artifact is the trigger word, so the when-to-use rule below doesn't apply to them.
 - Agents are stack-agnostic roles; technology knowledge goes into skills (ADR-0002).
