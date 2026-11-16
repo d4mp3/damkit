@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""PreToolUse guard: keeps devkit's read-only agents read-only.
+"""PreToolUse guard: keeps geostack's read-only agents read-only.
 
 Plugin agents ignore `permissionMode` and `hooks` frontmatter, so enforcement lives
 here, in a plugin-level hook filtered by `agent_type`. The main session is never
@@ -20,7 +20,7 @@ import re
 import shlex
 import sys
 
-PLUGIN_PREFIX = "devkit:"
+PLUGIN_PREFIX = "geostack:"
 READONLY_AGENTS = {
     "cluster-investigator",
     "platform-reviewer",
@@ -425,7 +425,7 @@ def main() -> int:
             "hookSpecificOutput": {
                 "hookEventName": "PreToolUse",
                 "permissionDecision": "deny",
-                "permissionDecisionReason": f"[devkit read-only guard: {agent}] {exc}",
+                "permissionDecisionReason": f"[geostack read-only guard: {agent}] {exc}",
             }
         }, sys.stdout)
     return 0
