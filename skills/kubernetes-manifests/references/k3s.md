@@ -1,4 +1,7 @@
-# k3s homelab reference (Raspberry Pi + VPS)
+# k3s reference
+
+k3s-specific behavior first. The sections on Raspberry Pi nodes and a VPS describe one homelab layout
+(arm64 Pi at home + amd64 VPS); apply them when the project's `## Deployment` says so.
 
 ## Bundled components (disable with `--disable <name>` if you replace them)
 - **Traefik** is the default ingress controller. It supports standard `Ingress` and its own
