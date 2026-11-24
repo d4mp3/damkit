@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""PreToolUse guard: keeps damstack's read-only agents read-only.
+"""PreToolUse guard: keeps damkit's read-only agents read-only.
 
 Plugin agents ignore `permissionMode` and `hooks` frontmatter, so enforcement lives
 here, in a plugin-level hook filtered by `agent_type`. The main session is never
@@ -20,7 +20,7 @@ import re
 import shlex
 import sys
 
-PLUGIN_PREFIX = "damstack:"
+PLUGIN_PREFIX = "damkit:"
 READONLY_AGENTS = {
     "cluster-investigator",
     "platform-reviewer",
@@ -429,7 +429,7 @@ def main() -> int:
             "hookSpecificOutput": {
                 "hookEventName": "PreToolUse",
                 "permissionDecision": "deny",
-                "permissionDecisionReason": f"[damstack read-only guard: {agent}] {exc}",
+                "permissionDecisionReason": f"[damkit read-only guard: {agent}] {exc}",
             }
         }, sys.stdout)
     return 0

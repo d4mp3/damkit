@@ -146,7 +146,7 @@ DENY = [
 ]
 
 
-def decide(command: str, agent: str = "damstack:cluster-investigator") -> str:
+def decide(command: str, agent: str = "damkit:cluster-investigator") -> str:
     payload = {"tool_name": "Bash", "tool_input": {"command": command}, "agent_type": agent}
     out = subprocess.run([sys.executable, str(GUARD)], input=json.dumps(payload),
                          capture_output=True, text=True, check=True).stdout
@@ -164,13 +164,13 @@ def main() -> int:
         if (d := decide(cmd)) != "deny":
             failures.append(f"expected deny, got {d}: {cmd}")
     # scoping: main session and non-readonly agents are never restricted
-    for agent in ("", "damstack:implementation-worker", "general-purpose"):
+    for agent in ("", "damkit:implementation-worker", "general-purpose"):
         if decide("kubectl delete pod x", agent) != "allow":
             failures.append(f"agent {agent!r} should not be restricted")
     # bare (non-namespaced) agent names are also recognised
     if decide("kubectl delete pod x", "platform-reviewer") != "deny":
         failures.append("bare agent name 'platform-reviewer' should be restricted")
-    if decide("npx eslint --fix .", "damstack:frontend-reviewer") != "deny":
+    if decide("npx eslint --fix .", "damkit:frontend-reviewer") != "deny":
         failures.append("frontend-reviewer should be restricted")
     for f in failures:
         print("FAIL", f)

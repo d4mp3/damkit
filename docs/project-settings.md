@@ -1,6 +1,6 @@
 # Project settings and hooks
 
-What `/damstack:setup-damstack` puts in a project besides `CLAUDE.md`, how each piece works, and
+What `/damkit:setup-damkit` puts in a project besides `CLAUDE.md`, how each piece works, and
 what stays in your user settings.
 
 ## Who decides and who enforces
@@ -20,7 +20,7 @@ for what must happen always or never. Two signals help:
 
 ## The files and who they reach
 
-| File | Who it affects | What damstack puts there |
+| File | Who it affects | What damkit puts there |
 |---|---|---|
 | `~/.claude/settings.json` | you, every project on this machine | nothing (see [User settings](#what-stays-in-your-user-settings)) |
 | `.claude/settings.json` | everyone in the repo and cloud sessions (commit it) | deny/ask rules, hooks, the plugin |
@@ -48,13 +48,13 @@ after each person accepts the folder's trust dialog.
     "Stop": [{
       "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check.sh" }] }]
   },
-  "extraKnownMarketplaces": { "dampe": { "source": { "source": "github", "repo": "d4mp3/damstack" } } },
-  "enabledPlugins": { "damstack@dampe": true }
+  "extraKnownMarketplaces": { "dampe": { "source": { "source": "github", "repo": "d4mp3/damkit" } } },
+  "enabledPlugins": { "damkit@dampe": true }
 }
 ```
 
 The full template is
-[`skills/setup-damstack/assets/settings.project.json`](../skills/setup-damstack/assets/settings.project.json).
+[`skills/setup-damkit/assets/settings.project.json`](../skills/setup-damkit/assets/settings.project.json).
 Setup merges it into an existing file and adds the project's other secret files.
 
 - **`deny`** is for what can't be undone if Claude gets it wrong once:
@@ -132,7 +132,7 @@ Design choices:
 
 Are ruff and mypy enough for Python? For per-turn checks, yes:
 - ruff covers what flake8, isort, pyupgrade and parts of bandit used to.
-- mypy covers types. A project on pyright instead can drop mypy: damstack's Pyright LSP server
+- mypy covers types. A project on pyright instead can drop mypy: damkit's Pyright LSP server
   already shows Claude type errors after every edit.
 
 For JS/TS, the equivalents are prettier (format), eslint (lint) and tsc (types), with biome replacing

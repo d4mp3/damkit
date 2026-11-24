@@ -13,7 +13,7 @@ the reasons behind decisions, rejected options, domain constraints or operationa
 
 - The rules for writing documentation live in the `documenting-code` skill. It is the single source of truth
   used by both the model and me.
-- We record decisions as ADRs (the `adr` skill, `/devkit:adr`). An accepted ADR is not edited,
+- We record decisions as ADRs (the `adr` skill, `/damkit:adr`). An accepted ADR is not edited,
   only superseded by a new one.
 - There is no separate documentation agent. The "why" is in the main session's conversation, and a subagent
   starts without it.

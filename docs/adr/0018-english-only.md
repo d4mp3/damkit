@@ -1,6 +1,6 @@
 # ADR-0018: All repository text in English
 
-- Status: Accepted (supersedes [ADR-0005](0005-language-policy.md)); the part about example UI copy refined by [ADR-0019](0019-setup-devkit-writes-project-claude-md.md)
+- Status: Accepted (supersedes [ADR-0005](0005-language-policy.md)); the part about example UI copy refined by [ADR-0019](0019-setup-damkit-writes-project-claude-md.md)
 - Date: 2026-11-16
 
 ## Context

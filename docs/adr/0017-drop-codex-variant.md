@@ -5,7 +5,7 @@
 
 ## Context
 
-ADR-0011 added an independent, manually maintained copy of devkit for Codex CLI in `codex/`, and ADR-0012
+ADR-0011 added an independent, manually maintained copy of damkit for Codex CLI in `codex/`, and ADR-0012
 moved the read-only guard there into a plugin hook. Since then the Claude version has been rebuilt
 around Matt Pocock's skills (ADR-0013), got a review of the knowledge skills (ADR-0014), QRSPI steps (ADR-0015)
 and LSP servers (ADR-0016). None of these changes reached `codex/`, so the copy drifted,
@@ -14,7 +14,7 @@ and every further change in `skills/`, `agents/` and `hooks/` increased the back
 ## Decision
 
 - I'm no longer developing the Codex CLI variant. The `codex/` directory is removed from the repo.
-- devkit is only a Claude Code plugin. Changes in `skills/`, `agents/` and `hooks/` no longer require
+- damkit is only a Claude Code plugin. Changes in `skills/`, `agents/` and `hooks/` no longer require
   porting or running `codex/scripts/check.py`.
 
 ## Alternatives considered

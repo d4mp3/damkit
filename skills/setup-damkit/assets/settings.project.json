@@ -42,11 +42,11 @@
     "dampe": {
       "source": {
         "source": "github",
-        "repo": "d4mp3/damstack"
+        "repo": "d4mp3/damkit"
       }
     }
   },
   "enabledPlugins": {
-    "damstack@dampe": true
+    "damkit@dampe": true
   }
 }

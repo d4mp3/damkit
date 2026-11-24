@@ -1,18 +1,18 @@
 # Workflows
 
-How to get work done with damstack and Matt Pocock's skills, one situation at a time. Matt's skills
-run the process. damstack adds stack knowledge and specialist agents at certain steps.
+How to get work done with damkit and Matt Pocock's skills, one situation at a time. Matt's skills
+run the process. damkit adds stack knowledge and specialist agents at certain steps.
 
-To ask from inside a session instead of reading: `/damstack:ask <your situation>`.
+To ask from inside a session instead of reading: `/damkit:ask <your situation>`.
 
 In the steps below, **You** means you typing in the session, **Claude** means the main session,
-and a name like **`damstack:test-runner`** means a subagent that Claude delegates to.
+and a name like **`damkit:test-runner`** means a subagent that Claude delegates to.
 
 ## Find your situation
 
 | Situation | Workflow |
 |---|---|
-| A repo without damstack or Matt's skills yet | [Set up a new project](#set-up-a-new-project) |
+| A repo without damkit or Matt's skills yet | [Set up a new project](#set-up-a-new-project) |
 | A small feature or bugfix that fits one session | [Everyday change](#everyday-change) |
 | A feature that needs a spec and spans several sessions | [Larger feature](#larger-feature) |
 | Several tickets with all their blockers closed | [Parallel tickets](#parallel-tickets) |
@@ -29,7 +29,7 @@ and a name like **`damstack:test-runner`** means a subagent that Claude delegate
 | A library or tool upgrade, a new technology | [Upgrade or new technology](#upgrade-or-new-technology) |
 | A decision worth recording | [Architecture decision](#architecture-decision) |
 | Learning something while doing a real task | [Learning on a task](#learning-on-a-task) |
-| Bug reports and requests from other people | Matt's `/triage`. damstack has no part in it. |
+| Bug reports and requests from other people | Matt's `/triage`. damkit has no part in it. |
 | Cleaning up the architecture | Matt's `/improve-codebase-architecture`. Knowledge skills give stack context for the chosen candidate. |
 | Whether to continue, `/clear`, `/compact` or `/handoff` | `/ask-matt` |
 
@@ -41,24 +41,24 @@ Most work follows this path. Dashed arrows are optional detours.
 
 ```mermaid
 flowchart TD
-  RQ["/damstack:to-research-questions<br>then /research in a fresh session"] -.-> G
+  RQ["/damkit:to-research-questions<br>then /research in a fresh session"] -.-> G
   G["/grill-with-docs"] -.->|needs running code| P["/prototype"]
   P -.-> G
-  G -.->|worth a code-owner review| DD["/damstack:to-design-discussion"]
+  G -.->|worth a code-owner review| DD["/damkit:to-design-discussion"]
   DD -.-> S
   G --> S["/to-spec"] --> T["/to-tickets"]
   T --> I["/implement, one ticket"]
   T -.->|several tickets ready| W["implementation-worker × N"]
   W -.-> M["merge the workers' branches"]
-  I --> TR["damstack:test-runner"]
+  I --> TR["damkit:test-runner"]
   M --> TR
-  TR --> CR["/code-review"] --> RC["/damstack:review-changes"] --> C["commit"]
+  TR --> CR["/code-review"] --> RC["/damkit:review-changes"] --> C["commit"]
 ```
 
 1. **You** run `/grill-with-docs` with the idea or the ticket. Claude interviews you and writes
-   `CONTEXT.md` (the project's glossary) and ADRs (records of decisions). damstack's knowledge
+   `CONTEXT.md` (the project's glossary) and ADRs (records of decisions). damkit's knowledge
    skills suggest the questions and defaults typical for the stack: storage CRS, design system
-   foundation, GitOps layout. `damstack:docs-researcher` answers questions that depend on a
+   foundation, GitOps layout. `damkit:docs-researcher` answers questions that depend on a
    library version.
    - A question that only running code can settle: `/handoff`, `/prototype` in a fresh session,
      `/handoff` back with the conclusions.
@@ -71,10 +71,10 @@ flowchart TD
 4. **You** run `/implement` for one ticket, and `/clear` before the next one. `/tdd` inside it
    writes a failing test, then the code. Knowledge skills load by themselves from the file paths.
    Several tickets ready at once: [Parallel tickets](#parallel-tickets).
-5. **`damstack:test-runner`** runs the final tests, linters and type checks, keeping the logs out
+5. **`damkit:test-runner`** runs the final tests, linters and type checks, keeping the logs out
    of your context.
 6. **You** review the diff against a *fixed point* (the branch or commit you compare with, usually
-   `main`): `/code-review main`, then `/damstack:review-changes main`.
+   `main`): `/code-review main`, then `/damkit:review-changes main`.
 7. **You** fix what the review found and commit.
 
 ### Review: three axes
@@ -83,7 +83,7 @@ flowchart TD
 |---|---|---|
 | **Standards** | `/code-review` | Does the code follow the repo's documented standards? Any code smells? |
 | **Spec** | `/code-review` | Does the diff do what the ticket asked, no less and no more? |
-| **Risk** | `/damstack:review-changes` | What will break: correctness, regressions, test gaps, security, migration locks, deploy, UI states, stale docs and `CONTEXT.md`. |
+| **Risk** | `/damkit:review-changes` | What will break: correctness, regressions, test gaps, security, migration locks, deploy, UI states, stale docs and `CONTEXT.md`. |
 
 Run the Risk axis when the diff touches auth, the database, infrastructure or the frontend. It
 always runs `code-reviewer`, and adds a specialist per kind of file: `security-reviewer`
@@ -95,19 +95,19 @@ axes are reported separately and never merged or ranked together.
 
 ## Set up a new project
 
-**When:** a repo where neither damstack nor Matt's skills are installed yet.
+**When:** a repo where neither damkit nor Matt's skills are installed yet.
 
-1. **You** install damstack for the project and commit the `.claude/settings.json` it writes:
+1. **You** install damkit for the project and commit the `.claude/settings.json` it writes:
    ```bash
-   claude plugin install damstack@dampe --scope project
+   claude plugin install damkit@dampe --scope project
    ```
 2. **You** add Matt's skills: `npx skills@latest add mattpocock/skills`.
-3. **You** run `/damstack:setup-damstack` in a session. Claude reads the commands and the stack
+3. **You** run `/damkit:setup-damkit` in a session. Claude reads the commands and the stack
    from the repo and asks only what it can't read:
    - the stack, when the repo is fresh or doesn't show it: backend, database, spatial data, frontend,
      images, Kubernetes. A layer you rule out gets no section in `CLAUDE.md`;
    - the languages of the conversation, UI copy, docs and commit messages;
-   - optional learning goals for `/damstack:mentor`;
+   - optional learning goals for `/damkit:mentor`;
    - the cluster, when the repo doesn't show it ("run by the ops team, details unknown" is a valid answer).
 
    It writes `CLAUDE.md` and the shared `.claude/settings.json`, copies the format and check hooks
@@ -137,8 +137,8 @@ axes are reported separately and never merged or ranked together.
 
 1. **You** describe the change. Still unclear? Run a short `/grill-with-docs` first.
 2. **You** run `/tdd` for one behavior, or `/implement` in the same session.
-3. **`damstack:test-runner`** runs the final tests, linters and type checks.
-4. **You** run `/code-review main`, then `/damstack:review-changes main`. Without a ticket the Spec
+3. **`damkit:test-runner`** runs the final tests, linters and type checks.
+4. **You** run `/code-review main`, then `/damkit:review-changes main`. Without a ticket the Spec
    axis reports "no spec available", and that's fine.
 5. **You** fix and commit.
 
@@ -171,11 +171,11 @@ axes are reported separately and never merged or ranked together.
    ```
    Tickets #12, #13 and #15 have their blockers closed. Give each to a separate implementation-worker, in parallel.
    ```
-2. **Each `damstack:implementation-worker`** works in its own git worktree. It reads its ticket and
+2. **Each `damkit:implementation-worker`** works in its own git worktree. It reads its ticket and
    the parent spec, writes tests first at the seams, and commits each small working step on its own
    branch. It reports `Status`, `Branch`, `Commits`, acceptance criteria and verification.
 3. **You** merge the workers' branches (`git merge <Branch>` for each report), then run
-   `damstack:test-runner`, `/code-review` and `/damstack:review-changes` once, on the merged diff.
+   `damkit:test-runner`, `/code-review` and `/damkit:review-changes` once, on the merged diff.
 4. **You** close the tickets. The tickets they blocked form the next frontier: go back to step 1.
 
 **Watch out:**
@@ -188,7 +188,7 @@ axes are reported separately and never merged or ranked together.
 **When:** a ticket touches code that you or the session haven't read, and you want the facts
 before the design.
 
-1. **You** run `/damstack:to-research-questions <ticket>`. Claude writes questions about the
+1. **You** run `/damkit:to-research-questions <ticket>`. Claude writes questions about the
    current code, with no trace of what you plan to build.
 2. **You** open a fresh session and run `/research` with only the questions file, never the
    ticket. You get `<area>-research.md`, with citations into the code.
@@ -203,7 +203,7 @@ that supports its favorite solution and skips the code that complicates it.
 **When:** after `/grill-with-docs`, the design changes code someone else owns, and they should
 review it before the spec is written.
 
-1. **You** run `/damstack:to-design-discussion` in the same session as the grill. Claude writes
+1. **You** run `/damkit:to-design-discussion` in the same session as the grill. Claude writes
    about 200 lines: current state, target state, patterns to follow and to avoid, decisions
    (D1, D2…) and open questions. Every pointer to code is verified.
 2. **You** send the document to the code owner.
@@ -218,9 +218,9 @@ review it before the spec is written.
 2. **You** or Claude run `pnpm gen:api` to generate the TypeScript types and client from OpenAPI
    (`frontend-stack`). An API change that breaks the frontend now fails in `tsc`, not in production.
 3. **Claude** builds the view as in [New UI view](#new-ui-view).
-4. **You** review: `/code-review`, then `/damstack:review-changes`. It runs `security-reviewer` and
+4. **You** review: `/code-review`, then `/damkit:review-changes`. It runs `security-reviewer` and
    `postgres-reviewer` on the backend and `frontend-reviewer` on the UI.
-5. **`damstack:test-runner`** runs pytest and vitest, and Playwright for the critical flow.
+5. **`damkit:test-runner`** runs pytest and vitest, and Playwright for the critical flow.
 
 **Watch out:** in `/to-tickets` this is one vertical ticket covering API, types and view.
 
@@ -281,7 +281,7 @@ change comes with before and after screenshots. The full guide: [design-system.m
    ```
    postgres-reviewer, assess this migration; the table has ~40M rows
    ```
-3. **`damstack:postgres-reviewer`** reports the lock level and the risk, and gives an
+3. **`damkit:postgres-reviewer`** reports the lock level and the risk, and gives an
    `EXPLAIN (ANALYZE, BUFFERS)` to run.
 4. **You** run it on data shaped like production, paste the result and decide.
 
@@ -299,10 +299,10 @@ failing Tekton run.
    ```
    cluster-investigator: the forest-web app hasn't been responding since this morning
    ```
-2. **`damstack:cluster-investigator`** reads the cluster: context, `get`, `describe`, logs, events,
+2. **`damkit:cluster-investigator`** reads the cluster: context, `get`, `describe`, logs, events,
    `argocd app get` and `diff`. It reports the cause (confirmed or likely), the evidence and a fix.
 3. **You** apply the fix in the GitOps repo, not with `kubectl apply`.
-4. **You** run `/damstack:review-changes` (it adds `platform-reviewer`), commit, and let ArgoCD sync.
+4. **You** run `/damkit:review-changes` (it adds `platform-reviewer`), commit, and let ArgoCD sync.
 
 **Watch out:** the agent fixes nothing itself, and the read-only hook blocks its `apply`, `delete`,
 `exec` and printing of Secrets. No cause after one run: [Hard or intermittent bug](#hard-or-intermittent-bug),
@@ -313,7 +313,7 @@ with the investigator supplying evidence.
 **When:** a pipeline failed in GitHub Actions, GitLab CI or Tekton.
 
 1. **You** paste the link or the log and ask "test-runner, diagnose".
-2. **`damstack:test-runner`** reproduces the failure with the same commands CI runs, and classifies
+2. **`damkit:test-runner`** reproduces the failure with the same commands CI runs, and classifies
    it: a bug, a wrong test, the environment, a flaky test, or "needs diagnosis".
 3. **Claude** fixes it in the main session.
 
@@ -328,8 +328,8 @@ with the investigator supplying evidence.
 **When:** a bug that resists a first look, a flaky test, or a regression between two known-good states.
 
 1. **You** run `/diagnosing-bugs`. It refuses to guess until it has one command that fails on this bug.
-2. damstack supplies that command:
-   - `damstack:test-runner` for a failing test or CI job;
+2. damkit supplies that command:
+   - `damkit:test-runner` for a failing test or CI job;
    - `EXPLAIN` from `postgres-reviewer` for a slow query;
    - evidence from `cluster-investigator` for the cluster.
 3. **Claude** fixes the bug with a regression test, and you review as in [the main flow](#the-main-flow).
@@ -342,7 +342,7 @@ with the investigator supplying evidence.
    ```
    docs-researcher: what changes when upgrading ArgoCD from 2.x to 3.x in our setup?
    ```
-2. **`damstack:docs-researcher`** reads the versions in the repo (`Chart.yaml`, lockfiles), then the
+2. **`damkit:docs-researcher`** reads the versions in the repo (`Chart.yaml`, lockfiles), then the
    official release notes, and reports with sources. Want the result kept in the repo? Use `/research` instead.
 3. The upgrade changes an earlier decision? **You** record it in `/grill-with-docs` as a new ADR
    that supersedes the old one.
@@ -365,7 +365,7 @@ alternatives. All three must hold.
 **When:** you want to learn a technology while doing a real task with it: homelab, platform
 engineering, frontend.
 
-1. **You** start the mentor with the task: `/damstack:mentor set up ArgoCD with app-of-apps on my k3s`.
+1. **You** start the mentor with the task: `/damkit:mentor set up ArgoCD with app-of-apps on my k3s`.
 2. **Claude** gives a mental model in up to 10 lines, the common pitfalls and a link to the docs.
 3. **Claude** builds the scaffolding. **You** write the parts marked `TODO(human)`.
 4. **Claude** asks you to predict a result ("what will `argocd app diff` show?"). You run it and compare.
@@ -379,16 +379,16 @@ sessions, use `/teach` in a separate directory, and practice its milestones here
 
 ## What to avoid
 
-- `/damstack:review-changes` **instead of** `/code-review`. It adds the Risk axis; it doesn't replace the other two.
+- `/damkit:review-changes` **instead of** `/code-review`. It adds the Risk axis; it doesn't replace the other two.
 - ADRs in any format other than `domain-modeling`'s.
 - A worker given a ticket with an open blocker or without agreed seams.
 - Triaging tickets that `/to-tickets` produced. They are ready for an agent by design.
-- Editing Matt's skills. Adjust damstack, or the `## Workflow` section in the project's `CLAUDE.md`.
+- Editing Matt's skills. Adjust damkit, or the `## Workflow` section in the project's `CLAUDE.md`.
 - A second process framework next to these two.
 
 ## Without Matt's skills
 
-damstack works on its own too: knowledge skills, reviewers, `test-runner`, `cluster-investigator`
+damkit works on its own too: knowledge skills, reviewers, `test-runner`, `cluster-investigator`
 and the read-only hook. References to `/code-review`, `/tdd`, `domain-modeling` and `docs/agents/`
-are then skipped, and the Risk axis works as a regular review. damstack doesn't run a process or
+are then skipped, and the Risk axis works as a regular review. damkit doesn't run a process or
 write ADRs on its own.

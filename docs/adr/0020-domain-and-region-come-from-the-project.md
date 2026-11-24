@@ -1,11 +1,11 @@
-# ADR-0020: devkit serves any GIS project; domain, region and CRS come from the project
+# ADR-0020: damkit serves any GIS project; domain, region and CRS come from the project
 
-- Status: Accepted (extends [ADR-0019](0019-setup-devkit-writes-project-claude-md.md) from languages to domain and region)
+- Status: Accepted (extends [ADR-0019](0019-setup-damkit-writes-project-claude-md.md) from languages to domain and region)
 - Date: 2026-11-16
 
 ## Context
 
-devkit grew out of my projects: a forestry platform, a geodata validator, a k3s homelab, all with data
+damkit grew out of my projects: a forestry platform, a geodata validator, a k3s homelab, all with data
 in Poland. ADR-0019 stopped skills from assuming Polish UI copy, but my context still leaked into
 behavior in other places:
 - the starter `tokens.css`, which is copied into projects, named its accent palette `--forest-*`;
@@ -15,8 +15,8 @@ behavior in other places:
 
 ## Decision
 
-- devkit is for any GIS specialist on this stack. Skills don't assume a domain, a country or a CRS.
-- The storage CRS comes from `## Data & GIS` in the project's `CLAUDE.md` or its ADR. `setup-devkit`
+- damkit is for any GIS specialist on this stack. Skills don't assume a domain, a country or a CRS.
+- The storage CRS comes from `## Data & GIS` in the project's `CLAUDE.md` or its ADR. `setup-damkit`
   reads it from the SRID of existing geometry columns; otherwise it stays a question for `/grill-with-docs`.
 - EPSG:2180, Geoportal, BDL and forestry stay as **examples**, named next to other national grids
   (27700, 25832/25833, UTM) where a choice is described.
@@ -32,5 +32,5 @@ behavior in other places:
 ## Consequences
 
 - Examples in README, `docs/` and hook tests (`forest-web`) stay as they are.
-- ADR-0001 and ADR-0007 still name my projects; they record why devkit was built.
+- ADR-0001 and ADR-0007 still name my projects; they record why damkit was built.
 - A project without `## Data & GIS` gets asked about its CRS instead of silently getting 2180.

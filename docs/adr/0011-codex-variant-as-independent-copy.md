@@ -5,9 +5,9 @@
 
 ## Context
 
-I want devkit in Codex CLI (0.156) with OpenAI models as well. Codex has plugins
+I want damkit in Codex CLI (0.156) with OpenAI models as well. Codex has plugins
 (`.codex-plugin/plugin.json`) with skills and hooks, and a marketplace (`.agents/plugins/marketplace.json`),
-but it differs from Claude Code in places devkit relies on:
+but it differs from Claude Code in places damkit relies on:
 - a plugin **cannot contain agents**. Agents are TOML files in `<project>/.codex/agents/`
   (`developer_instructions`, `model`, `model_reasoning_effort`, `sandbox_mode`);
 - the documentation does not describe the **agent type** in the `PreToolUse` hook input, so we can't rely on
@@ -21,7 +21,7 @@ but it differs from Claude Code in places devkit relies on:
 - **`codex/` is an independent, manually adapted copy**: the `dampe` plugin and marketplace in one
   directory, 16 skills, 9 roles. Only real files, no symlinks and no references outside `codex/`.
 - **Roles as TOML installed by a script** (`codex/scripts/install_agents.py`) into the project's
-  `.codex/agents/`, together with the guard in `.codex/devkit/`. Names in snake_case (`code_reviewer`).
+  `.codex/agents/`, together with the guard in `.codex/damkit/`. Names in snake_case (`code_reviewer`).
 - **Read-only = sandbox + guard in the role's TOML.** `sandbox_mode = "read-only"` is the main boundary.
   A port of the guard (without the agent filter) is wired as `[[hooks.PreToolUse]]` into the file of each of the 7 roles
   from `READONLY_AGENTS`. `probe_agent_hooks.sh` checks whether Codex honors hooks from the agent layer.
@@ -33,7 +33,7 @@ but it differs from Claude Code in places devkit relies on:
 - **`codex/skills/` generated from `skills/` + a test detecting drift**: one source of truth, but
   an extra tool and transformations for two audiences. Rejected: I prefer an independent copy that
   can be changed for Codex without worrying about a generator.
-- **Symlinks to `../skills`**: the content would stay Claude-specific (`/devkit:…`, subagent names,
+- **Symlinks to `../skills`**: the content would stay Claude-specific (`/damkit:…`, subagent names,
   `${CLAUDE_PLUGIN_ROOT}`), and Codex copies the plugin into a cache, so symlinks may not survive installation.
 - **A global guard in a plugin or project hook**: without a reliable agent type, it would also block the main
   session (`git commit`, `rm`, `npm install`). If the probe shows that `agent_type` is filled in,

@@ -4,7 +4,7 @@
   "description": "Personal Claude Code plugins.",
   "plugins": [
     {
-      "name": "damstack",
+      "name": "damkit",
       "source": "./",
       "description": "Role-based subagents and technology skills for Python/Django, PostGIS, Kubernetes and platform engineering."
     }

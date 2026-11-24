@@ -63,10 +63,10 @@ Rules:
 2. You build from primitives to composites: Button, Input, Label → FormField → Dialog → Table → patterns.
 3. Every component gets a story with **all states**: default, hover/focus, disabled, loading,
    error, long text, both themes, both densities.
-4. After each component: `/damstack:review-changes`. `frontend-reviewer` checks accessibility
+4. After each component: `/damkit:review-changes`. `frontend-reviewer` checks accessibility
    and consistency, and if Storybook is running, takes screenshots.
 
-This stage is a good candidate for `/damstack:mentor`. Tokens and accessible components (focus trap in Dialog,
+This stage is a good candidate for `/damkit:mentor`. Tokens and accessible components (focus trap in Dialog,
 ARIA roles in Tabs) are worth writing yourself at least once.
 
 ## Phase 3: enforcement
@@ -78,7 +78,7 @@ What can be checked automatically doesn't go into the prompt:
 - Visual tests: Playwright `toHaveScreenshot()` on stories. They are stable, unlike
   map tiles.
 - CI: lint + visual component tests on changes in `components/ui/`.
-- The project's `CLAUDE.md`: the **Design** section from the template (`skills/setup-damstack/assets/CLAUDE.project.md`), that is
+- The project's `CLAUDE.md`: the **Design** section from the template (`skills/setup-damkit/assets/CLAUDE.project.md`), that is
   where the tokens and components are, the product's character, density, rules for UI copy.
 
 ## Daily work with Claude
@@ -91,7 +91,7 @@ What can be checked automatically doesn't go into the prompt:
      → you accept or correct the structure before any code is written
 3. Implementation only from DS components and tokens, with all states
 4. Visual loop: screenshots at 375 px and 1280 px (+ dark), Claude looks and fixes
-5. /damstack:review-changes → frontend-reviewer (code + screenshots) → fixes
+5. /damkit:review-changes → frontend-reviewer (code + screenshots) → fixes
 ```
 
 ### A component is missing

@@ -1,6 +1,6 @@
 # ADR-0021: The plugin is renamed from devkit to geostack
 
-- Status: Superseded by [ADR-0028](0028-rename-to-damstack.md)
+- Status: Superseded by [ADR-0028](0028-rename-to-damkit.md)
 - Date: 2026-11-16
 
 ## Context

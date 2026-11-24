@@ -2,11 +2,11 @@
 
 - Status: Accepted
 - Date: 2026-10-07
-- Amends: ADR-0013 (devkit may add a process step where Matt's flow has none)
+- Amends: ADR-0013 (damkit may add a process step where Matt's flow has none)
 
 ## Context
 
-ADR-0013 handed the whole process to Matt's skills, so that devkit wouldn't compete with them for triggers. Matt's
+ADR-0013 handed the whole process to Matt's skills, so that damkit wouldn't compete with them for triggers. Matt's
 flow, however, has two gaps that show up with tickets in existing code the session doesn't know:
 
 - **Research is biased.** `/research` or grilling with the ticket in context makes
@@ -20,7 +20,7 @@ None of Matt's skills does either of these things, so adding them doesn't duplic
 
 ## Decision
 
-- Devkit may add a process step only where Matt's flow has none. The step hands its output to
+- Damkit may add a process step only where Matt's flow has none. The step hands its output to
   one of Matt's steps, reads his `docs/agents/*.md` and uses terms from `CONTEXT.md`.
   It neither replaces nor edits Matt's steps.
 - `to-research-questions`: ticket → 6–8 questions about the current state of the code, without the intent (leak test).
@@ -50,5 +50,5 @@ None of Matt's skills does either of these things, so adding them doesn't duplic
 - The full flow for unfamiliar code: `/to-research-questions` → `/research` (fresh session) →
   `/grill-with-docs` → `/to-design-discussion` → code owner review → `/to-spec` → `/to-tickets` → `/implement`.
 - Without Matt's skills, neither step works: they read `docs/agents/*.md` and hand their output to his steps.
-- A new process step in devkit requires showing a gap in Matt's flow and the step it hands its output to.
+- A new process step in damkit requires showing a gap in Matt's flow and the step it hands its output to.
 - The `codex/` variant doesn't have them yet (ADR-0011).

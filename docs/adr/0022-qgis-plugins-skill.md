@@ -5,7 +5,7 @@
 
 ## Context
 
-geostack covered the web side of GIS work (Django/FastAPI, PostGIS, web maps, validators, Kubernetes),
+damkit covered the web side of GIS work (Django/FastAPI, PostGIS, web maps, validators, Kubernetes),
 but GIS specialists also write QGIS plugins and PyQGIS scripts, often as the desktop client of the
 same services. The model knows PyQGIS, yet it is costly in a few places: touching the GUI or project
 layers from a background thread crashes QGIS without a traceback, `unload()` leaks surface only after a

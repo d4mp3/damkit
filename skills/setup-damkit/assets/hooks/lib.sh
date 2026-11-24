@@ -1,5 +1,5 @@
-# Shared helpers for the damstack hooks in .claude/hooks/. Sourced, not run.
-# Copied into the project by /damstack:setup-damstack; edit freely.
+# Shared helpers for the damkit hooks in .claude/hooks/. Sourced, not run.
+# Copied into the project by /damkit:setup-damkit; edit freely.
 
 # Path of the edited file from the hook's JSON on stdin (empty when there is none).
 hook_file_path() {

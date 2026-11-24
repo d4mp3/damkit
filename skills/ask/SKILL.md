@@ -1,18 +1,18 @@
 ---
 name: ask
-description: "Ask which damstack workflow, agent or skill fits your situation, and how it plugs into Matt Pocock's flow."
+description: "Ask which damkit workflow, agent or skill fits your situation, and how it plugs into Matt Pocock's flow."
 disable-model-invocation: true
 argument-hint: "[your situation or question]"
 ---
 
-# Ask damstack
+# Ask damkit
 
 The user describes a situation or asks how to get something done. Point them to the workflow that
 fits, and walk them through it for *their* case. You guide; you don't run the workflow.
 
 ## 1. Read the map
 
-Read `${CLAUDE_PLUGIN_ROOT}/docs/workflows.md`. It is the only source of damstack's workflows:
+Read `${CLAUDE_PLUGIN_ROOT}/docs/workflows.md`. It is the only source of damkit's workflows:
 - "Find your situation" is the index to match the question against;
 - "The main flow" is the path most work follows, and the three review axes;
 - each workflow has a **When** line, numbered steps and **Watch out** points.
@@ -25,7 +25,7 @@ Answer from these files. Don't invent steps, commands or agents they don't conta
 ## 2. Look at the project (read only, a few seconds)
 
 Check what the answer depends on:
-- `CLAUDE.md` with a `## Workflow` section: has `/damstack:setup-damstack` run?
+- `CLAUDE.md` with a `## Workflow` section: has `/damkit:setup-damkit` run?
 - `skills-lock.json`, `.claude/skills/` or `docs/agents/`: are Matt's skills installed and set up?
 - `## Language` in `CLAUDE.md`: the conversation language to answer in.
 

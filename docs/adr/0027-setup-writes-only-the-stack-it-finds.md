@@ -1,12 +1,12 @@
-# ADR-0027: setup-geostack asks for the stack and writes only the sections it needs
+# ADR-0027: setup-damkit asks for the stack and writes only the sections it needs
 
-- Status: Accepted (refines [ADR-0019](0019-setup-devkit-writes-project-claude-md.md) and [ADR-0024](0024-setup-writes-project-settings.md))
+- Status: Accepted (refines [ADR-0019](0019-setup-damkit-writes-project-claude-md.md) and [ADR-0024](0024-setup-writes-project-settings.md))
 - Date: 2026-11-16
 
 ## Context
 
-geostack covers a whole stack (Django or FastAPI, React, PostGIS, maps, containers, Kubernetes, GitOps),
-but most projects use only part of it. `setup-geostack` dropped `## Frontend`, `## Data & GIS` and
+damkit covers a whole stack (Django or FastAPI, React, PostGIS, maps, containers, Kubernetes, GitOps),
+but most projects use only part of it. `setup-damkit` dropped `## Frontend`, `## Data & GIS` and
 `## Deployment` only when the repo showed they didn't apply. In a fresh repo nothing showed that, so
 the project's `CLAUDE.md` got every section, with placeholders for layers it would never have. The
 template's commands were real uv and pnpm lines rather than placeholders, and the review-changes rule

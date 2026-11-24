@@ -34,7 +34,7 @@ acceptable single screen, but not a consistent platform, and it costs my time on
 ## Consequences
 
 - The character, brand and patterns of a specific product live in the product's repo (`CLAUDE.md`, tokens,
-  Storybook), not in devkit.
+  Storybook), not in damkit.
 - The visual loop requires a running dev server or Storybook, and Playwright browsers.
   Without them, the agent must state explicitly that there was no visual verification.
 - No skill replaces UX research with users (interviews, tests).

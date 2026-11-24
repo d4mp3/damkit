@@ -5,7 +5,7 @@
 
 ## Context
 
-ADR-0024 had `setup-geostack` build hooks from each project's commands. In practice the model would
+ADR-0024 had `setup-damkit` build hooks from each project's commands. In practice the model would
 then write a new inline shell one-liner per project, with the subtle parts redone each time:
 - reading the edited path from the hook's JSON;
 - exit 2 rather than 1, and stderr rather than stdout;
@@ -17,7 +17,7 @@ The user also asked for concrete tooling: ruff and mypy for Python, the equivale
 
 ## Decision
 
-- Three scripts live in `skills/setup-geostack/assets/hooks/`. Setup copies them to the project's
+- Three scripts live in `skills/setup-damkit/assets/hooks/`. Setup copies them to the project's
   `.claude/hooks/`, and the settings template registers them:
   - `format.sh` on `PostToolUse` (`Edit|Write`) formats the edited file: ruff format or black,
     prettier or biome. It exits 2 only on a parse error.
@@ -33,8 +33,8 @@ The user also asked for concrete tooling: ruff and mypy for Python, the equivale
 
 ## Alternatives considered
 
-- **Plugin-level hooks (`hooks/hooks.json` in geostack)**: no copying, but they would run in every
-  project with geostack enabled. They would also miss teammates without the plugin and cloud sessions,
+- **Plugin-level hooks (`hooks/hooks.json` in damkit)**: no copying, but they would run in every
+  project with damkit enabled. They would also miss teammates without the plugin and cloud sessions,
   where plugins don't load.
 - **Inline commands generated per project (ADR-0024 as written)**: different, untested logic in every
   repo.

@@ -16,10 +16,10 @@ The read-only guard also had a gap: it unwrapped `k3s kubectl` but not `microk8s
 
 ## Decision
 
-- geostack supports Kubernetes in any distribution: managed (EKS, GKE, AKS), OpenShift, k3s, RKE2,
+- damkit supports Kubernetes in any distribution: managed (EKS, GKE, AKS), OpenShift, k3s, RKE2,
   local clusters. No skill or agent assumes one.
 - The cluster's facts come from `## Deployment` in the project's `CLAUDE.md`: distribution, node
-  architectures, ingress or Gateway class, StorageClass, GitOps repo. `setup-geostack` reads them from
+  architectures, ingress or Gateway class, StorageClass, GitOps repo. `setup-damkit` reads them from
   manifests and infrastructure code. Without them, agents read the live cluster or state their
   assumption.
 - `kubernetes-manifests` names what differs between clusters and breaks manifests (ingress, storage

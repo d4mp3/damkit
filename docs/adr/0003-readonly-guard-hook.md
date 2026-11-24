@@ -14,7 +14,7 @@ there.
 
 - `hooks/hooks.json` registers a `PreToolUse` hook on Bash that runs `hooks/guard_readonly.py`.
 - The script acts only for agents in the `READONLY_AGENTS` list (it recognizes them by `agent_type`,
-  e.g. `devkit:cluster-investigator`). The main session and `implementation-worker` are not restricted.
+  e.g. `damkit:cluster-investigator`). The main session and `implementation-worker` are not restricted.
 - Cluster tools use a list of allowed verbs (allowlist). git, docker
   and psql use a denylist. Commands that cannot be parsed are rejected.
 - `Edit`/`Write` are additionally disabled via `disallowedTools`.
