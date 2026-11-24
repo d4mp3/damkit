@@ -1,16 +1,16 @@
 ---
-name: setup-geostack
-description: "Write or complete the project's CLAUDE.md (geostack's workflow, the project's commands, its language settings, sections only for the stack it uses) and its shared .claude/settings.json (deny rules, check hooks, the geostack plugin). Run once per project, before /setup-matt-pocock-skills."
+name: setup-damstack
+description: "Write or complete the project's CLAUDE.md (damstack's workflow, the project's commands, its language settings, sections only for the stack it uses) and its shared .claude/settings.json (deny rules, check hooks, the damstack plugin). Run once per project, before /setup-matt-pocock-skills."
 disable-model-invocation: true
 ---
 
-# Setup geostack
+# Setup damstack
 
-Write the project's `CLAUDE.md` from `${CLAUDE_PLUGIN_ROOT}/skills/setup-geostack/assets/CLAUDE.project.md`,
+Write the project's `CLAUDE.md` from `${CLAUDE_PLUGIN_ROOT}/skills/setup-damstack/assets/CLAUDE.project.md`,
 filled with what the repo shows and what only the user knows, and its shared `.claude/settings.json` from
-`${CLAUDE_PLUGIN_ROOT}/skills/setup-geostack/assets/settings.project.json`. It is the step before
+`${CLAUDE_PLUGIN_ROOT}/skills/setup-damstack/assets/settings.project.json`. It is the step before
 `/setup-matt-pocock-skills`, which appends its `## Agent skills` block to the `CLAUDE.md` it finds.
-Running in this order keeps geostack's `## Workflow` rules and Matt's pointers in one file.
+Running in this order keeps damstack's `## Workflow` rules and Matt's pointers in one file.
 
 This skill records **facts**, not decisions. Storage CRS, map library, design system foundation and
 deployment layout are decisions: they belong to `/grill-with-docs` and end in ADRs. Where the repo has
@@ -24,7 +24,7 @@ or the user knows it. The `CLAUDE.md` gets only the sections and lines that this
 
 - `CLAUDE.md` exists → you will **complete** it, never rewrite it. Note which template sections it lacks.
 - Only `AGENTS.md` exists → ask which file holds the project instructions and work on that one.
-- `## Agent skills` is already present → `/setup-matt-pocock-skills` ran first. That's fine: add geostack's
+- `## Agent skills` is already present → `/setup-matt-pocock-skills` ran first. That's fine: add damstack's
   sections above that block and leave it untouched.
 
 ### 2. Read the repo
@@ -87,7 +87,7 @@ don't skip it, even when every answer is English.
 - New file: fill the template for the stack from steps 2–3. Its sections and some lines carry a
   `when:` comment: keep them only where it holds for this project, then drop every comment. Keep
   `## Workflow` as written, except that its review-changes line names only the risk areas the project
-  has: the section is how Matt's `/implement` learns when to call geostack's agents.
+  has: the section is how Matt's `/implement` learns when to call damstack's agents.
 - Existing file: add only the sections and command lines the stack needs and the file lacks, e.g. a
   frontend that appeared since the last run. When the file and the repo
   disagree (e.g. a test command CI no longer runs), ask instead of choosing.
@@ -105,7 +105,7 @@ on conflicts. Never touch `.claude/settings.local.json`.
   If the repo commits a `.env.example`, replace `Read(./.env.*)` with the ignored env files by name, so
   Claude can still read the example.
 - **Ask** before what leaves the machine: `git push`, opening and merging PRs.
-- **Hooks**: copy `${CLAUDE_PLUGIN_ROOT}/skills/setup-geostack/assets/hooks/` (`lib.sh`, `format.sh`,
+- **Hooks**: copy `${CLAUDE_PLUGIN_ROOT}/skills/setup-damstack/assets/hooks/` (`lib.sh`, `format.sh`,
   `check.sh`) to `.claude/hooks/` and make the two scripts executable. A script that already exists there
   is the project's own copy: leave it, and ask before replacing it. The template registers them:
   - `format.sh` on `PostToolUse` (`Edit|Write`) formats the edited file with the formatter the project
@@ -119,7 +119,7 @@ on conflicts. Never touch `.claude/settings.local.json`.
   (mypy on a large untyped codebase), list the wanted tools as arguments instead
   (`check.sh ruff eslint tsc`) and say why. How the hooks work, for the user:
   `${CLAUDE_PLUGIN_ROOT}/docs/project-settings.md`.
-- **Plugins**: keep `geostack@dampe` and its marketplace, so teammates and cloud sessions get geostack.
+- **Plugins**: keep `damstack@dampe` and its marketplace, so teammates and cloud sessions get damstack.
 - Leave out what a project file can't or shouldn't set: `defaultMode: "auto"` and `autoMode` are ignored
   there, and personal choices (`statusLine`, `model`, sandbox paths for one machine) belong in user
   settings or `.claude/settings.local.json`.

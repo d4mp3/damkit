@@ -13,7 +13,7 @@ existing code win.
 
 - API types and the client are generated from the backend's OpenAPI schema (FastAPI natively,
   DRF through drf-spectacular). Use the project's generator and script (`pnpm gen:api` in the
-  geostack template). API types are always generated output.
+  damstack template). API types are always generated output.
 - After an API change: regenerate, commit the client, then `tsc --noEmit`. A green `pnpm build`
   says nothing about types, because Vite strips them unchecked.
 - CI regenerates the client and fails on a diff, so a backend change that breaks the frontend

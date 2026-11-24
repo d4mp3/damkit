@@ -34,7 +34,7 @@ Generate what can be generated from the code. Skip the rest.
 
 ## Lifecycle
 
-| Event | What you do | geostack help |
+| Event | What you do | damstack help |
 |---|---|---|
 | A decision that is hard to reverse was made | new ADR | `/grill-with-docs` writes it along the way; outside it, skill `domain-modeling` |
 | A decision changes | new ADR that supersedes the old one; in the old one you change only the status | skill `domain-modeling` |
@@ -52,7 +52,7 @@ Generate what can be generated from the code. Skip the rest.
 - [ ] Do new comments say "why", not "what"?
 - [ ] Did I avoid adding a description of code that will go stale with the next change?
 
-`/geostack:review-changes` (`code-reviewer`) checks the first two items automatically.
+`/damstack:review-changes` (`code-reviewer`) checks the first two items automatically.
 
 ## Anti-patterns
 

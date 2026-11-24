@@ -1,29 +1,29 @@
-# geostack (Claude Code plugin)
+# damstack (Claude Code plugin)
 
-This repo is both a Claude Code plugin (`geostack`) and its marketplace (`dampe`).
+This repo is both a Claude Code plugin (`damstack`) and its marketplace (`dampe`).
 All text in the repo, including README and docs/, is in English (ADR-0018).
 
 ## Commands
 - Validate manifests: `claude plugin validate .`
 - Guard hook tests: `python3 hooks/test_guard_readonly.py`
-- Try the plugin without installing: `claude --plugin-dir .` (from any project dir: `--plugin-dir ~/dev/geostack`)
+- Try the plugin without installing: `claude --plugin-dir .` (from any project dir: `--plugin-dir ~/dev/damstack`)
 - Refresh an installed copy: `claude plugin marketplace update dampe`
 
 ## Conventions
-- Process belongs to Matt Pocock's skills (ADR-0013): geostack has no own idea→ship flow, ADR
+- Process belongs to Matt Pocock's skills (ADR-0013): damstack has no own idea→ship flow, ADR
   format, glossary or multi-session teaching. A skill or agent description must not compete
   with their triggers (`review`, ADRs, `CONTEXT.md`, study plans); plug into their steps instead
   (Risk axis after /code-review, frontier tickets for implementation-worker). Don't edit their skills.
-- geostack adds a process step only where Matt's flow has none, and the step hands its output to
+- damstack adds a process step only where Matt's flow has none, and the step hands its output to
   one of his (ADR-0015). Today these are the QRSPI steps: `to-research-questions` (ticket →
   questions for a blind `/research` in a fresh session) and `to-design-discussion` (after
-  `/grill-with-docs` → document for a code-owner review → `/to-spec`), plus `setup-geostack`
+  `/grill-with-docs` → document for a code-owner review → `/to-spec`), plus `setup-damstack`
   (project `CLAUDE.md` and `.claude/settings.json` → `/setup-matt-pocock-skills`, ADR-0019, ADR-0024). They read Matt's
   `docs/agents/*.md` and use his terms; a new step follows the same rules.
 - Skills and agents don't assume a language, domain, country, CRS or cluster for the user's projects:
   UI copy, locale and docs language come from the project's `## Language` section (ADR-0019), the
   storage CRS from `## Data & GIS` (ADR-0020), the cluster from `## Deployment` (ADR-0023);
-  `setup-geostack` writes all three. Forestry, Poland, EPSG:2180 and a k3s homelab are examples only.
+  `setup-damstack` writes all three. Forestry, Poland, EPSG:2180 and a k3s homelab are examples only.
 - A process step's `description` names the artifact it produces ("Turn a ticket into research
   questions…"): the artifact is the trigger word, so the when-to-use rule below doesn't apply to them.
 - Agents are stack-agnostic roles; technology knowledge goes into skills (ADR-0002).

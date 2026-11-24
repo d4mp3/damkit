@@ -1,6 +1,6 @@
 # <Project name>
 
-<!-- Template for /geostack:setup-geostack, which fills it from the repo and the user's answers.
+<!-- Template for /damstack:setup-damstack, which fills it from the repo and the user's answers.
      By hand: copy to the project root as CLAUDE.md, fill it in, then run /setup-matt-pocock-skills:
      it appends its own `## Agent skills` block here. Keep it short: only what the model can't infer
      from the code. A `when:` comment says which projects need that section or line: delete what
@@ -14,19 +14,19 @@
      auth/permissions/input parsing with a backend, models/migrations/SQL with a database,
      Docker/k8s/CI for those it uses, frontend with a UI. -->
 Process follows Matt Pocock's skills (/grill-with-docs → /to-spec → /to-tickets → /implement).
-geostack adds stack knowledge, specialist agents and two optional steps; it never replaces a step.
-- Ticket in code the session doesn't know yet: /geostack:to-research-questions first, answer them
+damstack adds stack knowledge, specialist agents and two optional steps; it never replaces a step.
+- Ticket in code the session doesn't know yet: /damstack:to-research-questions first, answer them
   with /research in a fresh session (only the questions file, never the ticket), then
   /grill-with-docs with the ticket and the research file.
-- Design worth a code owner's review before the spec: /geostack:to-design-discussion after
+- Design worth a code owner's review before the spec: /damstack:to-design-discussion after
   /grill-with-docs, resolve the review in the same session, then /to-spec.
-- Project ADRs and `CONTEXT.md` override geostack skills; the contracts those skills describe are
+- Project ADRs and `CONTEXT.md` override damstack skills; the contracts those skills describe are
   proposals until an ADR settles them.
 - After /code-review: if the diff touches auth/permissions/input parsing, models/migrations/SQL,
-  Docker/k8s/CI or frontend, run /geostack:review-changes on the same fixed point and report it
+  Docker/k8s/CI or frontend, run /damstack:review-changes on the same fixed point and report it
   as a separate `## Risk` section. Don't merge or rerank it with Standards and Spec.
-- Final test/lint/type run: delegate to geostack:test-runner.
-- Tickets whose blockers are all done may run in parallel, one geostack:implementation-worker
+- Final test/lint/type run: delegate to damstack:test-runner.
+- Tickets whose blockers are all done may run in parallel, one damstack:implementation-worker
   per ticket. Each worker commits on its own branch; review once after merging those branches.
 
 ## Language
@@ -54,7 +54,7 @@ geostack adds stack knowledge, specialist agents and two optional steps; it neve
 - <patterns to follow: e.g. service layer in `services.py`, no logic in views>
 
 ## Frontend
-<!-- when: a web frontend. The first line is geostack's default for React; with another framework,
+<!-- when: a web frontend. The first line is damstack's default for React; with another framework,
      write what the project uses instead. -->
 - React + TypeScript (Vite), server state: TanStack Query, forms: React Hook Form + zod,
   URL-addressable state (filters, tabs, map view, pagination): search params
@@ -90,6 +90,6 @@ geostack adds stack knowledge, specialist agents and two optional steps; it neve
 - <non-obvious rules, e.g. "never call external APIs inside a transaction">
 - <one-line pointers to ADRs that constrain everyday coding, e.g. "Geometries stored in EPSG:2180, see docs/adr/0003-storage-crs.md">
 
-## Learning goals (optional, used by /geostack:mentor)
+## Learning goals (optional, used by /damstack:mentor)
 <!-- when: the user named goals -->
 - <e.g. "I want to write the NetworkPolicies and ArgoCD ApplicationSets myself">

@@ -42,11 +42,11 @@
     "dampe": {
       "source": {
         "source": "github",
-        "repo": "d4mp3/geostack"
+        "repo": "d4mp3/damstack"
       }
     }
   },
   "enabledPlugins": {
-    "geostack@dampe": true
+    "damstack@dampe": true
   }
 }

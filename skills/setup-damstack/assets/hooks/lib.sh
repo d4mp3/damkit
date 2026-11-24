@@ -1,5 +1,5 @@
-# Shared helpers for the geostack hooks in .claude/hooks/. Sourced, not run.
-# Copied into the project by /geostack:setup-geostack; edit freely.
+# Shared helpers for the damstack hooks in .claude/hooks/. Sourced, not run.
+# Copied into the project by /damstack:setup-damstack; edit freely.
 
 # Path of the edited file from the hook's JSON on stdin (empty when there is none).
 hook_file_path() {
