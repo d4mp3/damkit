@@ -18,6 +18,7 @@ and a name like **`damkit:test-runner`** means a subagent that Claude delegates 
 | Several tickets with all their blockers closed | [Parallel tickets](#parallel-tickets) |
 | A ticket in code that you or the session don't know yet | [Ticket in unfamiliar code](#ticket-in-unfamiliar-code) |
 | A design to show the code owner before the spec | [Design review by the code owner](#design-review-by-the-code-owner) |
+| A branch or PR too large to review in one piece | [Splitting a large PR](#splitting-a-large-pr) |
 | An API in Django or FastAPI plus a React view | [Fullstack feature](#fullstack-feature) |
 | A new screen or component | [New UI view](#new-ui-view) |
 | A frontend without a design system | [Building a design system](#building-a-design-system) |
@@ -208,6 +209,32 @@ review it before the spec is written.
    (D1, D2…) and open questions. Every pointer to code is verified.
 2. **You** send the document to the code owner.
 3. **You** bring their comments back to the same session, resolve them, then run `/to-spec`.
+
+## Splitting a large PR
+
+**When:** a branch or an open PR is too large to review well in one piece (roughly over
+600 changed lines, not counting lockfiles and generated code), usually after a long `/implement`
+or several merged workers.
+
+1. **You** run `/damkit:split-pr` on the branch. Claude pins the branch tip and a backup ref,
+   checks whether `gh stack` is installed and plans the layers: docs, refactors, schema, logic,
+   UI, then the flag flip. Each layer has 200–600 lines and is a two-way door except the last one.
+2. **You** approve or change the plan table. Nothing is written before that.
+3. **Sub-agents**, one per layer and one after another, build each branch on the previous one
+   from the original commit, splitting shared files by hunk. Each runs the tests and checks that
+   its layer is reversible: additive migrations, unchanged test assertions and contracts, new code
+   unreachable with the flag off.
+4. **Claude** checks that the top of the stack equals the original commit, then, after you agree,
+   pushes the branches and opens the PRs (`gh stack submit`, or `gh pr create --base` per layer).
+5. **You** review each PR against its parent: `/code-review <parent>`, plus
+   `/damkit:review-changes <parent>` for layers in risk areas. Merge bottom up with
+   `gh stack merge` once CI is green.
+
+**Watch out:**
+- A behavior change needs a feature flag. Claude adds it to the original branch before splitting,
+  so the stack still ends identical to it.
+- Keep the original branch and the backup ref until the stack is merged.
+- Smaller PRs from the start are cheaper: tickets from `/to-tickets` are the first split.
 
 ## Fullstack feature
 

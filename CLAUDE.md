@@ -17,7 +17,8 @@ All text in the repo, including README and docs/, is in English (ADR-0018).
 - damkit adds a process step only where Matt's flow has none, and the step hands its output to
   one of his (ADR-0015). Today these are the QRSPI steps: `to-research-questions` (ticket →
   questions for a blind `/research` in a fresh session) and `to-design-discussion` (after
-  `/grill-with-docs` → document for a code-owner review → `/to-spec`), plus `setup-damkit`
+  `/grill-with-docs` → document for a code-owner review → `/to-spec`), plus `split-pr` (large
+  branch → stack of small PRs → `/code-review` per PR, ADR-0029) and `setup-damkit`
   (project `CLAUDE.md` and `.claude/settings.json` → `/setup-matt-pocock-skills`, ADR-0019, ADR-0024). They read Matt's
   `docs/agents/*.md` and use his terms; a new step follows the same rules.
 - Skills and agents don't assume a language, domain, country, CRS or cluster for the user's projects:
