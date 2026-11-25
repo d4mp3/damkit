@@ -144,8 +144,8 @@ up, put it behind the flag, merge layers) and tell the user if the change crosse
 Report the stack table with PR URLs, and give the user:
 - **Review**: each PR on its own fixed point, `/code-review <parent branch>`, and
   `/damkit:review-changes <parent branch>` for the layers that touch risk areas.
-- **Merge** after green CI: stack mode `gh stack merge` (atomic, bottom up to the chosen PR). Plain mode:
-  the loop in [references/stack-commands.md](references/stack-commands.md).
+- **Merge** after review: `/damkit:merge-stack <top PR>` merges the PRs bottom up, one at a time,
+  each on green CI.
 - **Cleanup**, only after the integrity check passed: close the original PR with a link to the
-  stack, and delete the source branch and `split-pr/backup-<branch>` once the stack is merged.
-  Suggest these commands; don't run them yourself.
+  stack. The source branch and `split-pr/backup-<branch>` stay until the stack is merged;
+  `merge-stack` suggests deleting them.

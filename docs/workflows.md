@@ -19,6 +19,7 @@ and a name like **`damkit:test-runner`** means a subagent that Claude delegates 
 | A ticket in code that you or the session don't know yet | [Ticket in unfamiliar code](#ticket-in-unfamiliar-code) |
 | A design to show the code owner before the spec | [Design review by the code owner](#design-review-by-the-code-owner) |
 | A branch or PR too large to review in one piece | [Splitting a large PR](#splitting-a-large-pr) |
+| A reviewed stack, or several PRs that must land in order | [Merging a stack of PRs](#merging-a-stack-of-prs) |
 | An API in Django or FastAPI plus a React view | [Fullstack feature](#fullstack-feature) |
 | A new screen or component | [New UI view](#new-ui-view) |
 | A frontend without a design system | [Building a design system](#building-a-design-system) |
@@ -227,14 +228,34 @@ or several merged workers.
 4. **Claude** checks that the top of the stack equals the original commit, then, after you agree,
    pushes the branches and opens the PRs (`gh stack submit`, or `gh pr create --base` per layer).
 5. **You** review each PR against its parent: `/code-review <parent>`, plus
-   `/damkit:review-changes <parent>` for layers in risk areas. Merge bottom up with
-   `gh stack merge` once CI is green.
+   `/damkit:review-changes <parent>` for layers in risk areas. Then merge it:
+   [Merging a stack of PRs](#merging-a-stack-of-prs).
 
 **Watch out:**
 - A behavior change needs a feature flag. Claude adds it to the original branch before splitting,
   so the stack still ends identical to it.
 - Keep the original branch and the backup ref until the stack is merged.
 - Smaller PRs from the start are cheaper: tickets from `/to-tickets` are the first split.
+
+## Merging a stack of PRs
+
+**When:** the PRs of a stack (from `/damkit:split-pr` or built by hand) are reviewed, or several
+independent PRs have to land on the trunk in a given order.
+
+1. **You** run `/damkit:merge-stack` with the PR numbers bottom to top, or on any branch of the
+   stack. Claude finds the order, the merge method the repo allows and the head commit of each PR.
+2. **You** approve the plan table: CI, review and door of every PR. Nothing is merged before that.
+3. **Claude** merges one PR at a time: waits for green CI, merges it pinned to the tested commit,
+   then rebases the next PR onto the trunk, checks that its own diff didn't change, retargets it
+   and waits for its CI again. The one-way door PR at the top is confirmed once more before it merges.
+4. **Claude** reports the merge commits and suggests deleting the merged branches, the split-pr
+   source branch and its backup ref.
+
+**Watch out:**
+- Claude stops at red CI, changes requested, a rebase conflict or a push it didn't make, and never
+  merges the PRs above a stopped one. Fix the PR on its own branch, then run the skill again.
+- It never uses `--admin` or skips required checks. The harness asks before each `gh pr merge`.
+- A repo with a GitHub merge queue already serialises merges: the PRs only go into it in order.
 
 ## Fullstack feature
 

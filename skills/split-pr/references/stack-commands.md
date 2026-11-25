@@ -17,7 +17,6 @@ and `link`. Ask which remote if it isn't obvious.
 | Set a body | `gh pr edit <n> --body-file <file>`, `gh pr edit <n> --title "<title>"` |
 | After a fix in a lower layer | `gh stack rebase` (cascade), then `gh stack push` (`--force-with-lease` per branch, atomic) |
 | Trunk moved | `gh stack sync`: fetch, cascade rebase, push, relink PRs. A conflict restores all branches; resolve with `gh stack rebase`, then `--continue` or `--abort` |
-| Merge | `gh stack merge [<pr>]`: atomic merge of everything up to that PR; `--squash`/`--rebase`/`--merge`. Use `--yes` only when the user asked for no prompt |
 | Existing branches, no local tracking | `gh stack link <b1> <b2> …` (bottom to top) |
 
 `gh stack init` and `add` without `-m`/`-A` create the branch only; the layer's commit is made with
@@ -46,18 +45,4 @@ A fix in layer k after publishing: commit it on `<branch-k>`, then for each bran
 `git checkout <branch-i> && git rebase <branch-(i-1)>` and `git push --force-with-lease origin <branch-i>`.
 Only these new stack branches ever get `--force-with-lease`; never the trunk or the source branch.
 
-Merge, one PR at a time, bottom up, each after its CI is green:
-
-```bash
-gh pr merge <pr-1> --squash
-# the next PR still points at the merged branch: retarget it and replay only its own commits
-git fetch origin
-git rebase --onto origin/<trunk> <branch-1> <branch-2>
-git push --force-with-lease origin <branch-2>
-gh pr edit <pr-2> --base <trunk>
-# wait for CI on <pr-2>, then repeat for the next one
-```
-
-With merge commits instead of squash, `git rebase --onto` is not needed: retarget with
-`gh pr edit --base <trunk>` and the PR shows only its own commits. If the repo deletes merged
-branches automatically, GitHub retargets the next PR itself; rebase it anyway when squashing.
+Merging the stack, in either mode, is `/damkit:merge-stack`.
